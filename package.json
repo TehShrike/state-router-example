@@ -1,0 +1,19 @@
+{
+  "name": "state-router-example",
+  "version": "1.0.0",
+  "description": "Examples of abstract-state-router usage with various templating/rendering libraries",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TehShrike/state-router-example.git"
+  },
+  "author": "TehShrike",
+  "license": "WTFPL",
+  "bugs": {
+    "url": "https://github.com/TehShrike/state-router-example/issues"
+  },
+  "homepage": "https://github.com/TehShrike/state-router-example"
+}
