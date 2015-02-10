@@ -8,6 +8,7 @@ var data = {}  // big ball 'o state
 
 require('./login/login')(stateRouter, data)
 require('./app/app')(stateRouter, data)
+require('./app/about/about')(stateRouter, data)
 
 domready(function() {
 	stateRouter.evaluateCurrentRoute('login')

@@ -11,6 +11,11 @@ module.exports = function(stateRouter, data) {
 			var ractive = context.domApi
 
 			ractive.set('username', context.data.username)
+
+			ractive.on('logout', function() {
+				context.data.username = null
+				stateRouter.go('login')
+			})
 		}
 	})
 }

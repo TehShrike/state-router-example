@@ -3,10 +3,13 @@
 		<div class="navbar-header">
 			<ul class="nav navbar-nav">
 				<li>
-					<a href="#!/whatever">Whatever</a>
+					<a href="{{ makePath('app.todo') }}">Basic todo app</a>
 				</li>
 				<li>
-					<a href="#!/other">Other thing</a>
+					<a href="{{ makePath('app.about') }}">About the state router</a>
+				</li>
+				<li>
+					<a href="{{ makePath('login') }}" on-click="logout">"Log out"</a>
 				</li>
 			</ul>
 		</div>
