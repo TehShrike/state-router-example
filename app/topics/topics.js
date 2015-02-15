@@ -10,6 +10,16 @@ module.exports = function(stateRouter, currentUser) {
  			var ractive = context.domApi
 
  			ractive.set('topics', model.getTopics())
+
+ 			function handleStateChange(toState, toParameters) {
+ 				ractive.set('currentTopicId', toParameters.topicId)
+ 			}
+
+ 			stateRouter.on('stateChangeEnd', handleStateChange)
+
+ 			context.on('destroy', function() {
+ 				stateRouter.removeListeners('stateChangeEnd', handleStateChange)
+ 			})
  		}
 	})
 

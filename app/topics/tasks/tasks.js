@@ -7,11 +7,8 @@ module.exports = function(stateRouter, currentUser) {
 		route: '/:topicId([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
  		template: fs.readFileSync('app/topics/tasks/tasks.html', { encoding: 'utf8' }),
  		activate: function(context) {
- 			console.log('ACTIVATING')
  			var ractive = context.domApi
  			var topicId = context.parameters.topicId
-
- 			console.log('loading', topicId)
 
  			ractive.set('topic', model.getTopic(topicId))
  			ractive.set('tasks', model.getTasks(topicId))
