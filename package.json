@@ -22,9 +22,8 @@
     "vertx": false
   },
   "dependencies": {
+    "array.prototype.findindex": "^1.0.0",
     "domready": "^1.0.7",
-    "level-spaces": "^2.0.0",
-    "promise": "^6.1.0",
     "random-uuid-v4": "0.0.4"
   }
 }

@@ -1,0 +1,14 @@
+<div class="container">
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="list-group">
+				{{#topics}}
+					<a href="{{ makePath('app.topics.tasks', { topicId: id }) }}" class="list-group-item {{currentTopicId == id ? 'active' : ''}}">{{name}}</a>
+				{{/topics}}
+			</div>
+		</div>
+		<div class="col-sm-8">
+			<ui-view></ui-view>
+		</div>
+	</div>
+</div>

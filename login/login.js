@@ -1,16 +1,15 @@
 var fs = require('fs')
 
-module.exports = function(stateRouter, data) {
+module.exports = function(stateRouter, currentUser) {
 	stateRouter.addState({
 		name: 'login',
-		data: data,
 		route: '/login',
 		template: fs.readFileSync('./login/login.html').toString(),
 		activate: function(context) {
 			var ractive = context.domApi
 
 			ractive.on('login', function() {
-				context.data.username = ractive.get('username')
+				currentUser.name = ractive.get('username')
 				stateRouter.go('app')
 			})
 		}

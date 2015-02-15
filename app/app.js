@@ -1,21 +1,41 @@
+require('array.prototype.findindex')
 var fs = require('fs')
 
-module.exports = function(stateRouter, data) {
+module.exports = function(stateRouter, currentUser) {
 	stateRouter.addState({
 		name: 'app',
-		data: data,
 		route: '/app',
+		defaultChild: 'topics',
 		template: fs.readFileSync('./app/app.html').toString(),
-		resolve: require('../require-username'),
+		resolve: function resolve(data, parameters, cb) {
+			if (!currentUser.name) {
+				cb.redirect('login')
+			} else {
+				cb(null, {})
+			}
+		},
 		activate: function(context) {
 			var ractive = context.domApi
 
-			ractive.set('username', context.data.username)
+			ractive.set('username', currentUser.name)
 
 			ractive.on('logout', function() {
-				context.data.username = null
+				currentUser.name = null
 				stateRouter.go('login')
+			})
+
+			function updateCurrentState(state) {
+				ractive.set('current', state.name)
+			}
+
+			stateRouter.on('stateChangeEnd', updateCurrentState)
+
+			context.on('destroy', function() {
+				stateRouter.removeListener('stateChangeEnd', updateCurrentState)
 			})
 		}
 	})
+
+	require('./about/about')(stateRouter, currentUser)
+	require('./topics/topics')(stateRouter, currentUser)
 }
