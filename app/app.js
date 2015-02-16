@@ -23,16 +23,6 @@ module.exports = function(stateRouter, currentUser) {
 				currentUser.name = null
 				stateRouter.go('login')
 			})
-
-			function updateCurrentState(state) {
-				ractive.set('current', state.name)
-			}
-
-			stateRouter.on('stateChangeEnd', updateCurrentState)
-
-			context.on('destroy', function() {
-				stateRouter.removeListener('stateChangeEnd', updateCurrentState)
-			})
 		}
 	})
 

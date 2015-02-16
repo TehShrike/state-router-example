@@ -1,1 +1,35 @@
-Current topic is {{topic.name}}
+<h1>{{topic.name}}</h1>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>
+				Task name
+			</th>
+			<th style="width: 100px">
+				Complete
+			</th>
+			<th style="width: 87px">
+				Remove
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{#tasks}}
+			<tr>
+				<td>
+					{{name}}
+				</td>
+				<td>
+					<button class="btn btn-primary">Complete</button>
+				</td>
+				<td>
+					<button class="btn btn-danger">
+						Remove
+					</button>
+				</td>
+			</tr>
+		{{/tasks}}
+	</tbody>
+</table>
+

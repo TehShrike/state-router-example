@@ -77,7 +77,11 @@ function removeTopic(topicId) {
 }
 
 function getTasks(topicId) {
-	return tasks[topicId] || []
+	if (topicId) {
+		return tasks[topicId] || []
+	} else {
+		return tasks
+	}
 }
 
 function saveTasks(topicId) {

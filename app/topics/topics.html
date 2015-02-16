@@ -3,7 +3,11 @@
 		<div class="col-sm-4">
 			<div class="list-group">
 				{{#topics}}
-					<a href="{{ makePath('app.topics.tasks', { topicId: id }) }}" class="list-group-item {{currentTopicId == id ? 'active' : ''}}">{{name}}</a>
+					<a href="{{ makePath('app.topics.tasks', { topicId: id }) }}"
+					class="list-group-item"
+					decorator="active:'app.topics.tasks','topicId:{{id}}'">
+						{{name}} <span class="badge">{{tasks[id].length}}</span>
+					</a>
 				{{/topics}}
 			</div>
 		</div>

@@ -1,10 +1,12 @@
 var model = require('../../model.js')
 var fs = require('fs')
 
+var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+
 module.exports = function(stateRouter, currentUser) {
 	stateRouter.addState({
 		name: 'app.topics.tasks',
-		route: '/:topicId([a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12})',
+		route: '/:topicId(' + UUID_V4_REGEX + ')',
  		template: fs.readFileSync('app/topics/tasks/tasks.html', { encoding: 'utf8' }),
  		activate: function(context) {
  			var ractive = context.domApi

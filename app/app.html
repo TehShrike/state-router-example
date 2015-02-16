@@ -2,14 +2,17 @@
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<ul class="nav navbar-nav">
-				<li class="{{ current == 'app.topics' ? 'active' : '' }}">
-					<a href="{{ makePath('app.topics') }}">Basic todo app</a>
+				<li decorator="active:app.topics">
+					<a href="{{ makePath('app.topics') }}">Basic todo app!</a>
 				</li>
-				<li class="{{ current == 'app.about' ? 'active' : '' }}">
+				<li decorator="active:app.about">
 					<a href="{{ makePath('app.about') }}">About the state router</a>
 				</li>
 				<li>
 					<a href="{{ makePath('login') }}" on-click="logout">"Log out"</a>
+				</li>
+				<li>
+					{{currentStateName}}
 				</li>
 			</ul>
 		</div>
