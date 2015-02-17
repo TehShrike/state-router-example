@@ -9,11 +9,27 @@ module.exports = function(stateRouter) {
  		activate: function(context) {
  			var ractive = context.domApi
 
+ 			function recalculateTasksLeftToDoInTopic(topicId) {
+ 				var tasks = model.getTasks(topicId)
+
+ 				var leftToDo =  tasks.reduce(function(toDo, task) {
+ 					return toDo + (task.done ? 0 : 1)
+ 				}, 0)
+
+ 				ractive.set('tasksUndone.' + topicId, leftToDo)
+ 			}
+
+ 			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
+
  			ractive.set({
  				topics: model.getTopics(),
- 				tasks: model.getTasks()
+ 				tasks: model.getTasks(),
+ 				tasksUndone: {}
  			})
 
+ 			ractive.data.topics.forEach(function(topic) {
+ 				recalculateTasksLeftToDoInTopic(topic.id)
+ 			})
  		}
 	})
 

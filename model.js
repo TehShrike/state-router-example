@@ -1,20 +1,23 @@
 var uuid4 = require('random-uuid-v4')
+var EventEmitter = require('events').EventEmitter
 
 var topics = []
 var tasks = {}
 var currentUser = {}
 
-module.exports = {
-	getTopics: getTopics,
-	getTopic: getTopic,
-	addTopic: addTopic,
-	removeTopic: removeTopic,
-	getTasks: getTasks,
-	saveTasks: saveTasks,
-	saveTopics: saveTopics,
-	getCurrentUser: getCurrentUser,
-	saveCurrentUser: saveCurrentUser
-}
+var emitter = new EventEmitter()
+
+module.exports = emitter
+
+emitter.getTopics = getTopics
+emitter.getTopic = getTopic
+emitter.addTopic = addTopic
+emitter.removeTopic = removeTopic
+emitter.getTasks = getTasks
+emitter.saveTasks = saveTasks
+emitter.saveTopics = saveTopics
+emitter.getCurrentUser = getCurrentUser
+emitter.saveCurrentUser = saveCurrentUser
 
 function getTopics() {
 	return topics
@@ -65,6 +68,7 @@ function saveTasks(topicId) {
 		process.nextTick(function() {
 			localStorage.setItem(topicId, JSON.stringify(tasks[topicId]))
 		})
+		emitter.emit('tasks saved', topicId)
 	} else {
 		topics.forEach(function(topic) {
 			saveTasks(topic.id)
@@ -76,6 +80,7 @@ function saveTopics() {
 	process.nextTick(function() {
 		localStorage.setItem('topics', JSON.stringify(topics))
 	})
+	emitter.emit('topics saved')
 }
 
 function getCurrentUser() {
