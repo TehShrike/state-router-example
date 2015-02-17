@@ -1,34 +1,8 @@
 var uuid4 = require('random-uuid-v4')
 
-var topics = [{
-	name: 'Important stuff',
-	id: uuid4()
-}, {
-	name: 'Not as important',
-	id: uuid4()
-}]
-
+var topics = []
 var tasks = {}
-
-tasks[topics[0].id] = [{
-	name: 'Put on pants',
-	done: false
-}, {
-	name: 'Visit chat room to see if you still pass the Turing test',
-	done: false
-}]
-
-tasks[topics[1].id] = [{
-	name: 'Make cupcakes',
-	done: false
-}, {
-	name: 'Eat cupcakes',
-	done: false
-}, {
-	name: 'Write forum post rant about how chocolate cupcakes are the only good kind of cupcake',
-	done: false
-}]
-
+var currentUser = {}
 
 module.exports = {
 	getTopics: getTopics,
@@ -37,7 +11,9 @@ module.exports = {
 	removeTopic: removeTopic,
 	getTasks: getTasks,
 	saveTasks: saveTasks,
-	saveTopics: saveTopics
+	saveTopics: saveTopics,
+	getCurrentUser: getCurrentUser,
+	saveCurrentUser: saveCurrentUser
 }
 
 function getTopics() {
@@ -85,9 +61,15 @@ function getTasks(topicId) {
 }
 
 function saveTasks(topicId) {
-	process.nextTick(function() {
-		localStorage.setItem(topicId, JSON.stringify(tasks[topicId]))
-	})
+	if (topicId) {
+		process.nextTick(function() {
+			localStorage.setItem(topicId, JSON.stringify(tasks[topicId]))
+		})
+	} else {
+		topics.forEach(function(topic) {
+			saveTasks(topic.id)
+		})
+	}
 }
 
 function saveTopics() {
@@ -96,8 +78,25 @@ function saveTopics() {
 	})
 }
 
+function getCurrentUser() {
+	return currentUser
+}
+
+function saveCurrentUser(username) {
+	if (typeof username !== 'undefined') {
+		currentUser.name = username
+	}
+	if (currentUser.name) {
+		localStorage.setItem('currentUserName', currentUser.name)
+	} else {
+		localStorage.removeItem('currentUserName')
+	}
+}
+
 (function initialize() {
 	var topicsJson = localStorage.getItem('topics')
+
+	currentUser.name = localStorage.getItem('currentUserName')
 
 	function loadTasks(topicId) {
 		tasks[topicId] = JSON.parse(localStorage.getItem(topicId))
@@ -114,6 +113,8 @@ function saveTopics() {
 })()
 
 function initializeDummyData() {
+	console.log('Initializing dummy data')
+
 	topics = [{
 		name: 'Important stuff',
 		id: uuid4()
@@ -134,13 +135,16 @@ function initializeDummyData() {
 
 	tasks[topics[1].id] = [{
 		name: 'Make cupcakes',
-		done: false
+		done: true
 	}, {
 		name: 'Eat cupcakes',
-		done: false
+		done: true
 	}, {
 		name: 'Write forum post rant about how chocolate cupcakes are the only good kind of cupcake',
 		done: false
 	}]
+
+	saveTopics()
+	saveTasks()
 }
 

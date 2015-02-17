@@ -1,9 +1,9 @@
-var model = require('../../model.js')
+var model = require('../../../model.js')
 var fs = require('fs')
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
 
-module.exports = function(stateRouter, currentUser) {
+module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
@@ -12,8 +12,27 @@ module.exports = function(stateRouter, currentUser) {
  			var ractive = context.domApi
  			var topicId = context.parameters.topicId
 
- 			ractive.set('topic', model.getTopic(topicId))
- 			ractive.set('tasks', model.getTasks(topicId))
+ 			function task(index) {
+ 				return ractive.data.tasks[index]
+ 			}
+
+  			ractive.complete = function complete(taskIndex) {
+				task(taskIndex).done = true
+				model.saveTasks(topicId)
+ 			}
+ 			ractive.restore = function restore(taskIndex) {
+ 				task(taskIndex).done = false
+ 				model.saveTasks(topicId)
+ 			}
+ 			ractive.remove = function remove(taskIndex) {
+ 				ractive.data.tasks.splice(taskIndex, 1)
+ 				model.saveTasks()
+ 			}
+
+ 			ractive.set({
+ 				topic: model.getTopic(topicId),
+ 				tasks: model.getTasks(topicId)
+ 			})
  		}
 	})
 

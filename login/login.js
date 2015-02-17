@@ -1,6 +1,7 @@
 var fs = require('fs')
+var model = require('../model.js')
 
-module.exports = function(stateRouter, currentUser) {
+module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'login',
 		route: '/login',
@@ -9,8 +10,10 @@ module.exports = function(stateRouter, currentUser) {
 			var ractive = context.domApi
 
 			ractive.on('login', function() {
-				currentUser.name = ractive.get('username')
-				stateRouter.go('app')
+				if (ractive.get('username')) {
+					model.saveCurrentUser(ractive.get('username'))
+					stateRouter.go('app')
+				}
 			})
 		}
 	})

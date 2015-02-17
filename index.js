@@ -6,10 +6,8 @@ var stateRouter = StateRouter(ractiveRenderer({
 	magic: true
 }), 'body')
 
-var currentUser = {}
-
-require('./login/login')(stateRouter, currentUser)
-require('./app/app')(stateRouter, currentUser)
+require('./login/login')(stateRouter)
+require('./app/app')(stateRouter)
 
 domready(function() {
 	stateRouter.evaluateCurrentRoute('login')

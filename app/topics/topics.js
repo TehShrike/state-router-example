@@ -1,6 +1,6 @@
-var model = require('../model.js')
+var model = require('../../model.js')
 
-module.exports = function(stateRouter, currentUser) {
+module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics',
 		route: '/topics',
@@ -9,11 +9,13 @@ module.exports = function(stateRouter, currentUser) {
  		activate: function(context) {
  			var ractive = context.domApi
 
- 			ractive.set('topics', model.getTopics())
- 			ractive.set('tasks', model.getTasks())
+ 			ractive.set({
+ 				topics: model.getTopics(),
+ 				tasks: model.getTasks()
+ 			})
 
  		}
 	})
 
-	require('./tasks/tasks')(stateRouter, currentUser)
+	require('./tasks/tasks')(stateRouter)
 }

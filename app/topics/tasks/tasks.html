@@ -15,16 +15,23 @@
 		</tr>
 	</thead>
 	<tbody>
-		{{#tasks}}
+		{{#tasks:i}}
 			<tr>
-				<td>
-					{{name}}
+				<td class="{{#done}}text-muted{{/}} center-y">
+					<span class="center-y">
+						{{name}} &nbsp;{{#done}}<span class="glyphicon glyphicon-ok text-success"></span>{{/}}
+					</span>
+
 				</td>
 				<td>
-					<button class="btn btn-primary">Complete</button>
+					{{#if done}}
+						<button class="btn btn-primary full-width" on-click="restore(i)">Restore</button>
+					{{else}}
+						<button class="btn btn-success full-width" on-click="complete(i)">Complete</button>
+					{{/if}}
 				</td>
 				<td>
-					<button class="btn btn-danger">
+					<button class="btn btn-danger full-width" on-click="remove(i)">
 						Remove
 					</button>
 				</td>
