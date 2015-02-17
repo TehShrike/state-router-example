@@ -12,21 +12,20 @@ module.exports = function(stateRouter) {
  			var ractive = context.domApi
  			var topicId = context.parameters.topicId
 
- 			function task(index) {
- 				return ractive.data.tasks[index]
+ 			function setTaskDone(index, done) {
+ 				ractive.set('tasks.' + index + '.done', done)
+ 				model.saveTasks(topicId)
  			}
 
   			ractive.complete = function complete(taskIndex) {
-				task(taskIndex).done = true
-				model.saveTasks(topicId)
+  				setTaskDone(taskIndex, true)
  			}
  			ractive.restore = function restore(taskIndex) {
- 				task(taskIndex).done = false
- 				model.saveTasks(topicId)
+ 				setTaskDone(taskIndex, false)
  			}
  			ractive.remove = function remove(taskIndex) {
  				ractive.data.tasks.splice(taskIndex, 1)
- 				model.saveTasks()
+ 				model.saveTasks(topicId)
  			}
 
  			ractive.set({

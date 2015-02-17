@@ -3,7 +3,6 @@ var ractiveRenderer = require('ractive-state-router')
 var domready = require('domready')
 
 var stateRouter = StateRouter(ractiveRenderer({
-	magic: true
 }), 'body')
 
 require('./login/login')(stateRouter)

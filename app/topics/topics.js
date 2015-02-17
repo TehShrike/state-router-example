@@ -30,6 +30,10 @@ module.exports = function(stateRouter) {
  			ractive.data.topics.forEach(function(topic) {
  				recalculateTasksLeftToDoInTopic(topic.id)
  			})
+
+ 			context.on('destroy', function() {
+ 				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
+ 			})
  		}
 	})
 
