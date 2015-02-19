@@ -14,6 +14,7 @@ module.exports = function(stateRouter) {
 					model.saveCurrentUser(ractive.get('username'))
 					stateRouter.go('app')
 				}
+				return false
 			})
 		}
 	})

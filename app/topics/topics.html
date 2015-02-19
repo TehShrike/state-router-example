@@ -10,6 +10,10 @@
 					</a>
 				{{/topics}}
 			</div>
+			<form action="" on-submit="add-topic">
+				<input type="text" class="new-topic-name form-control {{^addingTopic}}hidden{{/addingTopic}}" style="width: 165px;display:inline" placeholder="Topic name" value="{{newTopic}}">
+				<button type="submit" class="btn btn-default pull-right">Add</button>
+			</form>
 		</div>
 		<div class="col-sm-8">
 			<ui-view></ui-view>
