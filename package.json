@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "browserify --ignore vertx -t brfs . -o bundle.js",
-    "watch": "watchify --ignore vertx -t brfs -d . -o bundle.js"
+    "build": "browserify -t brfs . -o bundle.js",
+    "watch": "watchify -t brfs -d . -o bundle.js"
   },
   "repository": {
     "type": "git",
