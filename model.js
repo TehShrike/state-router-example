@@ -18,6 +18,7 @@ emitter.saveTasks = saveTasks
 emitter.saveTopics = saveTopics
 emitter.getCurrentUser = getCurrentUser
 emitter.saveCurrentUser = saveCurrentUser
+emitter.saveTask = saveTask
 
 function getTopics() {
 	return topics
@@ -37,6 +38,9 @@ function addTopic(name) {
 
 	topics.push(topic)
 	tasks[topic.id] = []
+
+	saveTasks(topic.id)
+	saveTopics()
 
 	return topic
 }
@@ -61,6 +65,14 @@ function getTasks(topicId) {
 	} else {
 		return tasks
 	}
+}
+
+function saveTask(topicId, newTaskName) {
+	tasks[topicId].push({
+		name: newTaskName,
+		done: false
+	})
+	saveTasks(topicId)
 }
 
 function saveTasks(topicId) {

@@ -28,10 +28,24 @@ module.exports = function(stateRouter) {
  				model.saveTasks(topicId)
  			}
 
+ 			ractive.on('newTaskKeyup', function(e) {
+ 				var newTaskName = ractive.get('newTaskName')
+ 				if (e.original.keyCode === 13 && newTaskName) {
+ 					createNewTask(newTaskName)
+ 					ractive.set('newTaskName', '')
+ 				}
+ 			})
+
+ 			function createNewTask(taskName) {
+ 				model.saveTask(topicId, taskName)
+ 			}
+
  			ractive.set({
  				topic: model.getTopic(topicId),
  				tasks: model.getTasks(topicId)
  			})
+
+ 			ractive.find('.add-new-task').focus()
  		}
 	})
 

@@ -37,6 +37,11 @@
 				</td>
 			</tr>
 		{{/tasks}}
+		<tr>
+			<td>
+				<input type="text" class="form-control add-new-task" placeholder="New task" value="{{newTaskName}}" on-keyup="newTaskKeyup">
+			</td>
+		</tr>
 	</tbody>
 </table>
 
