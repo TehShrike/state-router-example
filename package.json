@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "browserify -t brfs . -o bundle.js",
-    "watch": "watchify -t brfs -d . -o bundle.js"
+    "build": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js",
+    "prepublish": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js",
+    "watch": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js"
   },
   "repository": {
     "type": "git",

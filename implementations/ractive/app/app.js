@@ -1,13 +1,13 @@
 require('array.prototype.findindex')
 var fs = require('fs')
-var model = require('../model.js')
+var model = require('model.js')
 
 module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app',
 		route: '/app',
 		defaultChild: 'topics',
-		template: fs.readFileSync('./app/app.html').toString(),
+		template: fs.readFileSync('implementations/ractive/app/app.html').toString(),
 		resolve: function resolve(data, parameters, cb) {
 			if (!model.getCurrentUser().name) {
 				cb.redirect('login')

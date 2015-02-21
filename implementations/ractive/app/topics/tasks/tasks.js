@@ -1,4 +1,4 @@
-var model = require('../../../model.js')
+var model = require('model.js')
 var fs = require('fs')
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
@@ -7,7 +7,7 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
- 		template: fs.readFileSync('app/topics/tasks/tasks.html', { encoding: 'utf8' }),
+ 		template: fs.readFileSync('implementations/ractive/app/topics/tasks/tasks.html', { encoding: 'utf8' }),
  		activate: function(context) {
  			var ractive = context.domApi
  			var topicId = context.parameters.topicId
@@ -52,7 +52,7 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.no-task',
 		route: '',
- 		template: fs.readFileSync('app/topics/tasks/no-task-selected.html', { encoding: 'utf8' }),
+ 		template: fs.readFileSync('implementations/ractive/app/topics/tasks/no-task-selected.html', { encoding: 'utf8' }),
  		activate: function(context) {
  			var ractive = context.domApi
 
