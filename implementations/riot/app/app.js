@@ -7,7 +7,7 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app',
 		route: '/app',
-		// defaultChild: 'topics',
+		defaultChild: 'topics',
 		template: 'app',
 		resolve: function resolve(data, parameters, cb) {
 			if (!model.getCurrentUser().name) {
@@ -21,6 +21,9 @@ module.exports = function(stateRouter) {
 		activate: function(context) {
 			var tag = context.domApi
 
+			tag.currentUser = model.getCurrentUser()
+			tag.update()
+
 			tag.on('logout', function() {
 				model.saveCurrentUser(null)
 				stateRouter.go('login')
@@ -28,6 +31,6 @@ module.exports = function(stateRouter) {
 		}
 	})
 
-	// require('./about/about')(stateRouter)
-	// require('./topics/topics')(stateRouter)
+	require('./about/about')(stateRouter)
+	require('./topics/topics')(stateRouter)
 }

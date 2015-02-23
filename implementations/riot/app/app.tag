@@ -4,13 +4,13 @@
 			<div class="navbar-header">
 				<ul class="nav navbar-nav">
 					<li class="{ active('app.topics') }">
-						<a href="{ makePath('app.topics') }">Basic todo app!</a>
+						<a href="{ opts.makePath('app.topics') }">Basic todo app!</a>
 					</li>
 					<li class="{ active('app.about') }">
-						<a href="{ makePath('app.about') }">About the state router</a>
+						<a href="{ opts.makePath('app.about') }">About the state router</a>
 					</li>
 					<li>
-						<a href="{ makePath('login') }" on-click="logout">"Log out"</a>
+						<a href="{ opts.makePath('login') }" on-click="logout">"Log out"</a>
 					</li>
 				</ul>
 			</div>

@@ -1,25 +1,27 @@
 var model = require('model.js')
 
+require('./topics.tag')
+
 module.exports = function(stateRouter) {
+
 	stateRouter.addState({
 		name: 'app.topics',
 		route: '/topics',
 		defaultChild: 'no-task',
- 		template: require('fs').readFileSync('implementations/ractive/app/topics/topics.html', { encoding: 'utf8' }),
+ 		template: 'topics',
  		activate: function(context) {
- 			var ractive = context.domApi
+ 			var tag = context.domApi
  			var topics = model.getTopics()
 
- 			ractive.set({
- 				topics: topics,
- 				tasks: model.getTasks(),
- 				tasksUndone: {},
- 				addingTopic: false
- 			})
+ 			tag.topics = topics
+ 			tag.tasks = model.getTasks()
+ 			tag.tasksUndone = {}
+ 			tag.addingTopic = false
+ 			tag.update()
 
- 			function setFocusOnAddTopicEdit() {
+ 			tag.setFocusOnAddTopicEdit = function() {
  				process.nextTick(function() {
- 					ractive.find('.new-topic-name').focus()
+ 					tag.root.querySelector('.new-topic-name').focus()
  				})
  			}
 
@@ -30,7 +32,8 @@ module.exports = function(stateRouter) {
  					return toDo + (task.done ? 0 : 1)
  				}, 0)
 
- 				ractive.set('tasksUndone.' + topicId, leftToDo)
+ 				tag.tasksUndone[topicId] = leftToDo
+ 				tag.update()
  			}
 
  			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
@@ -39,26 +42,15 @@ module.exports = function(stateRouter) {
  				recalculateTasksLeftToDoInTopic(topic.id)
  			})
 
- 			ractive.on('add-topic', function() {
- 				var addingTopic = ractive.get('addingTopic')
- 				var newTopicName = ractive.get('newTopic')
-
- 				if (addingTopic && newTopicName) {
- 					var newTopic = model.addTopic(newTopicName)
- 					ractive.set('newTopic', '')
- 					model.saveTopics()
- 					recalculateTasksLeftToDoInTopic(newTopic.id)
- 					stateRouter.go('app.topics.tasks', {
- 						topicId: newTopic.id
- 					})
- 				} else if (!addingTopic) {
- 					setFocusOnAddTopicEdit()
- 				}
-
- 				ractive.set('addingTopic', !addingTopic)
-
- 				return false
- 			})
+ 			tag.addTopic = function addTopic(newTopicName) {
+				var newTopic = model.addTopic(newTopicName)
+				tag.set('newTopic', '')
+				model.saveTopics()
+				recalculateTasksLeftToDoInTopic(newTopic.id)
+				stateRouter.go('app.topics.tasks', {
+					topicId: newTopic.id
+				})
+ 			}
 
  			context.on('destroy', function() {
  				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
