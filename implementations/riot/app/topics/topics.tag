@@ -10,7 +10,7 @@
 					</a>
 					</span>
 				</div>
-				<form action="" onsubmit="addTopic">
+				<form action="" onsubmit="{ onAddTopic }">
 					<div class="table">
 						<div class="table-row-group">
 							<div class="table-row">
@@ -33,14 +33,19 @@
 
 	this.addingTopic = false
 
-	addTopic() {
+	onAddTopic() {
 		var newTopicName = this.newTopic.value
 		if (this.addingTopic && newTopicName) {
+			this.newTopic.value = ''
 			this.addTopic(newTopicName)
-		} else {
-			setFocusOnAddTopicEdit()
 		}
+
 		this.addingTopic = !this.addingTopic
+		this.update()
+
+		if (this.addingTopic) {
+			this.setFocusOnAddTopicEdit()
+		}
 
 		return false
 	}

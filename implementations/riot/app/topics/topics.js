@@ -44,7 +44,6 @@ module.exports = function(stateRouter) {
 
  			tag.addTopic = function addTopic(newTopicName) {
 				var newTopic = model.addTopic(newTopicName)
-				tag.set('newTopic', '')
 				model.saveTopics()
 				recalculateTasksLeftToDoInTopic(newTopic.id)
 				stateRouter.go('app.topics.tasks', {
