@@ -1,6 +1,6 @@
 {
   "name": "state-router-example",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "Examples of abstract-state-router usage with various templating/rendering libraries",
   "main": "index.js",
   "scripts": {
