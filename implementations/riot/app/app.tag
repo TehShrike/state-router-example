@@ -3,10 +3,10 @@
 		<div class="container-fluid">
 			<div class="navbar-header">
 				<ul class="nav navbar-nav">
-					<li class="{ active('app.topics') }">
+					<li class="{ active: opts.active('app.topics') }">
 						<a href="{ opts.makePath('app.topics') }">Basic todo app!</a>
 					</li>
-					<li class="{ active('app.about') }">
+					<li class="{ active: opts.active('app.about') }">
 						<a href="{ opts.makePath('app.about') }">About the state router</a>
 					</li>
 					<li>
