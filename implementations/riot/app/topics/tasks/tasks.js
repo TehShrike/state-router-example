@@ -14,32 +14,24 @@ module.exports = function(stateRouter) {
  			var tag = context.domApi
  			var topicId = context.parameters.topicId
 
- 			function setTaskDone(index, done) {
- 				tag.tasks[index].done = done
- 				// ractive.set('tasks.' + index + '.done', done)
+  			tag.complete = function complete(task) {
+  				task.done = true
+  				model.saveTasks(topicId)
+ 			}
+ 			tag.restore = function restore(task) {
+ 				task.done = false
  				model.saveTasks(topicId)
  			}
-
-  			tag.complete = function complete(taskIndex) {
-  				setTaskDone(taskIndex, true)
- 			}
- 			tag.restore = function restore(taskIndex) {
- 				setTaskDone(taskIndex, false)
- 			}
- 			tag.remove = function remove(taskIndex) {
- 				tag.opts.tasks.splice(taskIndex, 1)
+ 			tag.remove = function remove(task) {
+ 				var index = tag.tasks.indexOf(task)
+ 				tag.tasks.splice(index, 1)
  				model.saveTasks(topicId)
  				tag.update()
  			}
 
  			tag.newTask = function(newTaskName) {
-				createNewTask(newTaskName)
-				tag.newTaskName = ''
+				model.saveTask(topicId, newTaskName)
 				tag.update()
- 			}
-
- 			function createNewTask(taskName) {
- 				model.saveTask(topicId, taskName)
  			}
 
  			tag.topic = model.getTopic(topicId)
