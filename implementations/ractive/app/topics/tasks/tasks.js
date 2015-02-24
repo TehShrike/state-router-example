@@ -10,6 +10,12 @@ module.exports = function(stateRouter) {
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
  		template: 'tasks',
+ 		resolve: function(data, parameters, cb) {
+ 			cb(null, {
+ 				topic: model.getTopic(parameters.topicId),
+ 				tasks: model.getTasks(parameters.topicId)
+ 			})
+ 		},
  		activate: function(context) {
  			var ractive = context.domApi
  			var topicId = context.parameters.topicId
@@ -41,11 +47,6 @@ module.exports = function(stateRouter) {
  			function createNewTask(taskName) {
  				model.saveTask(topicId, taskName)
  			}
-
- 			ractive.set({
- 				topic: model.getTopic(topicId),
- 				tasks: model.getTasks(topicId)
- 			})
 
  			ractive.find('.add-new-task').focus()
  		}

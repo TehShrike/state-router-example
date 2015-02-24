@@ -6,13 +6,16 @@ module.exports = function(stateRouter) {
 		route: '/topics',
 		defaultChild: 'no-task',
  		template: require('fs').readFileSync('implementations/ractive/app/topics/topics.html', { encoding: 'utf8' }),
+ 		resolve: function(data, parameters, cb) {
+ 			cb(null, {
+ 				topics: model.getTopics(),
+ 				tasks: model.getTasks()
+ 			})
+ 		},
  		activate: function(context) {
  			var ractive = context.domApi
- 			var topics = model.getTopics()
 
  			ractive.set({
- 				topics: topics,
- 				tasks: model.getTasks(),
  				tasksUndone: {},
  				addingTopic: false
  			})
@@ -35,7 +38,7 @@ module.exports = function(stateRouter) {
 
  			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
 
- 			topics.forEach(function(topic) {
+ 			context.content.topics.forEach(function(topic) {
  				recalculateTasksLeftToDoInTopic(topic.id)
  			})
 
