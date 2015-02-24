@@ -6,7 +6,7 @@
 					<span each="{ opts.topics }">
 					<a href="{ parent.opts.makePath('app.topics.tasks', 'topicId', id) }"
 							class="list-group-item">
-						{name} <span class="badge">{ tasksUndone[id] }</span>
+						{name} <span class="badge">{ parent.opts.tasksUndone[id] }</span>
 					</a>
 					</span>
 				</div>
