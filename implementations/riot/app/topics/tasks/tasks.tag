@@ -1,5 +1,5 @@
 <tasks>
-	<h1>{topic.name}</h1>
+	<h1>{opts.topic.name}</h1>
 
 	<table class="table table-striped">
 		<thead>
@@ -16,7 +16,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr each="{ tasks }">
+			<tr each="{ opts.tasks }">
 				<!-- {#done}text-muted{/} -->
 				<td class=" center-y">
 					<span class="center-y">

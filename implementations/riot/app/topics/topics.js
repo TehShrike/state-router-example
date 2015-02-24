@@ -9,14 +9,15 @@ module.exports = function(stateRouter) {
 		route: '/topics',
 		defaultChild: 'no-task',
  		template: 'topics',
+ 		resolve: function(data, parameters, cb) {
+ 			cb(null, {
+ 				topics: model.getTopics()
+ 			})
+ 		},
  		activate: function(context) {
  			var tag = context.domApi
- 			var topics = model.getTopics()
 
- 			tag.topics = topics
- 			tag.tasks = model.getTasks()
- 			tag.tasksUndone = {}
- 			tag.addingTopic = false
+ 			tag.opts.tasksUndone = {}
  			tag.update()
 
  			tag.setFocusOnAddTopicEdit = function() {
@@ -32,13 +33,13 @@ module.exports = function(stateRouter) {
  					return toDo + (task.done ? 0 : 1)
  				}, 0)
 
- 				tag.tasksUndone[topicId] = leftToDo
+ 				tag.opts.tasksUndone[topicId] = leftToDo
  				tag.update()
  			}
 
  			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
 
- 			topics.forEach(function(topic) {
+ 			tag.opts.topics.forEach(function(topic) {
  				recalculateTasksLeftToDoInTopic(topic.id)
  			})
 

@@ -10,6 +10,12 @@ module.exports = function(stateRouter) {
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
  		template: 'tasks',
+ 		resolve: function(data, parameters, cb) {
+ 			cb(null, {
+ 				topic: model.getTopic(parameters.topicId),
+ 				tasks: model.getTasks(parameters.topicId)
+ 			})
+ 		},
  		activate: function(context) {
  			var tag = context.domApi
  			var topicId = context.parameters.topicId
@@ -23,8 +29,8 @@ module.exports = function(stateRouter) {
  				model.saveTasks(topicId)
  			}
  			tag.remove = function remove(task) {
- 				var index = tag.tasks.indexOf(task)
- 				tag.tasks.splice(index, 1)
+ 				var index = tag.opts.tasks.indexOf(task)
+ 				tag.opts.tasks.splice(index, 1)
  				model.saveTasks(topicId)
  				tag.update()
  			}
@@ -34,8 +40,6 @@ module.exports = function(stateRouter) {
 				tag.update()
  			}
 
- 			tag.topic = model.getTopic(topicId)
- 			tag.tasks = model.getTasks(topicId)
  			tag.update()
 
  			tag.root.querySelector('.add-new-task').focus()
