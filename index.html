@@ -2,24 +2,107 @@
 	<head>
 		<title>State router examples</title>
 		<link href="styles/bootstrap.min.css" rel="stylesheet">
+		<style>
+			p {
+				font-size: larger;
+			}
+		</style>
 	</head>
 	<body>
 		<div class="container">
 			<div class="row">
-				<div class="col-sm-offset-1 col-sm-10">
+				<div class="col-sm-offset-2 col-sm-8">
 					<div class="page-header">
-						<h1>Example todo apps with different rendering engines</h1>
+						<h1><a href="https://github.com/TehShrike/abstract-state-router">abstract-state-router</a> examples</h1>
 					</div>
+					<p class="lead">
+						Example todo apps made with different rendering engines.
+					</p>
+				</div>
+				<div class="col-sm-offset-3 col-sm-5">
+					<p>
+						If you've written any kind of single-page app, you've probably worked with a client-side routing library - you give it different route strings, like /home and /about and maybe /post/:postId, and when one of those routes is visited the routing library calls the right function.
+					</p>
+					<p>
+						Or maybe if you use AngularJS, you've been lucky enough to use <a href="https://github.com/angular-ui/ui-router">ui-router</a>.  ui-router lets you nest multiple "states", so that the URL can change and show you content, but without you having to reload the whole page.
+					</p>
+					<p>
+						If you can't picture it, just visit one of the implementations below - note how in the todo app, when you click on the different topics, the list of tasks changes - but nothing else in the app has to reload.
+					</p>
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-offset-4 col-sm-4">
-					<ul>
-						<li><a href="./implementations/ractive/index.html">RactiveJS implementation</a></li>
-					</ul>
-					<ul>
-						<li><a href="./implementations/riot/index.html">Riot implementation</a></li>
-					</ul>
+				<div class="col-sm-offset-2 col-sm-8">
+					<h2>These example todo apps</h2>
+				</div>
+				<div class="col-sm-offset-3 col-sm-5">
+					<p>
+						You can read the docs over <a href="https://github.com/TehShrike/abstract-state-router">on Github</a>, but this site is here to serve as a proof of concept (you really can use a state router what whatever templating library you want!) and give people some code to copy/paste.
+					</p>
+					<p>
+						These examples use node-style require() calls made possible in the browser with <a href="https://github.com/substack/node-browserify">Browserify</a>.
+					</p>
+				</div>
+				<div class="col-sm-offset-2 col-sm-8">
+					<hr/>
+					<h3>Made with Ractive.js</h3>
+				</div>
+				<div class="col-sm-offset-3 col-sm-5">
+					<p>
+						<a href="http://www.ractivejs.org/">Ractive.js</a> is my favorite templating/DOM manipulation library at the moment.  A simple API that lets you interact with live content in the DOM and gives you the ability to write custom extensions your webapp will need, but gets out of your way for everything else.
+					</p>
+				</div>
+				<div class="col-sm-offset-2 col-sm-8">
+					<p>
+						<small>
+							<strong><a href="./implementations/ractive/index.html">View the todo app</a></strong> | <a href="https://github.com/TehShrike/state-router-example/tree/master/implementations/ractive">Source code</a> of the app | <a href="https://www.npmjs.com/package/ractive-state-router">Write your own app</a> using Ractive.js with the abstract-state-router
+						</small>
+					</p>
+				</div>
+
+				<div class="col-sm-offset-2 col-sm-8">
+					<hr/>
+					<h3>Made with Riot</h3>
+				</div>
+				<div class="col-sm-offset-3 col-sm-5">
+					<p>
+						<a href="https://muut.com/riotjs/">Riot</a> sells itself with its small code footprint, and even more attractive, its small API that lets you write self-contained tags that you can use on any web page.
+					</p>
+				</div>
+				<div class="col-sm-offset-2 col-sm-8">
+					<p>
+						<small>
+							<strong><a href="./implementations/riot/index.html">View the todo app</a></strong> | <a href="https://github.com/TehShrike/state-router-example/tree/master/implementations/riot">Source code</a> of the app | <a href="https://www.npmjs.com/package/riot-state-renderer">Write your own app</a> using Riot with the abstract-state-router
+						</small>
+					</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-sm-offset-2 col-sm-8">
+					<hr/>
+					<h2>Want to use a different templating/dom manipulation library?</h2>
+				</div>
+				<div class="col-sm-offset-3 col-sm-5">
+					<p>
+						Do it!  That's the point of the state router being abstract - you get powerful routing with whatever templating setup you prefer.
+					</p>
+					<p>
+						The easiest way to start is probably to fork <a href="https://github.com/TehShrike/state-router-example">this example repo</a> and make a new copy of either the riot/ractive folder, and then to copy either the <a href="https://github.com/TehShrike/riot-state-renderer">Riot renderer</a> or the <a href="https://github.com/TehShrike/ractive-state-router">Ractive renderer</a> and overwrite the methods with whatever makes sense for your dom manipulation shenanigans.
+					</p>
+				</div>
+				<div class="col-sm-offset-2 col-sm-8">
+					<h2>I will help you</h2>
+				</div>
+				<div class="col-sm-offset-3 col-sm-5">
+					<p>
+						I would love to help other people get their favorite front-end libraries working with the state router.  Feel free to open a <a href="https://github.com/TehShrike/abstract-state-router/issues">Github request</a> with any questions, or even just <a href="https://twitter.com/TehShrike">ping me on Twitter</a>.
+					</p>
+					<p>
+						If you're new to Browserify, I can help you get set up.  If you don't want to touch Browserify and would like to help <a href="https://github.com/umdjs/umd">umd</a>-ify the abstract-state-router, I'm open to pull requests - I just don't have any motivation to support non-browserify environments until someone comes along and asks for it.
+					</p>
+					<p>
+						I'm planning on using the abstract-state-router for my own webapps going forward, but I would be happy to help other people use it.  Ask me if you have any questions.
+					</p>
 				</div>
 			</div>
 		</div>
