@@ -3,12 +3,10 @@
 		<div class="row">
 			<div class="col-sm-4">
 				<div class="list-group">
-					<span each="{ opts.topics }">
-					<a href="{ parent.opts.makePath('app.topics.tasks', 'topicId', id) }"
+					<a each="{ opts.topics }" href="{ parent.opts.makePath('app.topics.tasks', 'topicId', id) }"
 							class="list-group-item { parent.opts.active('app.topics.tasks', 'topicId', id) ? 'active' : '' }">
 						{name} <span class="badge">{ parent.opts.tasksUndone[id] }</span>
 					</a>
-					</span>
 				</div>
 				<form action="" onsubmit="{ onAddTopic }">
 					<div class="table">
