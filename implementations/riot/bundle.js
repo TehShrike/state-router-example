@@ -169,7 +169,7 @@ function initializeDummyData() {
 
 
 }).call(this,require('_process'))
-},{"_process":50,"events":49,"random-uuid-v4":45}],2:[function(require,module,exports){
+},{"_process":46,"events":45,"random-uuid-v4":41}],2:[function(require,module,exports){
 require('./about.tag')
 
 module.exports = function(stateRouter) {
@@ -187,7 +187,7 @@ riot.tag('about', '<div class="container"> <div class="row"> <div class="col-sm-
 
 });
 
-},{"riot":48}],4:[function(require,module,exports){
+},{"riot":44}],4:[function(require,module,exports){
 require('array.prototype.findindex')
 var model = require('model.js')
 
@@ -225,18 +225,18 @@ module.exports = function(stateRouter) {
 	require('./topics/topics')(stateRouter)
 }
 
-},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":43,"model.js":1}],5:[function(require,module,exports){
+},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":39,"model.js":1}],5:[function(require,module,exports){
 var riot = require('riot');
 riot.tag('app', '<nav class="navbar navbar-default"> <div class="container-fluid"> <div class="navbar-header"> <ul class="nav navbar-nav"> <li class="{ active: opts.active(\'app.topics\') }"> <a href="{ opts.makePath(\'app.topics\') }">Basic todo app!</a> </li> <li class="{ active: opts.active(\'app.about\') }"> <a href="{ opts.makePath(\'app.about\') }">About the state router</a> </li> <li> <a href="{ opts.makePath(\'login\') }" on-click="logout">"Log out"</a> </li> </ul> </div> <div class="nav navbar-right"> <p class="navbar-text"> Logged in as { currentUser.name } </p> </div> </div> </nav> <ui-view></ui-view>', function(opts) {
 
 });
-},{"riot":48}],6:[function(require,module,exports){
+},{"riot":44}],6:[function(require,module,exports){
 var riot = require('riot');
 riot.tag('no-task-selected', '<span> <p> This is a very basic todo app to show off route states. </p> <p> Click on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing! </p> </span>', function(opts) {
 
 });
 
-},{"riot":48}],7:[function(require,module,exports){
+},{"riot":44}],7:[function(require,module,exports){
 var model = require('model.js')
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
@@ -321,7 +321,7 @@ riot.tag('tasks', '<h1>{opts.topic.name}</h1> <table class="table table-striped"
 
 });
 
-},{"riot":48}],9:[function(require,module,exports){
+},{"riot":44}],9:[function(require,module,exports){
 (function (process){
 var model = require('model.js')
 
@@ -387,7 +387,7 @@ module.exports = function(stateRouter) {
 }
 
 }).call(this,require('_process'))
-},{"./tasks/tasks":7,"./topics.tag":10,"_process":50,"model.js":1}],10:[function(require,module,exports){
+},{"./tasks/tasks":7,"./topics.tag":10,"_process":46,"model.js":1}],10:[function(require,module,exports){
 var riot = require('riot');
 riot.tag('topics', '<div class="container"> <div class="row"> <div class="col-sm-4"> <div class="list-group"> <span each="{ opts.topics }"> <a href="{ parent.opts.makePath(\'app.topics.tasks\', \'topicId\', id) }" class="list-group-item { parent.opts.active(\'app.topics.tasks\', \'topicId\', id) ? \'active\' : \'\' }"> {name} <span class="badge">{ parent.opts.tasksUndone[id] }</span> </a> </span> </div> <form action="" onsubmit="{ onAddTopic }"> <div class="table"> <div class="table-row-group"> <div class="table-row"> <div class="table-cell"> <input if="{ opts.addingTopic }" type="text" class="new-topic-name form-control" placeholder="Topic name" name="newTopic"> </div> <div class="table-cell" style="width: 60px; vertical-align: top"> <button type="submit" class="btn btn-default pull-right">Add</button> </div> </div> </div> </div> </form> </div> <div class="col-sm-8"> <ui-view></ui-view> </div> </div> </div>', function(opts) {
 
@@ -412,7 +412,7 @@ riot.tag('topics', '<div class="container"> <div class="row"> <div class="col-sm
 
 });
 
-},{"riot":48}],11:[function(require,module,exports){
+},{"riot":44}],11:[function(require,module,exports){
 var StateRouter = require('abstract-state-router')
 var riotRenderer = require('riot-state-renderer')
 var domready = require('domready')
@@ -426,7 +426,7 @@ domready(function() {
 	stateRouter.evaluateCurrentRoute('login')
 })
 
-},{"./app/app":4,"./login/login":12,"abstract-state-router":15,"domready":44,"riot-state-renderer":46}],12:[function(require,module,exports){
+},{"./app/app":4,"./login/login":12,"abstract-state-router":15,"domready":40,"riot-state-renderer":42}],12:[function(require,module,exports){
 var model = require('model.js')
 
 require('./login.tag')
@@ -461,7 +461,7 @@ riot.tag('login', '<div class="container-fluid"> <div class="row"> <div class="c
 
 });
 
-},{"riot":48}],14:[function(require,module,exports){
+},{"riot":44}],14:[function(require,module,exports){
 module.exports = function CurrentState() {
 	var current = null
 
@@ -815,7 +815,7 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./current-state":14,"./state-change-logic":38,"./state-comparison":39,"./state-state":40,"./state-string-parser":41,"./state-transition-manager":42,"_process":50,"combine-arrays":16,"events":49,"extend":17,"hash-brown-router":19,"page-path-builder":24,"promise":32,"promise-map-series":30}],16:[function(require,module,exports){
+},{"./current-state":14,"./state-change-logic":34,"./state-comparison":35,"./state-state":36,"./state-string-parser":37,"./state-transition-manager":38,"_process":46,"combine-arrays":16,"events":45,"extend":17,"hash-brown-router":19,"page-path-builder":22,"promise":28,"promise-map-series":26}],16:[function(require,module,exports){
 module.exports = function(obj) {
 	var keys = Object.keys(obj)
 
@@ -965,7 +965,7 @@ function removeHashFromPath(path) {
 	return (path && path[0] === '#') ? path.substr(1) : path
 }
 
-},{"events":49}],19:[function(require,module,exports){
+},{"events":45}],19:[function(require,module,exports){
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
 var qs = require('querystring')
 var xtend = require('xtend')
@@ -1055,7 +1055,7 @@ function setDefault(routes, defaultFn) {
 }
 
 
-},{"./hash-location.js":18,"array.prototype.find":20,"path-to-regexp-with-reversible-keys":21,"querystring":53,"xtend":23}],20:[function(require,module,exports){
+},{"./hash-location.js":18,"array.prototype.find":20,"path-to-regexp-with-reversible-keys":24,"querystring":49,"xtend":21}],20:[function(require,module,exports){
 // Array.prototype.find - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: https://github.com/paulmillr/array.prototype.find
 // Fixes and tests supplied by Duncan Hall <http://duncanhall.net> 
@@ -1091,6 +1091,103 @@ function setDefault(routes, defaultFn) {
 })(this);
 
 },{}],21:[function(require,module,exports){
+module.exports = extend
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
+
+},{}],22:[function(require,module,exports){
+var parser = require('./path-parser')
+var stringifyQuerystring = require('querystring').stringify
+
+module.exports = function(pathStr, parameters) {
+
+	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
+	var allTokens = parsed.allTokens
+	var regex = parsed.regex
+
+	if (parameters) {
+		var path = allTokens.map(function(bit) {
+			if (bit.string) {
+				return bit.string
+			}
+
+			if (!bit.optional && !parameters[bit.name]) {
+				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
+			}
+
+			return parameters[bit.name] ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
+		}).join('')
+
+		if (!regex.test(path)) {
+			throw new Error('Provided arguments do not match the original arguments')
+		}
+
+		return buildPathWithQuerystring(path, parameters, allTokens)
+	} else {
+		return parsed
+	}
+}
+
+function buildPathWithQuerystring(path, parameters, tokenArray) {
+	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
+
+	if (Object.keys(parametersInQuerystring).length === 0) {
+		return path
+	}
+
+	return path + '?' + stringifyQuerystring(parametersInQuerystring)
+}
+
+function getParametersWithoutMatchingToken(parameters, tokenArray) {
+	var tokenHash = tokenArray.reduce(function(memo, bit) {
+		if (!bit.string) {
+			memo[bit.name] = bit
+		}
+		return memo
+	}, {})
+
+	return Object.keys(parameters).filter(function(param) {
+		return !tokenHash[param]
+	}).reduce(function(newParameters, param) {
+		newParameters[param] = parameters[param]
+		return newParameters
+	}, {})
+}
+
+},{"./path-parser":23,"querystring":49}],23:[function(require,module,exports){
+// This file to be replaced with an official implementation maintained by
+// the page.js crew if and when that becomes an option
+
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+
+module.exports = function(pathString) {
+	var parseResults = pathToRegexp(pathString)
+
+	// The only reason I'm returning a new object instead of the results of the pathToRegexp
+	// function is so that if the official implementation ends up returning an
+	// allTokens-style array via some other mechanism, I may be able to change this file
+	// without having to change the rest of the module in index.js
+	return {
+		regex: parseResults,
+		allTokens: parseResults.allTokens
+	}
+}
+
+},{"path-to-regexp-with-reversible-keys":24}],24:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -1322,117 +1419,12 @@ function pathToRegexp (path, keys, options, allTokens) {
   return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
 }
 
-},{"isarray":22}],22:[function(require,module,exports){
+},{"isarray":25}],25:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],23:[function(require,module,exports){
-module.exports = extend
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        for (var key in source) {
-            if (source.hasOwnProperty(key)) {
-                target[key] = source[key]
-            }
-        }
-    }
-
-    return target
-}
-
-},{}],24:[function(require,module,exports){
-var parser = require('./path-parser')
-var stringifyQuerystring = require('querystring').stringify
-
-module.exports = function(pathStr, parameters) {
-
-	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
-	var allTokens = parsed.allTokens
-	var regex = parsed.regex
-
-	if (parameters) {
-		var path = allTokens.map(function(bit) {
-			if (bit.string) {
-				return bit.string
-			}
-
-			if (!bit.optional && !parameters[bit.name]) {
-				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
-			}
-
-			return parameters[bit.name] ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
-		}).join('')
-
-		if (!regex.test(path)) {
-			throw new Error('Provided arguments do not match the original arguments')
-		}
-
-		return buildPathWithQuerystring(path, parameters, allTokens)
-	} else {
-		return parsed
-	}
-}
-
-function buildPathWithQuerystring(path, parameters, tokenArray) {
-	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
-
-	if (Object.keys(parametersInQuerystring).length === 0) {
-		return path
-	}
-
-	return path + '?' + stringifyQuerystring(parametersInQuerystring)
-}
-
-function getParametersWithoutMatchingToken(parameters, tokenArray) {
-	var tokenHash = tokenArray.reduce(function(memo, bit) {
-		if (!bit.string) {
-			memo[bit.name] = bit
-		}
-		return memo
-	}, {})
-
-	return Object.keys(parameters).filter(function(param) {
-		return !tokenHash[param]
-	}).reduce(function(newParameters, param) {
-		newParameters[param] = parameters[param]
-		return newParameters
-	}, {})
-}
-
-},{"./path-parser":27,"querystring":53}],25:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"dup":21,"isarray":26}],26:[function(require,module,exports){
-arguments[4][22][0].apply(exports,arguments)
-},{"dup":22}],27:[function(require,module,exports){
-// This file to be replaced with an official implementation maintained by
-// the page.js crew if and when that becomes an option
-
-var pathToRegexp = require('path-to-regexp-with-reversible-keys')
-
-module.exports = function(pathString) {
-	var parseResults = pathToRegexp(pathString)
-
-	// The only reason I'm returning a new object instead of the results of the pathToRegexp
-	// function is so that if the official implementation ends up returning an
-	// allTokens-style array via some other mechanism, I may be able to change this file
-	// without having to change the rest of the module in index.js
-	return {
-		regex: parseResults,
-		allTokens: parseResults.allTokens
-	}
-}
-
-},{"path-to-regexp-with-reversible-keys":25}],28:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"dup":21,"isarray":29}],29:[function(require,module,exports){
-arguments[4][22][0].apply(exports,arguments)
-},{"dup":22}],30:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var Promise = require('rsvp').Promise;
 
 module.exports = function sequence(array, iterator, thisArg) {
@@ -1450,7 +1442,7 @@ module.exports = function sequence(array, iterator, thisArg) {
   return Promise.all(results)
 }
 
-},{"rsvp":31}],31:[function(require,module,exports){
+},{"rsvp":27}],27:[function(require,module,exports){
 (function (process){
 /*!
  * @overview RSVP - a tiny implementation of Promises/A+.
@@ -3125,14 +3117,14 @@ module.exports = function sequence(array, iterator, thisArg) {
 
 
 }).call(this,require('_process'))
-},{"_process":50}],32:[function(require,module,exports){
+},{"_process":46}],28:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/core.js')
 require('./lib/done.js')
 require('./lib/es6-extensions.js')
 require('./lib/node-extensions.js')
-},{"./lib/core.js":33,"./lib/done.js":34,"./lib/es6-extensions.js":35,"./lib/node-extensions.js":36}],33:[function(require,module,exports){
+},{"./lib/core.js":29,"./lib/done.js":30,"./lib/es6-extensions.js":31,"./lib/node-extensions.js":32}],29:[function(require,module,exports){
 'use strict';
 
 var asap = require('asap')
@@ -3239,7 +3231,7 @@ function doResolve(fn, onFulfilled, onRejected) {
   }
 }
 
-},{"asap":37}],34:[function(require,module,exports){
+},{"asap":33}],30:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./core.js')
@@ -3254,7 +3246,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
     })
   })
 }
-},{"./core.js":33,"asap":37}],35:[function(require,module,exports){
+},{"./core.js":29,"asap":33}],31:[function(require,module,exports){
 'use strict';
 
 //This file contains the ES6 extensions to the core Promises/A+ API
@@ -3364,7 +3356,7 @@ Promise.prototype['catch'] = function (onRejected) {
   return this.then(null, onRejected);
 }
 
-},{"./core.js":33,"asap":37}],36:[function(require,module,exports){
+},{"./core.js":29,"asap":33}],32:[function(require,module,exports){
 'use strict';
 
 //This file contains then/promise specific extensions that are only useful for node.js interop
@@ -3429,7 +3421,7 @@ Promise.prototype.nodeify = function (callback, ctx) {
   })
 }
 
-},{"./core.js":33,"asap":37}],37:[function(require,module,exports){
+},{"./core.js":29,"asap":33}],33:[function(require,module,exports){
 (function (process){
 
 // Use the fastest possible means to execute a task in a future turn
@@ -3546,7 +3538,7 @@ module.exports = asap;
 
 
 }).call(this,require('_process'))
-},{"_process":50}],38:[function(require,module,exports){
+},{"_process":46}],34:[function(require,module,exports){
 module.exports = function stateChangeLogic(stateComparisonResults) {
 	var hitChangingState = false
 	var hitDestroyedState = false
@@ -3577,7 +3569,7 @@ module.exports = function stateChangeLogic(stateComparisonResults) {
 	return output
 }
 
-},{}],39:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var combine = require('combine-arrays')
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
@@ -3634,7 +3626,7 @@ function stateComparison(parametersChanged, originalState, originalParameters, n
 	})
 }
 
-},{"./state-string-parser":41,"combine-arrays":16,"path-to-regexp-with-reversible-keys":28}],40:[function(require,module,exports){
+},{"./state-string-parser":37,"combine-arrays":16,"path-to-regexp-with-reversible-keys":24}],36:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var parse = require('./state-string-parser')
 
@@ -3727,7 +3719,7 @@ module.exports = function StateState() {
 	}
 }
 
-},{"./state-string-parser":41}],41:[function(require,module,exports){
+},{"./state-string-parser":37}],37:[function(require,module,exports){
 module.exports = function(stateString) {
 	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
 		if (stateNames.length) {
@@ -3738,7 +3730,7 @@ module.exports = function(stateString) {
 	}, [])
 }
 
-},{}],42:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 module.exports = function (emitter) {
 	var currentTransitionAttempt = null
 	var nextTransition = null
@@ -3793,7 +3785,7 @@ module.exports = function (emitter) {
 	}
 }
 
-},{}],43:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 // Array.prototype.findIndex - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: <https://github.com/paulmillr/Array.prototype.findIndex>
 (function (globals) {
@@ -3826,7 +3818,7 @@ module.exports = function (emitter) {
   }
 }(this));
 
-},{}],44:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -3858,7 +3850,7 @@ module.exports = function (emitter) {
 
 });
 
-},{}],45:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  *
  * This function was taken from a stackoverflow answer:
@@ -3881,12 +3873,12 @@ module.exports = function() {
     });
 };
 
-},{}],46:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 var riot = require('riot')
-var extend = require('extend')
+var xtend = require('xtend')
 
 module.exports = function RactiveStateRouter(options) {
-	var defaultOpts = extend({}, options)
+	var defaultOpts = xtend(options)
 
 	return {
 		render: function render(context, cb) {
@@ -3898,7 +3890,7 @@ module.exports = function RactiveStateRouter(options) {
 			}
 
 			try {
-				var tag = riot.mountTo(element, template, extend({}, defaultOpts, content))
+				var tag = riot.mount(element, template, xtend(defaultOpts, content))
 
 				if (!tag) {
 					console.error('Error creating riot tag', template, 'on', element)
@@ -3913,12 +3905,11 @@ module.exports = function RactiveStateRouter(options) {
 			var tag = context.domApi
 
 			tag.trigger('reset')
-			tag.opts = extend({}, defaultOpts, context.content)
+			tag.opts = xtend(defaultOpts, context.content)
 			tag.update()
 			cb()
 		},
 		destroy: function destroy(tag, cb) {
-			makeEmptyCopyAtSameLevel(tag.root) // unmount removes the original element, so we need to recreate it manually
 			tag.unmount()
 			cb()
 		},
@@ -3947,7 +3938,7 @@ module.exports = function RactiveStateRouter(options) {
 // Since I can't figure out how to use object literals in a Riot expressions
 function makeRiotPath() {
 	try {
-		var args = Array.prototype.slice.apply(arguments)
+		var args = Array.prototype.slice.call(arguments)
 		var makePath = args.shift()
 		var stateName = args.shift()
 		var opts = {}
@@ -3960,16 +3951,9 @@ function makeRiotPath() {
 	}
 }
 
-function makeEmptyCopyAtSameLevel(element) {
-	var parent = element.parentNode
-	var elementPrime = element.cloneNode(false)
-	parent.insertBefore(elementPrime, element)
-	return elementPrime
-}
-
-},{"extend":47,"riot":48}],47:[function(require,module,exports){
-arguments[4][17][0].apply(exports,arguments)
-},{"dup":17}],48:[function(require,module,exports){
+},{"riot":44,"xtend":43}],43:[function(require,module,exports){
+arguments[4][21][0].apply(exports,arguments)
+},{"dup":21}],44:[function(require,module,exports){
 /* Riot v2.0.11, @license MIT, (c) 2015 Muut Inc. + contributors */
 
 ;(function() {
@@ -4791,7 +4775,7 @@ riot.mountTo = riot.mount
 
 })();
 
-},{}],49:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5094,7 +5078,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],50:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5153,7 +5137,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],51:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5239,7 +5223,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],52:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5326,10 +5310,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],53:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":51,"./encode":52}]},{},[11]);
+},{"./decode":47,"./encode":48}]},{},[11]);

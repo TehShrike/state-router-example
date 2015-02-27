@@ -169,7 +169,7 @@ function initializeDummyData() {
 
 
 }).call(this,require('_process'))
-},{"_process":47,"events":46,"random-uuid-v4":41}],2:[function(require,module,exports){
+},{"_process":43,"events":42,"random-uuid-v4":37}],2:[function(require,module,exports){
 module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.about',
@@ -215,7 +215,7 @@ module.exports = function(stateRouter) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"./about/about":2,"./topics/topics":5,"array.prototype.findindex":37,"buffer":42,"model.js":1}],4:[function(require,module,exports){
+},{"./about/about":2,"./topics/topics":5,"array.prototype.findindex":33,"buffer":38,"model.js":1}],4:[function(require,module,exports){
 var model = require('model.js')
 
 
@@ -354,7 +354,7 @@ module.exports = function(stateRouter) {
 }
 
 }).call(this,require('_process'))
-},{"./tasks/tasks":4,"_process":47,"model.js":1}],6:[function(require,module,exports){
+},{"./tasks/tasks":4,"_process":43,"model.js":1}],6:[function(require,module,exports){
 var StateRouter = require('abstract-state-router')
 var ractiveRenderer = require('ractive-state-router')
 var domready = require('domready')
@@ -369,7 +369,7 @@ domready(function() {
 	stateRouter.evaluateCurrentRoute('login')
 })
 
-},{"./app/app":3,"./login/login":7,"abstract-state-router":9,"domready":38,"ractive-state-router":40}],7:[function(require,module,exports){
+},{"./app/app":3,"./login/login":7,"abstract-state-router":9,"domready":34,"ractive-state-router":36}],7:[function(require,module,exports){
 (function (Buffer){
 
 var model = require('model.js')
@@ -394,7 +394,7 @@ module.exports = function(stateRouter) {
 }
 
 }).call(this,require("buffer").Buffer)
-},{"buffer":42,"model.js":1}],8:[function(require,module,exports){
+},{"buffer":38,"model.js":1}],8:[function(require,module,exports){
 module.exports = function CurrentState() {
 	var current = null
 
@@ -748,7 +748,7 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./current-state":8,"./state-change-logic":32,"./state-comparison":33,"./state-state":34,"./state-string-parser":35,"./state-transition-manager":36,"_process":47,"combine-arrays":10,"events":46,"extend":11,"hash-brown-router":13,"page-path-builder":18,"promise":26,"promise-map-series":24}],10:[function(require,module,exports){
+},{"./current-state":8,"./state-change-logic":28,"./state-comparison":29,"./state-state":30,"./state-string-parser":31,"./state-transition-manager":32,"_process":43,"combine-arrays":10,"events":42,"extend":11,"hash-brown-router":13,"page-path-builder":16,"promise":22,"promise-map-series":20}],10:[function(require,module,exports){
 module.exports = function(obj) {
 	var keys = Object.keys(obj)
 
@@ -898,7 +898,7 @@ function removeHashFromPath(path) {
 	return (path && path[0] === '#') ? path.substr(1) : path
 }
 
-},{"events":46}],13:[function(require,module,exports){
+},{"events":42}],13:[function(require,module,exports){
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
 var qs = require('querystring')
 var xtend = require('xtend')
@@ -988,7 +988,7 @@ function setDefault(routes, defaultFn) {
 }
 
 
-},{"./hash-location.js":12,"array.prototype.find":14,"path-to-regexp-with-reversible-keys":15,"querystring":50,"xtend":17}],14:[function(require,module,exports){
+},{"./hash-location.js":12,"array.prototype.find":14,"path-to-regexp-with-reversible-keys":18,"querystring":46,"xtend":15}],14:[function(require,module,exports){
 // Array.prototype.find - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: https://github.com/paulmillr/array.prototype.find
 // Fixes and tests supplied by Duncan Hall <http://duncanhall.net> 
@@ -1024,6 +1024,103 @@ function setDefault(routes, defaultFn) {
 })(this);
 
 },{}],15:[function(require,module,exports){
+module.exports = extend
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
+
+},{}],16:[function(require,module,exports){
+var parser = require('./path-parser')
+var stringifyQuerystring = require('querystring').stringify
+
+module.exports = function(pathStr, parameters) {
+
+	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
+	var allTokens = parsed.allTokens
+	var regex = parsed.regex
+
+	if (parameters) {
+		var path = allTokens.map(function(bit) {
+			if (bit.string) {
+				return bit.string
+			}
+
+			if (!bit.optional && !parameters[bit.name]) {
+				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
+			}
+
+			return parameters[bit.name] ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
+		}).join('')
+
+		if (!regex.test(path)) {
+			throw new Error('Provided arguments do not match the original arguments')
+		}
+
+		return buildPathWithQuerystring(path, parameters, allTokens)
+	} else {
+		return parsed
+	}
+}
+
+function buildPathWithQuerystring(path, parameters, tokenArray) {
+	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
+
+	if (Object.keys(parametersInQuerystring).length === 0) {
+		return path
+	}
+
+	return path + '?' + stringifyQuerystring(parametersInQuerystring)
+}
+
+function getParametersWithoutMatchingToken(parameters, tokenArray) {
+	var tokenHash = tokenArray.reduce(function(memo, bit) {
+		if (!bit.string) {
+			memo[bit.name] = bit
+		}
+		return memo
+	}, {})
+
+	return Object.keys(parameters).filter(function(param) {
+		return !tokenHash[param]
+	}).reduce(function(newParameters, param) {
+		newParameters[param] = parameters[param]
+		return newParameters
+	}, {})
+}
+
+},{"./path-parser":17,"querystring":46}],17:[function(require,module,exports){
+// This file to be replaced with an official implementation maintained by
+// the page.js crew if and when that becomes an option
+
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+
+module.exports = function(pathString) {
+	var parseResults = pathToRegexp(pathString)
+
+	// The only reason I'm returning a new object instead of the results of the pathToRegexp
+	// function is so that if the official implementation ends up returning an
+	// allTokens-style array via some other mechanism, I may be able to change this file
+	// without having to change the rest of the module in index.js
+	return {
+		regex: parseResults,
+		allTokens: parseResults.allTokens
+	}
+}
+
+},{"path-to-regexp-with-reversible-keys":18}],18:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -1255,117 +1352,12 @@ function pathToRegexp (path, keys, options, allTokens) {
   return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
 }
 
-},{"isarray":16}],16:[function(require,module,exports){
+},{"isarray":19}],19:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],17:[function(require,module,exports){
-module.exports = extend
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        for (var key in source) {
-            if (source.hasOwnProperty(key)) {
-                target[key] = source[key]
-            }
-        }
-    }
-
-    return target
-}
-
-},{}],18:[function(require,module,exports){
-var parser = require('./path-parser')
-var stringifyQuerystring = require('querystring').stringify
-
-module.exports = function(pathStr, parameters) {
-
-	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
-	var allTokens = parsed.allTokens
-	var regex = parsed.regex
-
-	if (parameters) {
-		var path = allTokens.map(function(bit) {
-			if (bit.string) {
-				return bit.string
-			}
-
-			if (!bit.optional && !parameters[bit.name]) {
-				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
-			}
-
-			return parameters[bit.name] ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
-		}).join('')
-
-		if (!regex.test(path)) {
-			throw new Error('Provided arguments do not match the original arguments')
-		}
-
-		return buildPathWithQuerystring(path, parameters, allTokens)
-	} else {
-		return parsed
-	}
-}
-
-function buildPathWithQuerystring(path, parameters, tokenArray) {
-	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
-
-	if (Object.keys(parametersInQuerystring).length === 0) {
-		return path
-	}
-
-	return path + '?' + stringifyQuerystring(parametersInQuerystring)
-}
-
-function getParametersWithoutMatchingToken(parameters, tokenArray) {
-	var tokenHash = tokenArray.reduce(function(memo, bit) {
-		if (!bit.string) {
-			memo[bit.name] = bit
-		}
-		return memo
-	}, {})
-
-	return Object.keys(parameters).filter(function(param) {
-		return !tokenHash[param]
-	}).reduce(function(newParameters, param) {
-		newParameters[param] = parameters[param]
-		return newParameters
-	}, {})
-}
-
-},{"./path-parser":21,"querystring":50}],19:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"dup":15,"isarray":20}],20:[function(require,module,exports){
-arguments[4][16][0].apply(exports,arguments)
-},{"dup":16}],21:[function(require,module,exports){
-// This file to be replaced with an official implementation maintained by
-// the page.js crew if and when that becomes an option
-
-var pathToRegexp = require('path-to-regexp-with-reversible-keys')
-
-module.exports = function(pathString) {
-	var parseResults = pathToRegexp(pathString)
-
-	// The only reason I'm returning a new object instead of the results of the pathToRegexp
-	// function is so that if the official implementation ends up returning an
-	// allTokens-style array via some other mechanism, I may be able to change this file
-	// without having to change the rest of the module in index.js
-	return {
-		regex: parseResults,
-		allTokens: parseResults.allTokens
-	}
-}
-
-},{"path-to-regexp-with-reversible-keys":19}],22:[function(require,module,exports){
-arguments[4][15][0].apply(exports,arguments)
-},{"dup":15,"isarray":23}],23:[function(require,module,exports){
-arguments[4][16][0].apply(exports,arguments)
-},{"dup":16}],24:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var Promise = require('rsvp').Promise;
 
 module.exports = function sequence(array, iterator, thisArg) {
@@ -1383,7 +1375,7 @@ module.exports = function sequence(array, iterator, thisArg) {
   return Promise.all(results)
 }
 
-},{"rsvp":25}],25:[function(require,module,exports){
+},{"rsvp":21}],21:[function(require,module,exports){
 (function (process){
 /*!
  * @overview RSVP - a tiny implementation of Promises/A+.
@@ -3058,14 +3050,14 @@ module.exports = function sequence(array, iterator, thisArg) {
 
 
 }).call(this,require('_process'))
-},{"_process":47}],26:[function(require,module,exports){
+},{"_process":43}],22:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib/core.js')
 require('./lib/done.js')
 require('./lib/es6-extensions.js')
 require('./lib/node-extensions.js')
-},{"./lib/core.js":27,"./lib/done.js":28,"./lib/es6-extensions.js":29,"./lib/node-extensions.js":30}],27:[function(require,module,exports){
+},{"./lib/core.js":23,"./lib/done.js":24,"./lib/es6-extensions.js":25,"./lib/node-extensions.js":26}],23:[function(require,module,exports){
 'use strict';
 
 var asap = require('asap')
@@ -3172,7 +3164,7 @@ function doResolve(fn, onFulfilled, onRejected) {
   }
 }
 
-},{"asap":31}],28:[function(require,module,exports){
+},{"asap":27}],24:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./core.js')
@@ -3187,7 +3179,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
     })
   })
 }
-},{"./core.js":27,"asap":31}],29:[function(require,module,exports){
+},{"./core.js":23,"asap":27}],25:[function(require,module,exports){
 'use strict';
 
 //This file contains the ES6 extensions to the core Promises/A+ API
@@ -3297,7 +3289,7 @@ Promise.prototype['catch'] = function (onRejected) {
   return this.then(null, onRejected);
 }
 
-},{"./core.js":27,"asap":31}],30:[function(require,module,exports){
+},{"./core.js":23,"asap":27}],26:[function(require,module,exports){
 'use strict';
 
 //This file contains then/promise specific extensions that are only useful for node.js interop
@@ -3362,7 +3354,7 @@ Promise.prototype.nodeify = function (callback, ctx) {
   })
 }
 
-},{"./core.js":27,"asap":31}],31:[function(require,module,exports){
+},{"./core.js":23,"asap":27}],27:[function(require,module,exports){
 (function (process){
 
 // Use the fastest possible means to execute a task in a future turn
@@ -3479,7 +3471,7 @@ module.exports = asap;
 
 
 }).call(this,require('_process'))
-},{"_process":47}],32:[function(require,module,exports){
+},{"_process":43}],28:[function(require,module,exports){
 module.exports = function stateChangeLogic(stateComparisonResults) {
 	var hitChangingState = false
 	var hitDestroyedState = false
@@ -3510,7 +3502,7 @@ module.exports = function stateChangeLogic(stateComparisonResults) {
 	return output
 }
 
-},{}],33:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var combine = require('combine-arrays')
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
@@ -3567,7 +3559,7 @@ function stateComparison(parametersChanged, originalState, originalParameters, n
 	})
 }
 
-},{"./state-string-parser":35,"combine-arrays":10,"path-to-regexp-with-reversible-keys":22}],34:[function(require,module,exports){
+},{"./state-string-parser":31,"combine-arrays":10,"path-to-regexp-with-reversible-keys":18}],30:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var parse = require('./state-string-parser')
 
@@ -3660,7 +3652,7 @@ module.exports = function StateState() {
 	}
 }
 
-},{"./state-string-parser":35}],35:[function(require,module,exports){
+},{"./state-string-parser":31}],31:[function(require,module,exports){
 module.exports = function(stateString) {
 	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
 		if (stateNames.length) {
@@ -3671,7 +3663,7 @@ module.exports = function(stateString) {
 	}, [])
 }
 
-},{}],36:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 module.exports = function (emitter) {
 	var currentTransitionAttempt = null
 	var nextTransition = null
@@ -3726,7 +3718,7 @@ module.exports = function (emitter) {
 	}
 }
 
-},{}],37:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 // Array.prototype.findIndex - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: <https://github.com/paulmillr/Array.prototype.findIndex>
 (function (globals) {
@@ -3759,7 +3751,7 @@ module.exports = function (emitter) {
   }
 }(this));
 
-},{}],38:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -3791,7 +3783,7 @@ module.exports = function (emitter) {
 
 });
 
-},{}],39:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 /*
 	ractive.js v0.6.1
 	2014-10-25 - commit 3a576eb3 
@@ -18140,7 +18132,7 @@ module.exports = function (emitter) {
 
 }( typeof window !== 'undefined' ? window : this ) );
 
-},{}],40:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 var Ractive = require('ractive')
 
 function wrapWackyPromise(promise, cb) {
@@ -18245,7 +18237,7 @@ function allParametersMatch(toMatch, parameters) {
 	})
 }
 
-},{"ractive":39}],41:[function(require,module,exports){
+},{"ractive":35}],37:[function(require,module,exports){
 /**
  *
  * This function was taken from a stackoverflow answer:
@@ -18268,7 +18260,7 @@ module.exports = function() {
     });
 };
 
-},{}],42:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 /*!
  * The buffer module from node.js, for the browser.
  *
@@ -19580,7 +19572,7 @@ function decodeUtf8Char (str) {
   }
 }
 
-},{"base64-js":43,"ieee754":44,"is-array":45}],43:[function(require,module,exports){
+},{"base64-js":39,"ieee754":40,"is-array":41}],39:[function(require,module,exports){
 var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 ;(function (exports) {
@@ -19706,7 +19698,7 @@ var lookup = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 	exports.fromByteArray = uint8ToBase64
 }(typeof exports === 'undefined' ? (this.base64js = {}) : exports))
 
-},{}],44:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 exports.read = function(buffer, offset, isLE, mLen, nBytes) {
   var e, m,
       eLen = nBytes * 8 - mLen - 1,
@@ -19792,7 +19784,7 @@ exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128;
 };
 
-},{}],45:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 
 /**
  * isArray
@@ -19827,7 +19819,7 @@ module.exports = isArray || function (val) {
   return !! val && '[object Array]' == str.call(val);
 };
 
-},{}],46:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20130,7 +20122,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],47:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -20189,7 +20181,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],48:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20275,7 +20267,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],49:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -20362,10 +20354,10 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],50:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":48,"./encode":49}]},{},[6]);
+},{"./decode":44,"./encode":45}]},{},[6]);
