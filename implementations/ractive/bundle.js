@@ -271,9 +271,7 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.no-task',
 		route: '',
- 		template: "<p>\n\tThis is a very basic todo app\tto show off route states.\n</p>\n<p>\n\tClick on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing!\n</p>\n",
- 		activate: function(context) {
- 		}
+ 		template: "<p>\n\tThis is a very basic todo app\tto show off route states.\n</p>\n<p>\n\tClick on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing!\n</p>\n"
 	})
 }
 
@@ -427,7 +425,7 @@ var combine = require('combine-arrays')
 var buildPath = require('page-path-builder')
 var StateTransitionManager = require('./state-transition-manager')
 
-module.exports = function StateProvider(renderer, rootElement, hashRouter) {
+module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
 	var prototypalStateHolder = StateState()
 	var current = CurrentState()
 	var stateProviderEmitter = new EventEmitter()
@@ -435,10 +433,10 @@ module.exports = function StateProvider(renderer, rootElement, hashRouter) {
 	hashRouter = hashRouter || newHashBrownRouter()
 	current.set('', {})
 
-	var destroyDom = Promise.denodeify(renderer.destroy)
-	var getDomChild = Promise.denodeify(renderer.getChildElement)
-	var renderDom = Promise.denodeify(renderer.render)
-	var resetDom = Promise.denodeify(renderer.reset)
+	var destroyDom = null
+	var getDomChild = null
+	var renderDom = null
+	var resetDom = null
 
 	var activeDomApis = {}
 	var activeStateResolveContent = {}
@@ -659,15 +657,12 @@ module.exports = function StateProvider(renderer, rootElement, hashRouter) {
 		}))
 	}
 
-	if (renderer.setUpMakePathFunction) {
-		renderer.setUpMakePathFunction(stateProviderEmitter.makePath)
-	}
-	if (renderer.setUpStateIsActiveFunction) {
-		renderer.setUpStateIsActiveFunction(stateProviderEmitter.stateIsActive)
-	}
-	if (renderer.handleStateRouter) {
-		renderer.handleStateRouter(stateProviderEmitter)
-	}
+	var renderer = makeRenderer(stateProviderEmitter)
+
+	destroyDom = Promise.denodeify(renderer.destroy)
+	getDomChild = Promise.denodeify(renderer.getChildElement)
+	renderDom = Promise.denodeify(renderer.render)
+	resetDom = Promise.denodeify(renderer.reset)
 
 	return stateProviderEmitter
 }
@@ -18144,53 +18139,51 @@ function wrapWackyPromise(promise, cb) {
 }
 
 module.exports = function RactiveStateRouter(options) {
-	var ExtendedRactive = Ractive.extend(options || {})
-	var stateRouter = null
+	return function makeRenderer(stateRouter) {
+		var ExtendedRactive = Ractive.extend(options || {})
+		var extendedData = ExtendedRactive.defaults.data
+		var ractiveData = Ractive.defaults.data
 
-	return {
-		render: function render(context, cb) {
-			var element = context.element
-			var template = context.template
-			try {
-				var ractive = new ExtendedRactive({
-					el: element,
-					template: template,
-					decorators: {
-						active: activeStateDecarator.bind(null, stateRouter)
-					},
-					data: context.content
-				})
-				cb(null, ractive)
-			} catch (e) {
-				cb(e)
+		extendedData.makePath = ractiveData.makePath = stateRouter.makePath
+
+		extendedData.active = ractiveData.active = function active(stateName) {
+			return stateRouter.stateIsActive(stateName) ? 'active' : ''
+		}
+
+		return {
+			render: function render(context, cb) {
+				var element = context.element
+				var template = context.template
+				try {
+					var ractive = new ExtendedRactive({
+						el: element,
+						template: template,
+						decorators: {
+							active: activeStateDecarator.bind(null, stateRouter)
+						},
+						data: context.content
+					})
+					cb(null, ractive)
+				} catch (e) {
+					cb(e)
+				}
+			},
+			reset: function reset(context, cb) {
+				var ractive = context.domApi
+				ractive.off()
+				wrapWackyPromise(ractive.reset(context.content), cb)
+			},
+			destroy: function destroy(ractive, cb) {
+				wrapWackyPromise(ractive.teardown(), cb)
+			},
+			getChildElement: function getChildElement(ractive, cb) {
+				try {
+					var child = ractive.find('ui-view')
+					cb(null, child)
+				} catch (e) {
+					cb(e)
+				}
 			}
-		},
-		reset: function reset(context, cb) {
-			var ractive = context.domApi
-			ractive.off()
-			wrapWackyPromise(ractive.reset(context.content), cb)
-		},
-		destroy: function destroy(ractive, cb) {
-			wrapWackyPromise(ractive.teardown(), cb)
-		},
-		getChildElement: function getChildElement(ractive, cb) {
-			try {
-				var child = ractive.find('ui-view')
-				cb(null, child)
-			} catch (e) {
-				cb(e)
-			}
-		},
-		setUpMakePathFunction: function setUpMakePathFunction(makePath) {
-			ExtendedRactive.defaults.data.makePath = Ractive.defaults.data.makePath = makePath
-		},
-		setUpStateIsActiveFunction: function setUpStateIsActiveFunction(stateIsActive) {
-			ExtendedRactive.defaults.data.active = Ractive.defaults.data.active = function(stateName) {
-				return stateIsActive(stateName) ? 'active' : ''
-			}
-		},
-		handleStateRouter: function handleStateRouter(newStateRouter) {
-			stateRouter = newStateRouter
 		}
 	}
 }

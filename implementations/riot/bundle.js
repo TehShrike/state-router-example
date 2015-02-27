@@ -494,7 +494,7 @@ var combine = require('combine-arrays')
 var buildPath = require('page-path-builder')
 var StateTransitionManager = require('./state-transition-manager')
 
-module.exports = function StateProvider(renderer, rootElement, hashRouter) {
+module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
 	var prototypalStateHolder = StateState()
 	var current = CurrentState()
 	var stateProviderEmitter = new EventEmitter()
@@ -502,10 +502,10 @@ module.exports = function StateProvider(renderer, rootElement, hashRouter) {
 	hashRouter = hashRouter || newHashBrownRouter()
 	current.set('', {})
 
-	var destroyDom = Promise.denodeify(renderer.destroy)
-	var getDomChild = Promise.denodeify(renderer.getChildElement)
-	var renderDom = Promise.denodeify(renderer.render)
-	var resetDom = Promise.denodeify(renderer.reset)
+	var destroyDom = null
+	var getDomChild = null
+	var renderDom = null
+	var resetDom = null
 
 	var activeDomApis = {}
 	var activeStateResolveContent = {}
@@ -726,15 +726,12 @@ module.exports = function StateProvider(renderer, rootElement, hashRouter) {
 		}))
 	}
 
-	if (renderer.setUpMakePathFunction) {
-		renderer.setUpMakePathFunction(stateProviderEmitter.makePath)
-	}
-	if (renderer.setUpStateIsActiveFunction) {
-		renderer.setUpStateIsActiveFunction(stateProviderEmitter.stateIsActive)
-	}
-	if (renderer.handleStateRouter) {
-		renderer.handleStateRouter(stateProviderEmitter)
-	}
+	var renderer = makeRenderer(stateProviderEmitter)
+
+	destroyDom = Promise.denodeify(renderer.destroy)
+	getDomChild = Promise.denodeify(renderer.getChildElement)
+	renderDom = Promise.denodeify(renderer.render)
+	resetDom = Promise.denodeify(renderer.reset)
 
 	return stateProviderEmitter
 }
@@ -3877,60 +3874,59 @@ module.exports = function() {
 var riot = require('riot')
 var xtend = require('xtend')
 
-module.exports = function RactiveStateRouter(options) {
+module.exports = function RiotStateRenderer(options) {
 	var defaultOpts = xtend(options)
 
-	return {
-		render: function render(context, cb) {
-			var element = context.element
-			var template = context.template
-			var content = context.content
-			if (typeof element === 'string') {
-				element = document.querySelector(element)
-			}
+	return function makeRenderer(stateRouter) {
+		defaultOpts.makePath = makeRiotPath.bind(null, stateRouter.makePath)
 
-			try {
-				var tag = riot.mount(element, template, xtend(defaultOpts, content))
+		defaultOpts.active = makeRiotPath.bind(null, stateRouter.stateIsActive)
 
-				if (!tag) {
-					console.error('Error creating riot tag', template, 'on', element)
+		stateRouter.on('stateChangeEnd', function() {
+			riot.update()
+		})
+
+		return {
+			render: function render(context, cb) {
+				var element = context.element
+				var template = context.template
+				var content = context.content
+				if (typeof element === 'string') {
+					element = document.querySelector(element)
 				}
 
-				cb(null, tag)
-			} catch (e) {
-				cb(e)
-			}
-		},
-		reset: function reset(context, cb) {
-			var tag = context.domApi
+				try {
+					var tag = riot.mount(element, template, xtend(defaultOpts, content))
 
-			tag.trigger('reset')
-			tag.opts = xtend(defaultOpts, context.content)
-			tag.update()
-			cb()
-		},
-		destroy: function destroy(tag, cb) {
-			tag.unmount()
-			cb()
-		},
-		getChildElement: function getChildElement(tag, cb) {
-			try {
-				var child = tag.root.querySelector('ui-view')
-				cb(null, child)
-			} catch (e) {
-				cb(e)
+					if (!tag) {
+						console.error('Error creating riot tag', template, 'on', element)
+					}
+
+					cb(null, tag)
+				} catch (e) {
+					cb(e)
+				}
+			},
+			reset: function reset(context, cb) {
+				var tag = context.domApi
+
+				tag.trigger('reset')
+				tag.opts = xtend(defaultOpts, context.content)
+				tag.update()
+				cb()
+			},
+			destroy: function destroy(tag, cb) {
+				tag.unmount()
+				cb()
+			},
+			getChildElement: function getChildElement(tag, cb) {
+				try {
+					var child = tag.root.querySelector('ui-view')
+					cb(null, child)
+				} catch (e) {
+					cb(e)
+				}
 			}
-		},
-		setUpMakePathFunction: function setUpMakePathFunction(makePath) {
-			defaultOpts.makePath = makeRiotPath.bind(null, makePath)
-		},
-		setUpStateIsActiveFunction: function setUpStateIsActiveFunction(stateIsActive) {
-			defaultOpts.active = makeRiotPath.bind(null, stateIsActive)
-		},
-		handleStateRouter: function handleStateRouter(newStateRouter) {
-			newStateRouter.on('stateChangeEnd', function() {
-				riot.update()
-			})
 		}
 	}
 }
