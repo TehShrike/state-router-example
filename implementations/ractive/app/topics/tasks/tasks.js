@@ -53,8 +53,6 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.no-task',
 		route: '',
- 		template: fs.readFileSync('implementations/ractive/app/topics/tasks/no-task-selected.html', { encoding: 'utf8' }),
- 		activate: function(context) {
- 		}
+ 		template: fs.readFileSync('implementations/ractive/app/topics/tasks/no-task-selected.html', { encoding: 'utf8' })
 	})
 }
