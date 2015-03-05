@@ -5,9 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js; browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js",
+    "build": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js && browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js && browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
     "watchriot": "watchify -t riotify -d implementations/riot/index.js -o implementations/riot/bundle.js",
-    "watchractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js"
+    "watchractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js",
+    "watchvirtualdom": "watchify -d implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js"
   },
   "repository": {
     "type": "git",
