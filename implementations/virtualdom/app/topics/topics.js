@@ -14,6 +14,7 @@ module.exports = function(stateRouter) {
 			})
 		},
 		activate: function(context) {
+			/*
 			var ractive = context.domApi
 
 			ractive.set({
@@ -67,6 +68,7 @@ module.exports = function(stateRouter) {
 			context.on('destroy', function() {
 				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
 			})
+			*/
 		}
 	})
 
