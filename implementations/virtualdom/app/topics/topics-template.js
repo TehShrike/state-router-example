@@ -1,12 +1,13 @@
-module.exports = function (h, context) {
+var addingTopic = false
+
+module.exports = function (h, context, helpers) {
 	var model = context.model
+	var stateRouter = context.stateRouter
 	var tasksUndone = {}
-	var addingTopic = false
-	var newTopic = ''
 
 	function setFocusOnAddTopicEdit() {
 		process.nextTick(function() {
-			document.querySelector('.new-topic-name').focus()
+			document.getElementById('new-topic-name').focus()
 		})
 	}
 
@@ -21,15 +22,20 @@ module.exports = function (h, context) {
 	}
 
 	model.on('tasks saved', recalculateTasksLeftToDoInTopic)
+	model.on('tasks saved', helpers.update) // maybe?
 
-	context.topics.forEach(function(topic) {
+	model.getTopics().forEach(function(topic) {
 		recalculateTasksLeftToDoInTopic(topic.id)
 	})
 
-	function addTopic() {
+	function addTopic(e) {
+		console.log('e:', e)
+		var inputEl = e.target.querySelector('input')
+		var newTopic = inputEl.value
+
 		if (addingTopic && newTopic) {
 			var newTopicObject = model.addTopic(newTopic)
-			newTopic = ''
+			inputEl.value = ''
 			model.saveTopics()
 			recalculateTasksLeftToDoInTopic(newTopicObject.id)
 			stateRouter.go('app.topics.tasks', {
@@ -38,57 +44,59 @@ module.exports = function (h, context) {
 		} else if (!addingTopic) {
 			setFocusOnAddTopicEdit()
 		}
-
 		addingTopic = !addingTopic
 
-		return false
+		helpers.killEvent(e)
+		helpers.update()
 	}
 
-	return h('div.container',
-		h('div.row',
-			h('div.col-sm-4',
+	console.log('rendering topics')
+
+	return h('div.container#topics-template', [
+		h('div.row', [
+			h('div.col-sm-4', [
 				h('div.list-group',
-					context.topics.map(function (topic) {
-						h('a.list-group-item', {
-								href: context.makePath('app.topics.tasks', { topicId: topic.id }),
-								decorator: "active:'app.topics.tasks','topicId:{{id}}'"
-							},
-							topic.name,
-							h('span.badge', topic.tasksUndone[id] )
+					model.getTopics().map(function (topic) {
+						return h('a.list-group-item', {
+								href: helpers.makePath('app.topics.tasks', { topicId: topic.id }),
+								class: helpers.active('app.topics.tasks', { topicId: topic.id })
+							}, [
+								topic.name,
+								h('span.badge', tasksUndone[topic.id].toString() ) // was topics.tasksUndone[id]
+							]
 						)
 					})
 				),
-				h('form', { action: "", 'on-submit': addTopic },
-					h('div.table',
-						h('div.table-row-group',
-							h('div.table-row',
-								h('div.table-cell',
+				h('form', { action: "", onsubmit: addTopic }, [
+					h('div.table', [
+						h('div.table-row-group', [
+							h('div.table-row', [
+								h('div.table-cell', [
 									h('input', {
 										type: "text",
-										class: "new-topic-name form-control" +
-											addingTopic ? "hidden" : "",
-										placeholder: "Topic name",
-										value: newTopic
+										id: 'new-topic-name',
+										class: "form-control" +
+											addingTopic ? " hidden" : "",
+										placeholder: "Topic name"
 									})
-								),
+								]),
 								h('div', {
 										class: "table-cell",
 										style: "width: 60px; vertical-align: top"
 									},
 									h('button', {
-											type: "submit",
-											class: "btn btn-default pull-right"
-										}, "Add"
-									)
+										type: "submit",
+										class: "btn btn-default pull-right"
+									}, "Add" )
 								)
-							)
-						)
-					)
-				)
-			),
-			h('div.col-sm-8',
+							])
+						])
+					])
+				])
+			]),
+			h('div.col-sm-8', [
 				h('ui-view')
-			)
-		)
-	)
+			])
+		])
+	])
 }

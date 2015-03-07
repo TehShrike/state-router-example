@@ -6,6 +6,12 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'login',
 		route: '/login',
-		template: template
+		template: template,
+		resolve: function resolve(data, parameters, cb) {
+			cb(null, {
+				model: model,
+				stateRouter: stateRouter
+			})
+		}
 	})
 }

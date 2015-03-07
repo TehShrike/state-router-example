@@ -9,13 +9,12 @@ module.exports = function(stateRouter) {
 		template: require('./tasks-template'),
 		resolve: function(data, parameters, cb) {
 			cb(null, {
-				topic: model.getTopic(parameters.topicId),
-				tasks: model.getTasks(parameters.topicId),
+				model: model,
 				topicId: parameters.topicId
 			})
 		},
 		activate: function(context) {
-			document.querySelector('.add-new-task').focus()
+			document.querySelector('.add-new-task').focus() // or just autofocus?
 		}
 	})
 

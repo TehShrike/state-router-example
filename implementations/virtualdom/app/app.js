@@ -12,7 +12,10 @@ module.exports = function(stateRouter) {
 			if (!model.getCurrentUser().name) {
 				cb.redirect('login')
 			} else {
-				cb(null, model)
+				cb(null, {
+					model: model,
+					stateRouter: stateRouter
+				})
 			}
 		}
 	})

@@ -1,5 +1,8 @@
-module.exports = function (t, context) {
-	h("div.container-fluid", [
+module.exports = function (h, context, helpers) {
+	var model = context.model
+	var stateRouter = context.stateRouter
+
+	return h("div.container-fluid", [
 		h("div.row", [
 			h("div.col-sm-offset-3.col-sm-6", [
 				h("h1", [ "Welcome to the abstract-state-router demo!" ])
@@ -9,10 +12,10 @@ module.exports = function (t, context) {
 			h("div.col-sm-offset-3.col-sm-6", [
 				h("div.well", [
 					h("p.lead", [
-						"This is a demo webapp showing off basic usage of the",
+						"This is a demo webapp showing off basic usage of the ",
 						h("a", {
-							"href": "https://github.com/TehShrike/abstract-state-router"
-						}, [ "abstract-state-router" ]), "library using a few different templating libraries."
+							href: "https://github.com/TehShrike/abstract-state-router"
+						}, [ "abstract-state-router" ]), " library using a few different templating libraries."
 					])
 				])
 			])
@@ -21,18 +24,18 @@ module.exports = function (t, context) {
 			h("div.col-sm-offset-4.col-sm-4", [
 				h("div.form-group.panel", [
 					h("form.panel-body", {
-						"on-submit": login,
-						"action": ""
+						onsubmit: login,
+						action: ""
 					}, [
 						h("label", [
 							"Put in whatever username you feel like:",
 							h("input.form-control", {
-								"type": "text",
-								"value": "{{username}}"
+								type: "text",
+								value: ""
 							})
 						]),
 						h("button.btn.btn-primary", {
-							"type": "submit"
+							type: "submit"
 						}, [ "\"Log in\"" ])
 					])
 				])
@@ -40,11 +43,12 @@ module.exports = function (t, context) {
 		])
 	])
 
-	function login() {
-		if (ractive.get('username')) {
-			model.saveCurrentUser(ractive.get('username'))
+	function login(e) {
+		var username = e.srcElement.querySelector('input').value
+		if (username) {
+			model.saveCurrentUser(username)
 			stateRouter.go('app')
 		}
-		return false
+		helpers.killEvent(e)
 	}
 }
