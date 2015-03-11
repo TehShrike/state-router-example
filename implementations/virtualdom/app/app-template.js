@@ -3,7 +3,6 @@ module.exports = function (h, context, helpers) {
 	var stateRouter = context.stateRouter
 
 	function onlogout(e) {
-		console.log('LOGOUT')
 		model.saveCurrentUser(null)
 		stateRouter.go('login')
 		helpers.killEvent(e)

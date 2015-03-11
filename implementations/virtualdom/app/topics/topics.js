@@ -14,7 +14,6 @@ module.exports = function(stateRouter) {
 			})
 		},
 		activate: function (context) {
-			console.log('topics activate')
 			var update = context.domApi.update
 
 			model.on('tasks saved', update)
