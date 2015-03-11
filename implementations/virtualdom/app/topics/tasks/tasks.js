@@ -14,7 +14,8 @@ module.exports = function(stateRouter) {
 			})
 		},
 		activate: function(context) {
-			document.querySelector('.add-new-task').focus() // or just autofocus?
+			var el = document.querySelector('.add-new-task')
+			el && el.focus()
 		}
 	})
 

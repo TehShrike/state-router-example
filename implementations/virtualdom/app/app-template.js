@@ -8,7 +8,7 @@ module.exports = function (h, context, helpers) {
 		helpers.killEvent(e)
 	}
 
-	return h('div#app-template', [
+	return h('div', [
 		h("nav.navbar.navbar-default", [
 			h("div.container-fluid", [
 				h("div.navbar-header", [

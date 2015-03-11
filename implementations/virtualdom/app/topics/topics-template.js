@@ -5,12 +5,6 @@ module.exports = function (h, context, helpers) {
 	var stateRouter = context.stateRouter
 	var tasksUndone = {}
 
-	function setFocusOnAddTopicEdit() {
-		process.nextTick(function() {
-			document.getElementById('new-topic-name').focus()
-		})
-	}
-
 	function recalculateTasksLeftToDoInTopic(topicId) {
 		var tasks = model.getTasks(topicId)
 
@@ -26,9 +20,8 @@ module.exports = function (h, context, helpers) {
 	})
 
 	function addTopic(e) {
-		console.log('e:', e)
-		var inputEl = e.target.querySelector('input')
-		var newTopic = inputEl.value
+		var inputEl = e.srcElement.querySelector('input')
+		var newTopic = inputEl && inputEl.value
 
 		if (addingTopic && newTopic) {
 			var newTopicObject = model.addTopic(newTopic)
@@ -39,7 +32,9 @@ module.exports = function (h, context, helpers) {
 				topicId: newTopicObject.id
 			})
 		} else if (!addingTopic) {
-			setFocusOnAddTopicEdit()
+			setTimeout(function () {
+				inputEl.focus()
+			}, 0)
 		}
 		addingTopic = !addingTopic
 
@@ -47,7 +42,7 @@ module.exports = function (h, context, helpers) {
 		helpers.update()
 	}
 
-	return h('div.container#topics-template', [
+	return h('div.container', [
 		h('div.row', [
 			h('div.col-sm-4', [
 				h('div.list-group',
@@ -67,11 +62,9 @@ module.exports = function (h, context, helpers) {
 						h('div.table-row-group', [
 							h('div.table-row', [
 								h('div.table-cell', [
-									h('input', {
+									h('input.form-control' + (addingTopic ? "" : ".hidden"), {
 										type: "text",
 										id: 'new-topic-name',
-										class: "form-control" +
-											addingTopic ? " hidden" : "",
 										placeholder: "Topic name"
 									})
 								]),
@@ -79,9 +72,8 @@ module.exports = function (h, context, helpers) {
 										class: "table-cell",
 										style: "width: 60px; vertical-align: top"
 									},
-									h('button', {
-										type: "submit",
-										class: "btn btn-default pull-right"
+									h('button.btn.btn-default.pull-right', {
+										type: "submit"
 									}, "Add" )
 								)
 							])

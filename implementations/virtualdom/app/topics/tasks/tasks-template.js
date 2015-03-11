@@ -26,6 +26,9 @@ module.exports = function (h, context, helpers) {
 			e.srcElement.value = ''
 			createNewTask(newTaskName)
 			helpers.update()
+			setTimeout(function () {
+				document.querySelector('.add-new-task').focus()
+			}, 0)
 		}
 		helpers.killEvent(e)
 	}
@@ -41,12 +44,8 @@ module.exports = function (h, context, helpers) {
 			h('thead', [
 				h('tr', [
 					h('th', 'Task name'),
-					h('th', {
-						'style': 'width: 100px'
-					}, 'Complete'),
-					h('th', {
-						'style': 'width: 87px'
-					}, 'Remove')
+					h('th', { style: 'width: 100px;' }, 'Complete'),
+					h('th', { style: 'width: 87px;' }, 'Remove')
 				])
 			]),
 			h('tbody',
@@ -56,7 +55,7 @@ module.exports = function (h, context, helpers) {
 					return h('tr', [
 						h('td.center-y' + done ? '.text-muted' : '', [
 							h('span.center-y', [
-								name, done ? h('span.glyphicon.glyphicon-ok.text-success') : null
+								name, (done ? h('span.glyphicon.glyphicon-ok.text-success') : null)
 							])
 						]),
 						h('td',
