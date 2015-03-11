@@ -12,6 +12,16 @@ module.exports = function(stateRouter) {
 				model: model,
 				stateRouter: stateRouter
 			})
+		},
+		activate: function (context) {
+			console.log('topics activate')
+			var update = context.domApi.update
+
+			model.on('tasks saved', update)
+
+			context.on('destroy', function () {
+				model.removeListener('tasks saved', update)
+			})
 		}
 	})
 

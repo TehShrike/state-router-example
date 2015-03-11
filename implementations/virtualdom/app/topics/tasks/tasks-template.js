@@ -4,8 +4,6 @@ module.exports = function (h, context, helpers) {
 	var topic = model.getTopic(topicId)
 	var tasks = model.getTasks(topicId)
 
-	console.log('rendering tasks:', topicId, tasks)
-
 	function setTaskDone(index, done) {
 		return function () {
 			tasks[index].done = done

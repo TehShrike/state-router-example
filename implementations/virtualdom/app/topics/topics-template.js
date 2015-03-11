@@ -21,9 +21,6 @@ module.exports = function (h, context, helpers) {
 		tasksUndone[topicId] = sumOfNotDoneTasks
 	}
 
-	model.on('tasks saved', recalculateTasksLeftToDoInTopic)
-	model.on('tasks saved', helpers.update) // maybe?
-
 	model.getTopics().forEach(function(topic) {
 		recalculateTasksLeftToDoInTopic(topic.id)
 	})
@@ -49,8 +46,6 @@ module.exports = function (h, context, helpers) {
 		helpers.killEvent(e)
 		helpers.update()
 	}
-
-	console.log('rendering topics')
 
 	return h('div.container#topics-template', [
 		h('div.row', [
