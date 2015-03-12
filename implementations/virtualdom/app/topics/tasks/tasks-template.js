@@ -44,8 +44,8 @@ module.exports = function (h, context, helpers) {
 			h('thead', [
 				h('tr', [
 					h('th', 'Task name'),
-					h('th', { style: 'width: 100px;' }, 'Complete'),
-					h('th', { style: 'width: 87px;' }, 'Remove')
+					h('th', { style: { width: '100px' } }, 'Complete'),
+					h('th', { style: { width: '87px' } }, 'Remove')
 				])
 			]),
 			h('tbody',
