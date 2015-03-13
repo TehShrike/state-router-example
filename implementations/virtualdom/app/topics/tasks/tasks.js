@@ -8,14 +8,29 @@ module.exports = function(stateRouter) {
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
 		template: require('./tasks-template'),
 		resolve: function(data, parameters, cb) {
+			var topicId = parameters.topicId
 			cb(null, {
-				model: model,
-				topicId: parameters.topicId
+				topicId: topicId,
+				topic: model.getTopic(topicId),
+				tasks: model.getTasks(topicId)
 			})
 		},
 		activate: function(context) {
-			var el = document.querySelector('.add-new-task')
+			var domApi = context.domApi
+			var el = domApi.el.querySelector('.add-new-task')
 			el && el.focus()
+
+			var resolveContent = context.content
+
+			domApi.on('saveTasks', function () {
+				model.saveTasks(resolveContent.topicId)
+				domApi.update()
+			})
+
+			domApi.on('newTask', function (taskName) {
+				model.saveTask(resolveContent.topicId, taskName)
+				domApi.update()
+			})
 		}
 	})
 

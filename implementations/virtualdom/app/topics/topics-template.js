@@ -1,36 +1,19 @@
-var addingTopic = false
+//var addingTopic = false
 
-module.exports = function (h, context, helpers) {
-	var model = context.model
-	var stateRouter = context.stateRouter
-	var tasksUndone = {}
+module.exports = function (h, resolveContext, helpers) {
+	var topics = resolveContext.topics
+	var tasksUndone = resolveContext.tasksUndone || {}
+	var addingTopic = resolveContext.addingTopic
 
-	function recalculateTasksLeftToDoInTopic(topicId) {
-		var tasks = model.getTasks(topicId)
-
-		var sumOfNotDoneTasks = tasks.reduce(function(sum, task) {
-			return sum + Number(!task.done)
-		}, 0)
-
-		tasksUndone[topicId] = sumOfNotDoneTasks
-	}
-
-	model.getTopics().forEach(function(topic) {
-		recalculateTasksLeftToDoInTopic(topic.id)
-	})
+	console.log('tasks undone:', tasksUndone)
 
 	function addTopic(e) {
 		var inputEl = e.srcElement.querySelector('input')
 		var newTopic = inputEl && inputEl.value
 
 		if (addingTopic && newTopic) {
-			var newTopicObject = model.addTopic(newTopic)
+			helpers.emitter.emit('new topic', newTopic)
 			inputEl.value = ''
-			model.saveTopics()
-			recalculateTasksLeftToDoInTopic(newTopicObject.id)
-			stateRouter.go('app.topics.tasks', {
-				topicId: newTopicObject.id
-			})
 		} else if (!addingTopic) {
 			setTimeout(function () {
 				inputEl.focus()
@@ -39,20 +22,21 @@ module.exports = function (h, context, helpers) {
 		addingTopic = !addingTopic
 
 		helpers.killEvent(e)
-		helpers.update()
+		//helpers.update()
 	}
 
 	return h('div.container', [
 		h('div.row', [
 			h('div.col-sm-4', [
 				h('div.list-group',
-					model.getTopics().map(function (topic) {
+					topics.map(function (topic) {
+						var undone = tasksUndone[topic.id]
 						return h('a.list-group-item', {
 								href: helpers.makePath('app.topics.tasks', { topicId: topic.id }),
 								class: helpers.active('app.topics.tasks', { topicId: topic.id })
 							}, [
 								topic.name,
-								h('span.badge', tasksUndone[topic.id].toString() ) // was topics.tasksUndone[id]
+								h('span.badge', undone ? undone.toString() : [] )
 							]
 						)
 					})
