@@ -1,3 +1,5 @@
+var nbsp = String.fromCharCode(160)
+
 module.exports = function (h, context, helpers) {
 	var model = context.model
 	var topicId = context.topicId
@@ -53,10 +55,12 @@ module.exports = function (h, context, helpers) {
 					var done = task.done
 					var name = task.name
 					return h('tr', [
-						h('td.center-y' + done ? '.text-muted' : '', [
+						h('td.center-y' + (done ? '.text-muted' : ''), [
 							h('span.center-y', [
-								name, (done ? h('span.glyphicon.glyphicon-ok.text-success') : null)
-							])
+								name
+							].concat(
+								done ? [nbsp, h('span.glyphicon.glyphicon-ok.text-success')] : null
+							))
 						]),
 						h('td',
 							h('button.full-width.btn.btn-' + (done ? 'primary' : 'success'), {

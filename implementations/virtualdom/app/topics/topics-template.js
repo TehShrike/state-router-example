@@ -68,9 +68,8 @@ module.exports = function (h, context, helpers) {
 										placeholder: "Topic name"
 									})
 								]),
-								h('div', {
-										class: "table-cell",
-										style: "width: 60px; vertical-align: top"
+								h('div.table-cell', {
+										style: { width: '60px', 'vertical-align': 'top' }
 									},
 									h('button.btn.btn-default.pull-right', {
 										type: "submit"
