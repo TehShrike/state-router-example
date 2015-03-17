@@ -1,11 +1,12 @@
 module.exports = function (h, context, helpers) {
+	// Model should be abstracted out!
 	var model = context.model
-	var stateRouter = context.stateRouter
+	// var stateRouter = context.stateRouter
 
 	function onlogout(e) {
 		model.saveCurrentUser(null)
-		stateRouter.go('login')
-		helpers.killEvent(e)
+		// stateRouter.go('login') // Maybe don't need this b/c line 23...
+		// helpers.killEvent(e)
 	}
 
 	return h('div', [
