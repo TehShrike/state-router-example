@@ -5,8 +5,6 @@ module.exports = function (h, resolveContext, helpers) {
 	var tasksUndone = resolveContext.tasksUndone || {}
 	var addingTopic = resolveContext.addingTopic
 
-	console.log('tasks undone:', tasksUndone)
-
 	function addTopic(e) {
 		var inputEl = e.srcElement.querySelector('input')
 		var newTopic = inputEl && inputEl.value
@@ -31,9 +29,9 @@ module.exports = function (h, resolveContext, helpers) {
 				h('div.list-group',
 					topics.map(function (topic) {
 						var undone = tasksUndone[topic.id]
-						return h('a.list-group-item', {
-								href: helpers.makePath('app.topics.tasks', { topicId: topic.id }),
-								class: helpers.active('app.topics.tasks', { topicId: topic.id })
+						var active =  helpers.active('app.topics.tasks', { topicId: topic.id })
+						return h('a.list-group-item.' + active, {
+								href: helpers.makePath('app.topics.tasks', { topicId: topic.id })
 							}, [
 								topic.name,
 								h('span.badge', undone ? undone.toString() : [] )
