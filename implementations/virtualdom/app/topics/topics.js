@@ -9,7 +9,7 @@ module.exports = function(stateRouter) {
 		route: '/topics',
 		defaultChild: 'no-task',
 		template: template,
-		resolve: function(data, parameters, cb) {
+		resolve: function resolve(data, parameters, cb) {
 			cb(null, {
 				topics: model.getTopics()
 			})

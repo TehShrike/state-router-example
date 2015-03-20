@@ -1,4 +1,6 @@
 var model = require('model.js')
+var tasksTemplate = require('./tasks-template')
+var noTaskTemplate = require('./no-task-selected-template')
 
 var UUID_V4_REGEX = '[a-f0-9-]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
 
@@ -6,8 +8,8 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
-		template: require('./tasks-template'),
-		resolve: function(data, parameters, cb) {
+		template: tasksTemplate,
+		resolve: function resolve(data, parameters, cb) {
 			var topicId = parameters.topicId
 			cb(null, {
 				topicId: topicId,
@@ -15,7 +17,7 @@ module.exports = function(stateRouter) {
 				tasks: model.getTasks(topicId)
 			})
 		},
-		activate: function(context) {
+		activate: function activate(context) {
 			var domApi = context.domApi
 			var el = domApi.el.querySelector('.add-new-task')
 			el && el.focus()
@@ -37,6 +39,6 @@ module.exports = function(stateRouter) {
 
 	stateRouter.addState({
 		name: 'app.topics.no-task',
-		template: require('./no-task-selected-template')
+		template: noTaskTemplate
 	})
 }
