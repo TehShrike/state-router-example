@@ -1,9 +1,9 @@
-//var addingTopic = false
+var addingTopic = false
 
 module.exports = function (h, resolveContext, helpers) {
 	var topics = resolveContext.topics
 	var tasksUndone = resolveContext.tasksUndone || {}
-	var addingTopic = resolveContext.addingTopic
+	//var addingTopic = resolveContext.addingTopic
 
 	function addTopic(e) {
 		var inputEl = e.srcElement.querySelector('input')
@@ -20,7 +20,7 @@ module.exports = function (h, resolveContext, helpers) {
 		addingTopic = !addingTopic
 
 		helpers.killEvent(e)
-		//helpers.update()
+		helpers.emitter.emit('refresh')
 	}
 
 	return h('div.container', [
@@ -39,23 +39,23 @@ module.exports = function (h, resolveContext, helpers) {
 						)
 					})
 				),
-				h('form', { action: "", onsubmit: addTopic }, [
+				h('form', { action: '', onsubmit: addTopic }, [
 					h('div.table', [
 						h('div.table-row-group', [
 							h('div.table-row', [
 								h('div.table-cell', [
-									h('input.form-control' + (addingTopic ? "" : ".hidden"), {
-										type: "text",
+									h('input.form-control' + (addingTopic ? '' : '.hidden'), {
+										type: 'text',
 										id: 'new-topic-name',
-										placeholder: "Topic name"
+										placeholder: 'Topic name'
 									})
 								]),
 								h('div.table-cell', {
 										style: { width: '60px', 'vertical-align': 'top' }
 									},
 									h('button.btn.btn-default.pull-right', {
-										type: "submit"
-									}, "Add" )
+										type: 'submit'
+									}, 'Add' )
 								)
 							])
 						])
