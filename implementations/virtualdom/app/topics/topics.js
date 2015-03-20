@@ -14,7 +14,7 @@ module.exports = function(stateRouter) {
 				topics: model.getTopics()
 			})
 		},
-		activate: activate
+		activate: activate.bind(null, stateRouter)
 	})
 
 	tasksState(stateRouter)

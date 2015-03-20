@@ -1,6 +1,6 @@
 var model = require('model.js')
 
-function activate(context) {
+function activate(stateRouter, context) {
 	var domApi = context.domApi
 	var topicId = context.parameters.topicId
 
@@ -12,6 +12,9 @@ function activate(context) {
 			topicId: newTopicObject.id
 		})
 	})
+
+	domApi.emitter.on('refresh', domApi.update)
+
 	model.on('tasks saved', recalculateAndUpdate)
 
 	context.on('destroy', function () {
