@@ -1,12 +1,8 @@
 module.exports = function (h, context, helpers) {
-	// Model should be abstracted out!
-	var model = context.model
-	// var stateRouter = context.stateRouter
+	var username = context.username
 
 	function onlogout(e) {
-		model.saveCurrentUser(null)
-		// stateRouter.go('login') // Maybe don't need this b/c line 23...
-		// helpers.killEvent(e)
+		helpers.emitter.emit('save tasks')
 	}
 
 	return h('div', [
@@ -20,12 +16,16 @@ module.exports = function (h, context, helpers) {
 						h('li', { class: helpers.active('app.about')}, [
 							h('a', { href:  helpers.makePath('app.about') }, 'About the state router')
 						]),
-						h('li', h('a', { href: helpers.makePath('login'), onclick: onlogout }, 'Log out'))
+						h('li', h('a', {
+							href: helpers.makePath('login'),
+							action: '',
+							onclick: onlogout
+						}, 'Log out'))
 					])
 				]),
 				h('div.nav.navbar-right',
 					h('p.navbar-text', [
-						'Logged in as ', model.getCurrentUser().name
+						'Logged in as ', username
 					])
 				)
 			])

@@ -12,6 +12,12 @@ module.exports = function(stateRouter) {
 				model: model,
 				stateRouter: stateRouter
 			})
+		},
+		activate: function activate(context) {
+			context.domApi.emitter.on('login', function (username) {
+				model.saveCurrentUser(username)
+				stateRouter.go('app')
+			})
 		}
 	})
 }

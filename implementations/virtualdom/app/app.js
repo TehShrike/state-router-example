@@ -11,14 +11,18 @@ module.exports = function(stateRouter) {
 		defaultChild: 'topics',
 		template: template,
 		resolve: function resolve(data, parameters, cb) {
-			if (!model.getCurrentUser().name) {
+			var username = model.getCurrentUser().name
+			if (!username) {
 				cb.redirect('login')
 			} else {
-				cb(null, {
-					model: model,
-					stateRouter: stateRouter
-				})
+				cb(null, { username: username })
 			}
+		},
+		activate: function (context) {
+			context.domApi.emitter.on('save', function () {
+				model.saveCurrentUser(null)
+				console.log('saving')
+			})
 		}
 	})
 
