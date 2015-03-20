@@ -1,5 +1,7 @@
 require('array.prototype.findindex')
 var model = require('model.js')
+var aboutState = require('./about/about')
+var topicsState = require('./topics/topics')
 var template = require('./app-template.js')
 
 module.exports = function(stateRouter) {
@@ -20,6 +22,6 @@ module.exports = function(stateRouter) {
 		}
 	})
 
-	require('./about/about')(stateRouter)
-	require('./topics/topics')(stateRouter)
+	aboutState(stateRouter)
+	topicsState(stateRouter)
 }
