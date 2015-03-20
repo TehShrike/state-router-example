@@ -2,7 +2,7 @@ var StateRouter = require('abstract-state-router')
 var virtualdomRenderer = require('virtualdom-state-renderer')
 var domready = require('domready')
 
-var stateRouter = StateRouter(virtualdomRenderer(), 'body')
+var stateRouter = StateRouter(virtualdomRenderer, 'body')
 
 require('./login/login')(stateRouter)
 require('./app/app')(stateRouter)
