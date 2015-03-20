@@ -2,9 +2,9 @@ var model = require('model.js')
 
 function activate(context) {
 	var domApi = context.domApi
-	var update = domApi.update
+	var topicId = context.parameters.topicId
 
-	domApi.on('new topic', function (newTopicName) {
+	domApi.emitter.on('new topic', function (newTopicName) {
 		var newTopicObject = model.addTopic(newTopicName)
 		model.saveTopics()
 		recalculateTasksLeftToDoInTopic(newTopicObject.id)
@@ -12,11 +12,9 @@ function activate(context) {
 			topicId: newTopicObject.id
 		})
 	})
-	//domApi.on('update', recalculateAndUpdate)
 	model.on('tasks saved', recalculateAndUpdate)
 
 	context.on('destroy', function () {
-		//domApi.removeListener('update', recalculateAndUpdate)
 		model.removeListener('tasks saved', recalculateAndUpdate)
 	})
 
@@ -33,10 +31,9 @@ function activate(context) {
 	}
 
 	function recalculateAndUpdate(topicId) {
-		console.log('recalculating ' + topicId.slice(-3))
 		recalculateTasksLeftToDoInTopic(topicId)
 		model.saveTopics()
-		update(topicId)
+		domApi.update(topicId)
 	}
 
 	model.getTopics().forEach(function(topic) {

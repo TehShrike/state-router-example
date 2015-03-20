@@ -20,15 +20,16 @@ module.exports = function(stateRouter) {
 			var el = domApi.el.querySelector('.add-new-task')
 			el && el.focus()
 
-			var resolveContent = context.content
 
-			domApi.on('saveTasks', function () {
-				model.saveTasks(resolveContent.topicId)
+			var topicId = context.content.topicId
+
+			domApi.emitter.on('saveTasks', function saveTasks() {
+				model.saveTasks(topicId)
 				domApi.update()
 			})
 
-			domApi.on('newTask', function (taskName) {
-				model.saveTask(resolveContent.topicId, taskName)
+			domApi.emitter.on('newTask', function (taskName) {
+				model.saveTask(topicId, taskName)
 				domApi.update()
 			})
 		}

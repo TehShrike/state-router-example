@@ -1,7 +1,6 @@
 var nbsp = String.fromCharCode(160)
 
 module.exports = function (h, resolveContext, helpers) {
-	var topicId = resolveContext.topicId
 	var topic = resolveContext.topic
 	var tasks = resolveContext.tasks
 
