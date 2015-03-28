@@ -284,68 +284,68 @@ module.exports = function(stateRouter) {
 		name: 'app.topics',
 		route: '/topics',
 		defaultChild: 'no-task',
- 		template: "<div class=\"container\">\n\t<div class=\"row\">\n\t\t<div class=\"col-sm-4\">\n\t\t\t<div class=\"list-group\">\n\t\t\t\t{{#topics}}\n\t\t\t\t\t<a href=\"{{ makePath('app.topics.tasks', { topicId: id }) }}\"\n\t\t\t\t\tclass=\"list-group-item\"\n\t\t\t\t\tdecorator=\"active:'app.topics.tasks','topicId:{{id}}'\">\n\t\t\t\t\t\t{{name}} <span class=\"badge\">{{ tasksUndone[id] }}</span>\n\t\t\t\t\t</a>\n\t\t\t\t{{/topics}}\n\t\t\t</div>\n\t\t\t<form action=\"\" on-submit=\"add-topic\">\n\t\t\t\t<div class=\"table\">\n\t\t\t\t\t<div class=\"table-row-group\">\n\t\t\t\t\t\t<div class=\"table-row\">\n\t\t\t\t\t\t\t<div class=\"table-cell\">\n\t\t\t\t\t\t\t\t<input type=\"text\" class=\"new-topic-name form-control {{^addingTopic}}hidden{{/addingTopic}}\" placeholder=\"Topic name\" value=\"{{newTopic}}\">\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"table-cell\" style=\"width: 60px; vertical-align: top\">\n\t\t\t\t\t\t\t\t<button type=\"submit\" class=\"btn btn-default pull-right\">Add</button>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</form>\n\t\t</div>\n\t\t<div class=\"col-sm-8\">\n\t\t\t<ui-view></ui-view>\n\t\t</div>\n\t</div>\n</div>\n",
- 		resolve: function(data, parameters, cb) {
- 			cb(null, {
- 				topics: model.getTopics(),
- 				tasks: model.getTasks()
- 			})
- 		},
- 		activate: function(context) {
- 			var ractive = context.domApi
+		template: "<div class=\"container\">\n\t<div class=\"row\">\n\t\t<div class=\"col-sm-4\">\n\t\t\t<div class=\"list-group\">\n\t\t\t\t{{#topics}}\n\t\t\t\t\t<a href=\"{{ makePath('app.topics.tasks', { topicId: id }) }}\"\n\t\t\t\t\tclass=\"list-group-item\"\n\t\t\t\t\tdecorator=\"active:'app.topics.tasks','topicId:{{id}}'\">\n\t\t\t\t\t\t{{name}} <span class=\"badge\">{{ tasksUndone[id] }}</span>\n\t\t\t\t\t</a>\n\t\t\t\t{{/topics}}\n\t\t\t</div>\n\t\t\t<form action=\"\" on-submit=\"add-topic\">\n\t\t\t\t<div class=\"table\">\n\t\t\t\t\t<div class=\"table-row-group\">\n\t\t\t\t\t\t<div class=\"table-row\">\n\t\t\t\t\t\t\t<div class=\"table-cell\">\n\t\t\t\t\t\t\t\t<input type=\"text\" class=\"new-topic-name form-control {{^addingTopic}}hidden{{/addingTopic}}\" placeholder=\"Topic name\" value=\"{{newTopic}}\">\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t<div class=\"table-cell\" style=\"width: 60px; vertical-align: top\">\n\t\t\t\t\t\t\t\t<button type=\"submit\" class=\"btn btn-default pull-right\">Add</button>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t</form>\n\t\t</div>\n\t\t<div class=\"col-sm-8\">\n\t\t\t<ui-view></ui-view>\n\t\t</div>\n\t</div>\n</div>\n",
+		resolve: function(data, parameters, cb) {
+			cb(null, {
+				topics: model.getTopics(),
+				tasks: model.getTasks()
+			})
+		},
+		activate: function(context) {
+			var ractive = context.domApi
 
- 			ractive.set({
- 				tasksUndone: {},
- 				addingTopic: false
- 			})
+			ractive.set({
+				tasksUndone: {},
+				addingTopic: false
+			})
 
- 			function setFocusOnAddTopicEdit() {
- 				process.nextTick(function() {
- 					ractive.find('.new-topic-name').focus()
- 				})
- 			}
+			function setFocusOnAddTopicEdit() {
+				process.nextTick(function() {
+					ractive.find('.new-topic-name').focus()
+				})
+			}
 
- 			function recalculateTasksLeftToDoInTopic(topicId) {
- 				var tasks = model.getTasks(topicId)
+			function recalculateTasksLeftToDoInTopic(topicId) {
+				var tasks = model.getTasks(topicId)
 
- 				var leftToDo =  tasks.reduce(function(toDo, task) {
- 					return toDo + (task.done ? 0 : 1)
- 				}, 0)
+				var leftToDo =  tasks.reduce(function(toDo, task) {
+					return toDo + (task.done ? 0 : 1)
+				}, 0)
 
- 				ractive.set('tasksUndone.' + topicId, leftToDo)
- 			}
+				ractive.set('tasksUndone.' + topicId, leftToDo)
+			}
 
- 			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
+			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
 
- 			context.content.topics.forEach(function(topic) {
- 				recalculateTasksLeftToDoInTopic(topic.id)
- 			})
+			context.content.topics.forEach(function(topic) {
+				recalculateTasksLeftToDoInTopic(topic.id)
+			})
 
- 			ractive.on('add-topic', function() {
- 				var addingTopic = ractive.get('addingTopic')
- 				var newTopicName = ractive.get('newTopic')
+			ractive.on('add-topic', function() {
+				var addingTopic = ractive.get('addingTopic')
+				var newTopicName = ractive.get('newTopic')
 
- 				if (addingTopic && newTopicName) {
- 					var newTopic = model.addTopic(newTopicName)
- 					ractive.set('newTopic', '')
- 					model.saveTopics()
- 					recalculateTasksLeftToDoInTopic(newTopic.id)
- 					stateRouter.go('app.topics.tasks', {
- 						topicId: newTopic.id
- 					})
- 				} else if (!addingTopic) {
- 					setFocusOnAddTopicEdit()
- 				}
+				if (addingTopic && newTopicName) {
+					var newTopic = model.addTopic(newTopicName)
+					ractive.set('newTopic', '')
+					model.saveTopics()
+					recalculateTasksLeftToDoInTopic(newTopic.id)
+					stateRouter.go('app.topics.tasks', {
+						topicId: newTopic.id
+					})
+				} else if (!addingTopic) {
+					setFocusOnAddTopicEdit()
+				}
 
- 				ractive.set('addingTopic', !addingTopic)
+				ractive.set('addingTopic', !addingTopic)
 
- 				return false
- 			})
+				return false
+			})
 
- 			context.on('destroy', function() {
- 				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
- 			})
- 		}
+			context.on('destroy', function() {
+				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
+			})
+		}
 	})
 
 	require('./tasks/tasks')(stateRouter)
@@ -861,32 +861,34 @@ module.exports = function extend() {
 },{}],12:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
 
-module.exports = function HashLocation() {
+module.exports = function HashLocation(window) {
 	var emitter = new EventEmitter()
+	var last = ''
 
-	function onHashChange() {
-		emitter.emit('hashchange')
-	}
+	window.addEventListener('hashchange', function() {
+		if (last !== emitter.get()) {
+			last = emitter.get()
+			emitter.emit('hashchange')
+		}
+	})
 
-	window.addEventListener('hashchange', onHashChange)
-
-	emitter.go = go
-	emitter.replace = replace
-	emitter.get = get
+	emitter.go = go.bind(null, window)
+	emitter.replace = replace.bind(null, window)
+	emitter.get = get.bind(null, window)
 
 	return emitter
 }
 
-function replace(newPath) {
-	location.replace(location.origin + location.pathname + '#' + newPath)
+function replace(window, newPath) {
+	window.location.replace(window.location.origin + window.location.pathname + '#' + newPath)
 }
 
-function go(newPath) {
-	location.hash = newPath
+function go(window, newPath) {
+	window.location.hash = newPath
 }
 
-function get() {
-	return removeHashFromPath(location.hash)
+function get(window) {
+	return removeHashFromPath(window.location.hash)
 }
 
 function removeHashFromPath(path) {
@@ -902,7 +904,7 @@ require('array.prototype.find')
 
 module.exports = function Router(hashLocation) {
 	if (!hashLocation) {
-		hashLocation = browserHashLocation()
+		hashLocation = browserHashLocation(window)
 	}
 
 	var routes = []
@@ -1377,7 +1379,7 @@ module.exports = function sequence(array, iterator, thisArg) {
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/tildeio/rsvp.js/master/LICENSE
- * @version   3.0.17
+ * @version   3.0.18
  */
 
 (function() {
@@ -2763,7 +2765,7 @@ module.exports = function sequence(array, iterator, thisArg) {
       var results = [];
 
       for (var key in input) {
-        if (promise._state === lib$rsvp$$internal$$PENDING && input.hasOwnProperty(key)) {
+        if (promise._state === lib$rsvp$$internal$$PENDING && Object.prototype.hasOwnProperty.call(input, key)) {
           results.push({
             position: key,
             entry: input[key]
@@ -3602,12 +3604,9 @@ module.exports = function StateState() {
 	}
 
 	function buildFullStateRoute(stateName) {
-		return getHierarchy(stateName).reduce(function(route, state) {
-			if (route && route[route.length - 1] !== '/' && state.route[0] !== '/') {
-				route = route + '/'
-			}
-			return route + (state.route || '')
-		}, '')
+		return getHierarchy(stateName).map(function(state) {
+			return '/' + (state.route || '')
+		}).join('').replace(/\/{2,}/g, '/')
 	}
 
 	function applyDefaultChildStates(stateName) {
