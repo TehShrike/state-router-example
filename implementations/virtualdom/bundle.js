@@ -1032,12 +1032,20 @@ module.exports = function(obj) {
 
 },{}],18:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
-var toString = Object.prototype.toString;
+var toStr = Object.prototype.toString;
 var undefined;
+
+var isArray = function isArray(arr) {
+	if (typeof Array.isArray === 'function') {
+		return Array.isArray(arr);
+	}
+
+	return toStr.call(arr) === '[object Array]';
+};
 
 var isPlainObject = function isPlainObject(obj) {
 	'use strict';
-	if (!obj || toString.call(obj) !== '[object Object]') {
+	if (!obj || toStr.call(obj) !== '[object Object]') {
 		return false;
 	}
 
@@ -1089,10 +1097,10 @@ module.exports = function extend() {
 				}
 
 				// Recurse if we're merging plain objects or arrays
-				if (deep && copy && (isPlainObject(copy) || (copyIsArray = Array.isArray(copy)))) {
+				if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
 					if (copyIsArray) {
 						copyIsArray = false;
-						clone = src && Array.isArray(src) ? src : [];
+						clone = src && isArray(src) ? src : [];
 					} else {
 						clone = src && isPlainObject(src) ? src : {};
 					}
@@ -4027,7 +4035,7 @@ module.exports = function (emitter) {
   })
 
   return function (fn) {
-    loaded ? fn() : fns.push(fn)
+    loaded ? setTimeout(fn, 0) : fns.push(fn)
   }
 
 });
