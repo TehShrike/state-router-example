@@ -169,7 +169,7 @@ function initializeDummyData() {
 
 
 }).call(this,require('_process'))
-},{"_process":46,"events":45,"random-uuid-v4":41}],2:[function(require,module,exports){
+},{"_process":48,"events":47,"random-uuid-v4":53}],2:[function(require,module,exports){
 require('./about.tag')
 
 module.exports = function(stateRouter) {
@@ -187,7 +187,7 @@ riot.tag('about', '<div class="container"> <div class="row"> <div class="col-sm-
 
 });
 
-},{"riot":44}],4:[function(require,module,exports){
+},{"riot":56}],4:[function(require,module,exports){
 require('array.prototype.findindex')
 var model = require('model.js')
 
@@ -225,18 +225,18 @@ module.exports = function(stateRouter) {
 	require('./topics/topics')(stateRouter)
 }
 
-},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":39,"model.js":1}],5:[function(require,module,exports){
+},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":45,"model.js":1}],5:[function(require,module,exports){
 var riot = require('riot');
 riot.tag('app', '<nav class="navbar navbar-default"> <div class="container-fluid"> <div class="navbar-header"> <ul class="nav navbar-nav"> <li class="{ active: opts.active(\'app.topics\') }"> <a href="{ opts.makePath(\'app.topics\') }">Basic todo app!</a> </li> <li class="{ active: opts.active(\'app.about\') }"> <a href="{ opts.makePath(\'app.about\') }">About the state router</a> </li> <li> <a href="{ opts.makePath(\'login\') }" on-click="logout">"Log out"</a> </li> </ul> </div> <div class="nav navbar-right"> <p class="navbar-text"> Logged in as { currentUser.name } </p> </div> </div> </nav> <ui-view></ui-view>', function(opts) {
 
 });
-},{"riot":44}],6:[function(require,module,exports){
+},{"riot":56}],6:[function(require,module,exports){
 var riot = require('riot');
 riot.tag('no-task-selected', '<span> <p> This is a very basic todo app to show off route states. </p> <p> Click on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing! </p> </span>', function(opts) {
 
 });
 
-},{"riot":44}],7:[function(require,module,exports){
+},{"riot":56}],7:[function(require,module,exports){
 var model = require('model.js')
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
@@ -321,7 +321,7 @@ riot.tag('tasks', '<h1>{opts.topic.name}</h1> <table class="table table-striped"
 
 });
 
-},{"riot":44}],9:[function(require,module,exports){
+},{"riot":56}],9:[function(require,module,exports){
 (function (process){
 var model = require('model.js')
 
@@ -387,7 +387,7 @@ module.exports = function(stateRouter) {
 }
 
 }).call(this,require('_process'))
-},{"./tasks/tasks":7,"./topics.tag":10,"_process":46,"model.js":1}],10:[function(require,module,exports){
+},{"./tasks/tasks":7,"./topics.tag":10,"_process":48,"model.js":1}],10:[function(require,module,exports){
 var riot = require('riot');
 riot.tag('topics', '<div class="container"> <div class="row"> <div class="col-sm-4"> <div class="list-group"> <a each="{ opts.topics }" href="{ parent.opts.makePath(\'app.topics.tasks\', \'topicId\', id) }" class="list-group-item { parent.opts.active(\'app.topics.tasks\', \'topicId\', id) ? \'active\' : \'\' }"> {name} <span class="badge">{ parent.opts.tasksUndone[id] }</span> </a> </div> <form action="" onsubmit="{ onAddTopic }"> <div class="table"> <div class="table-row-group"> <div class="table-row"> <div class="table-cell"> <input if="{ opts.addingTopic }" type="text" class="new-topic-name form-control" placeholder="Topic name" name="newTopic"> </div> <div class="table-cell" style="width: 60px; vertical-align: top"> <button type="submit" class="btn btn-default pull-right">Add</button> </div> </div> </div> </div> </form> </div> <div class="col-sm-8"> <ui-view></ui-view> </div> </div> </div>', function(opts) {
 
@@ -412,21 +412,7 @@ riot.tag('topics', '<div class="container"> <div class="row"> <div class="col-sm
 
 });
 
-},{"riot":44}],11:[function(require,module,exports){
-var StateRouter = require('abstract-state-router')
-var riotRenderer = require('riot-state-renderer')
-var domready = require('domready')
-
-var stateRouter = StateRouter(riotRenderer(), 'body')
-
-require('./login/login')(stateRouter)
-require('./app/app')(stateRouter)
-
-domready(function() {
-	stateRouter.evaluateCurrentRoute('login')
-})
-
-},{"./app/app":4,"./login/login":12,"abstract-state-router":15,"domready":40,"riot-state-renderer":42}],12:[function(require,module,exports){
+},{"riot":56}],11:[function(require,module,exports){
 var model = require('model.js')
 
 require('./login.tag')
@@ -449,7 +435,7 @@ module.exports = function(stateRouter) {
 	})
 }
 
-},{"./login.tag":13,"model.js":1}],13:[function(require,module,exports){
+},{"./login.tag":12,"model.js":1}],12:[function(require,module,exports){
 var riot = require('riot');
 riot.tag('login', '<div class="container-fluid"> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <h1>Welcome to the abstract-state-router demo!</h1> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-3 col-sm-6"> <div class="well"> <p class="lead"> This is a demo webapp showing off basic usage of the <a href="https://github.com/TehShrike/abstract-state-router">abstract-state-router</a> library using a few different templating libraries. </p> </div> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-4 col-sm-4"> <div class="form-group panel"> <form onsubmit="{ login }" class="panel-body" action=""> <label> Put in whatever username you feel like: <input type="text" class="form-control" name="username"> </label> <button type="submit" class="btn btn-primary">"Log in"</button> </form> </div> </div> </div> </div>', function(opts) {
 
@@ -461,7 +447,7 @@ riot.tag('login', '<div class="container-fluid"> <div class="row"> <div class="c
 
 });
 
-},{"riot":44}],14:[function(require,module,exports){
+},{"riot":56}],13:[function(require,module,exports){
 module.exports = function CurrentState() {
 	var current = null
 
@@ -478,7 +464,7 @@ module.exports = function CurrentState() {
 	}
 }
 
-},{}],15:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (process){
 var StateState = require('./state-state')
 var extend = require('extend')
@@ -493,13 +479,21 @@ var parse = require('./state-string-parser')
 var combine = require('combine-arrays')
 var buildPath = require('page-path-builder')
 var StateTransitionManager = require('./state-transition-manager')
+var debug = require('debug')('abstract-state-router')
 
-module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
+module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOptions) {
 	var prototypalStateHolder = StateState()
 	var current = CurrentState()
 	var stateProviderEmitter = new EventEmitter()
 	StateTransitionManager(stateProviderEmitter)
-	hashRouter = hashRouter || newHashBrownRouter()
+	stateRouterOptions = extend({
+		throwOnError: true
+	}, stateRouterOptions)
+
+	if (!stateRouterOptions.router) {
+		stateRouterOptions.router = newHashBrownRouter({ reverse: true })
+	}
+
 	current.set('', {})
 
 	var destroyDom = null
@@ -514,7 +508,10 @@ module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
 	function handleError(event, err) {
 		process.nextTick(function() {
 			stateProviderEmitter.emit(event, err)
-			console.error(err)
+			debug(event + ' - ' + err.message)
+			if (stateRouterOptions.throwOnError) {
+				throw err
+			}
 		})
 	}
 
@@ -568,12 +565,15 @@ module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
 	}
 
 	function onRouteChange(state, parameters) {
-		function stateGo(transition) {
-			var fullStateName = prototypalStateHolder.applyDefaultChildStates(state.name)
-			attemptStateChange(fullStateName, parameters, transition)
-		}
+		var fullStateName = prototypalStateHolder.applyDefaultChildStates(state.name)
 
-		stateProviderEmitter.emit('stateChangeAttempt', stateGo)
+		if (fullStateName !== state.name) {
+			stateProviderEmitter.go(fullStateName, parameters, { replace: true })
+		} else {
+			stateProviderEmitter.emit('stateChangeAttempt', function stateGo(transition) {
+				attemptStateChange(fullStateName, parameters, transition)
+			})
+		}
 	}
 
 	function addState(state) {
@@ -588,7 +588,7 @@ module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
 
 		var route = prototypalStateHolder.buildFullStateRoute(state.name)
 
-		hashRouter.add(route, onRouteChange.bind(null, state))
+		stateRouterOptions.router.add(route, onRouteChange.bind(null, state))
 	}
 
 	function getStatesToResolve(stateChanges) {
@@ -674,7 +674,7 @@ module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
 			try {
 				stateProviderEmitter.emit('stateChangeEnd', prototypalStateHolder.get(newStateName), parameters)
 			} catch (e) {
-				handleError('error', e)
+				handleError('stateError', e)
 			}
 		}).catch(ifNotCancelled(function handleStateChangeError(err) {
 			if (err && err.redirectTo) {
@@ -705,15 +705,15 @@ module.exports = function StateProvider(makeRenderer, rootElement, hashRouter) {
 	stateProviderEmitter.addState = addState
 	stateProviderEmitter.go = function go(newStateName, parameters, options) {
 		options = extend({}, defaultOptions, options)
-		var goFunction = options.replace ? hashRouter.replace : hashRouter.go
+		var goFunction = options.replace ? stateRouterOptions.router.replace : stateRouterOptions.router.go
 
 		return promiseMe(makePath, newStateName, parameters).then(goFunction, handleError.bind(null, 'stateChangeError'))
 	}
 	stateProviderEmitter.evaluateCurrentRoute = function evaluateCurrentRoute(defaultRoute, defaultParams) {
 		return promiseMe(makePath, defaultRoute, defaultParams).then(function(defaultPath) {
-			hashRouter.evaluateCurrent(defaultPath)
+			stateRouterOptions.router.evaluateCurrent(defaultPath)
 		}).catch(function(err) {
-			handleError('error', err)
+			handleError('stateError', err)
 		})
 	}
 	stateProviderEmitter.makePath = function makePathAndPrependHash(stateName, parameters) {
@@ -812,7 +812,7 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./current-state":14,"./state-change-logic":34,"./state-comparison":35,"./state-state":36,"./state-string-parser":37,"./state-transition-manager":38,"_process":46,"combine-arrays":16,"events":45,"extend":17,"hash-brown-router":19,"page-path-builder":22,"promise":28,"promise-map-series":26}],16:[function(require,module,exports){
+},{"./current-state":13,"./state-change-logic":40,"./state-comparison":41,"./state-state":42,"./state-string-parser":43,"./state-transition-manager":44,"_process":48,"combine-arrays":15,"debug":16,"events":47,"extend":19,"hash-brown-router":21,"page-path-builder":24,"promise":30,"promise-map-series":28}],15:[function(require,module,exports){
 module.exports = function(obj) {
 	var keys = Object.keys(obj)
 
@@ -844,7 +844,503 @@ module.exports = function(obj) {
 	return output
 }
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
+
+/**
+ * This is the web browser implementation of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = require('./debug');
+exports.log = log;
+exports.formatArgs = formatArgs;
+exports.save = save;
+exports.load = load;
+exports.useColors = useColors;
+exports.storage = 'undefined' != typeof chrome
+               && 'undefined' != typeof chrome.storage
+                  ? chrome.storage.local
+                  : localstorage();
+
+/**
+ * Colors.
+ */
+
+exports.colors = [
+  'lightseagreen',
+  'forestgreen',
+  'goldenrod',
+  'dodgerblue',
+  'darkorchid',
+  'crimson'
+];
+
+/**
+ * Currently only WebKit-based Web Inspectors, Firefox >= v31,
+ * and the Firebug extension (any Firefox version) are known
+ * to support "%c" CSS customizations.
+ *
+ * TODO: add a `localStorage` variable to explicitly enable/disable colors
+ */
+
+function useColors() {
+  // is webkit? http://stackoverflow.com/a/16459606/376773
+  return ('WebkitAppearance' in document.documentElement.style) ||
+    // is firebug? http://stackoverflow.com/a/398120/376773
+    (window.console && (console.firebug || (console.exception && console.table))) ||
+    // is firefox >= v31?
+    // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+    (navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31);
+}
+
+/**
+ * Map %j to `JSON.stringify()`, since no Web Inspectors do that by default.
+ */
+
+exports.formatters.j = function(v) {
+  return JSON.stringify(v);
+};
+
+
+/**
+ * Colorize log arguments if enabled.
+ *
+ * @api public
+ */
+
+function formatArgs() {
+  var args = arguments;
+  var useColors = this.useColors;
+
+  args[0] = (useColors ? '%c' : '')
+    + this.namespace
+    + (useColors ? ' %c' : ' ')
+    + args[0]
+    + (useColors ? '%c ' : ' ')
+    + '+' + exports.humanize(this.diff);
+
+  if (!useColors) return args;
+
+  var c = 'color: ' + this.color;
+  args = [args[0], c, 'color: inherit'].concat(Array.prototype.slice.call(args, 1));
+
+  // the final "%c" is somewhat tricky, because there could be other
+  // arguments passed either before or after the %c, so we need to
+  // figure out the correct index to insert the CSS into
+  var index = 0;
+  var lastC = 0;
+  args[0].replace(/%[a-z%]/g, function(match) {
+    if ('%%' === match) return;
+    index++;
+    if ('%c' === match) {
+      // we only are interested in the *last* %c
+      // (the user may have provided their own)
+      lastC = index;
+    }
+  });
+
+  args.splice(lastC, 0, c);
+  return args;
+}
+
+/**
+ * Invokes `console.log()` when available.
+ * No-op when `console.log` is not a "function".
+ *
+ * @api public
+ */
+
+function log() {
+  // this hackery is required for IE8/9, where
+  // the `console.log` function doesn't have 'apply'
+  return 'object' === typeof console
+    && console.log
+    && Function.prototype.apply.call(console.log, console, arguments);
+}
+
+/**
+ * Save `namespaces`.
+ *
+ * @param {String} namespaces
+ * @api private
+ */
+
+function save(namespaces) {
+  try {
+    if (null == namespaces) {
+      exports.storage.removeItem('debug');
+    } else {
+      exports.storage.debug = namespaces;
+    }
+  } catch(e) {}
+}
+
+/**
+ * Load `namespaces`.
+ *
+ * @return {String} returns the previously persisted debug modes
+ * @api private
+ */
+
+function load() {
+  var r;
+  try {
+    r = exports.storage.debug;
+  } catch(e) {}
+  return r;
+}
+
+/**
+ * Enable namespaces listed in `localStorage.debug` initially.
+ */
+
+exports.enable(load());
+
+/**
+ * Localstorage attempts to return the localstorage.
+ *
+ * This is necessary because safari throws
+ * when a user disables cookies/localstorage
+ * and you attempt to access it.
+ *
+ * @return {LocalStorage}
+ * @api private
+ */
+
+function localstorage(){
+  try {
+    return window.localStorage;
+  } catch (e) {}
+}
+
+},{"./debug":17}],17:[function(require,module,exports){
+
+/**
+ * This is the common logic for both the Node.js and web browser
+ * implementations of `debug()`.
+ *
+ * Expose `debug()` as the module.
+ */
+
+exports = module.exports = debug;
+exports.coerce = coerce;
+exports.disable = disable;
+exports.enable = enable;
+exports.enabled = enabled;
+exports.humanize = require('ms');
+
+/**
+ * The currently active debug mode names, and names to skip.
+ */
+
+exports.names = [];
+exports.skips = [];
+
+/**
+ * Map of special "%n" handling functions, for the debug "format" argument.
+ *
+ * Valid key names are a single, lowercased letter, i.e. "n".
+ */
+
+exports.formatters = {};
+
+/**
+ * Previously assigned color.
+ */
+
+var prevColor = 0;
+
+/**
+ * Previous log timestamp.
+ */
+
+var prevTime;
+
+/**
+ * Select a color.
+ *
+ * @return {Number}
+ * @api private
+ */
+
+function selectColor() {
+  return exports.colors[prevColor++ % exports.colors.length];
+}
+
+/**
+ * Create a debugger with the given `namespace`.
+ *
+ * @param {String} namespace
+ * @return {Function}
+ * @api public
+ */
+
+function debug(namespace) {
+
+  // define the `disabled` version
+  function disabled() {
+  }
+  disabled.enabled = false;
+
+  // define the `enabled` version
+  function enabled() {
+
+    var self = enabled;
+
+    // set `diff` timestamp
+    var curr = +new Date();
+    var ms = curr - (prevTime || curr);
+    self.diff = ms;
+    self.prev = prevTime;
+    self.curr = curr;
+    prevTime = curr;
+
+    // add the `color` if not set
+    if (null == self.useColors) self.useColors = exports.useColors();
+    if (null == self.color && self.useColors) self.color = selectColor();
+
+    var args = Array.prototype.slice.call(arguments);
+
+    args[0] = exports.coerce(args[0]);
+
+    if ('string' !== typeof args[0]) {
+      // anything else let's inspect with %o
+      args = ['%o'].concat(args);
+    }
+
+    // apply any `formatters` transformations
+    var index = 0;
+    args[0] = args[0].replace(/%([a-z%])/g, function(match, format) {
+      // if we encounter an escaped % then don't increase the array index
+      if (match === '%%') return match;
+      index++;
+      var formatter = exports.formatters[format];
+      if ('function' === typeof formatter) {
+        var val = args[index];
+        match = formatter.call(self, val);
+
+        // now we need to remove `args[index]` since it's inlined in the `format`
+        args.splice(index, 1);
+        index--;
+      }
+      return match;
+    });
+
+    if ('function' === typeof exports.formatArgs) {
+      args = exports.formatArgs.apply(self, args);
+    }
+    var logFn = enabled.log || exports.log || console.log.bind(console);
+    logFn.apply(self, args);
+  }
+  enabled.enabled = true;
+
+  var fn = exports.enabled(namespace) ? enabled : disabled;
+
+  fn.namespace = namespace;
+
+  return fn;
+}
+
+/**
+ * Enables a debug mode by namespaces. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} namespaces
+ * @api public
+ */
+
+function enable(namespaces) {
+  exports.save(namespaces);
+
+  var split = (namespaces || '').split(/[\s,]+/);
+  var len = split.length;
+
+  for (var i = 0; i < len; i++) {
+    if (!split[i]) continue; // ignore empty strings
+    namespaces = split[i].replace(/\*/g, '.*?');
+    if (namespaces[0] === '-') {
+      exports.skips.push(new RegExp('^' + namespaces.substr(1) + '$'));
+    } else {
+      exports.names.push(new RegExp('^' + namespaces + '$'));
+    }
+  }
+}
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+function disable() {
+  exports.enable('');
+}
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+function enabled(name) {
+  var i, len;
+  for (i = 0, len = exports.skips.length; i < len; i++) {
+    if (exports.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (i = 0, len = exports.names.length; i < len; i++) {
+    if (exports.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/**
+ * Coerce `val`.
+ *
+ * @param {Mixed} val
+ * @return {Mixed}
+ * @api private
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+},{"ms":18}],18:[function(require,module,exports){
+/**
+ * Helpers.
+ */
+
+var s = 1000;
+var m = s * 60;
+var h = m * 60;
+var d = h * 24;
+var y = d * 365.25;
+
+/**
+ * Parse or format the given `val`.
+ *
+ * Options:
+ *
+ *  - `long` verbose formatting [false]
+ *
+ * @param {String|Number} val
+ * @param {Object} options
+ * @return {String|Number}
+ * @api public
+ */
+
+module.exports = function(val, options){
+  options = options || {};
+  if ('string' == typeof val) return parse(val);
+  return options.long
+    ? long(val)
+    : short(val);
+};
+
+/**
+ * Parse the given `str` and return milliseconds.
+ *
+ * @param {String} str
+ * @return {Number}
+ * @api private
+ */
+
+function parse(str) {
+  str = '' + str;
+  if (str.length > 10000) return;
+  var match = /^((?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|years?|yrs?|y)?$/i.exec(str);
+  if (!match) return;
+  var n = parseFloat(match[1]);
+  var type = (match[2] || 'ms').toLowerCase();
+  switch (type) {
+    case 'years':
+    case 'year':
+    case 'yrs':
+    case 'yr':
+    case 'y':
+      return n * y;
+    case 'days':
+    case 'day':
+    case 'd':
+      return n * d;
+    case 'hours':
+    case 'hour':
+    case 'hrs':
+    case 'hr':
+    case 'h':
+      return n * h;
+    case 'minutes':
+    case 'minute':
+    case 'mins':
+    case 'min':
+    case 'm':
+      return n * m;
+    case 'seconds':
+    case 'second':
+    case 'secs':
+    case 'sec':
+    case 's':
+      return n * s;
+    case 'milliseconds':
+    case 'millisecond':
+    case 'msecs':
+    case 'msec':
+    case 'ms':
+      return n;
+  }
+}
+
+/**
+ * Short format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function short(ms) {
+  if (ms >= d) return Math.round(ms / d) + 'd';
+  if (ms >= h) return Math.round(ms / h) + 'h';
+  if (ms >= m) return Math.round(ms / m) + 'm';
+  if (ms >= s) return Math.round(ms / s) + 's';
+  return ms + 'ms';
+}
+
+/**
+ * Long format for `ms`.
+ *
+ * @param {Number} ms
+ * @return {String}
+ * @api private
+ */
+
+function long(ms) {
+  return plural(ms, d, 'day')
+    || plural(ms, h, 'hour')
+    || plural(ms, m, 'minute')
+    || plural(ms, s, 'second')
+    || ms + ' ms';
+}
+
+/**
+ * Pluralization helper.
+ */
+
+function plural(ms, n, name) {
+  if (ms < n) return;
+  if (ms < n * 1.5) return Math.floor(ms / n) + ' ' + name;
+  return Math.ceil(ms / n) + ' ' + name + 's';
+}
+
+},{}],19:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toStr = Object.prototype.toString;
 var undefined;
@@ -935,7 +1431,7 @@ module.exports = function extend() {
 };
 
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
 
 module.exports = function HashLocation(window) {
@@ -972,21 +1468,28 @@ function removeHashFromPath(path) {
 	return (path && path[0] === '#') ? path.substr(1) : path
 }
 
-},{"events":45}],19:[function(require,module,exports){
+},{"events":47}],21:[function(require,module,exports){
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
 var qs = require('querystring')
 var xtend = require('xtend')
 var browserHashLocation = require('./hash-location.js')
 require('array.prototype.find')
 
-module.exports = function Router(hashLocation) {
+module.exports = function Router(opts, hashLocation) {
+	if (isHashLocation(opts)) {
+		hashLocation = opts
+		opts = null
+	}
+
+	opts = opts || {}
+
 	if (!hashLocation) {
 		hashLocation = browserHashLocation(window)
 	}
 
 	var routes = []
 
-	var onHashChange = evaluateCurrentPath.bind(null, routes, hashLocation)
+	var onHashChange = evaluateCurrentPath.bind(null, routes, hashLocation, !!opts.reverse)
 
 	hashLocation.on('hashchange', onHashChange)
 
@@ -1004,8 +1507,8 @@ module.exports = function Router(hashLocation) {
 	}
 }
 
-function evaluateCurrentPath(routes, hashLocation) {
-	evaluatePath(routes, hashLocation.get())
+function evaluateCurrentPath(routes, hashLocation, reverse) {
+	evaluatePath(routes, hashLocation.get(), reverse)
 }
 
 function getPathParts(path) {
@@ -1016,12 +1519,12 @@ function getPathParts(path) {
 	}
 }
 
-function evaluatePath(routes, path) {
+function evaluatePath(routes, path, reverse) {
 	var pathParts = getPathParts(path)
 	path = pathParts.path
 	var queryStringParameters = pathParts.queryString
 
-	var matchingRoute = routes.find("".match, path)
+	var matchingRoute = (reverse ? reverseArray(routes) : routes).find("".match, path)
 
 	if (matchingRoute) {
 		var regexResult = matchingRoute.exec(path)
@@ -1031,6 +1534,10 @@ function evaluatePath(routes, path) {
 	} else if (routes.defaultFn) {
 		routes.defaultFn(path, queryStringParameters)
 	}
+}
+
+function reverseArray(ary) {
+	return ary.slice().reverse()
 }
 
 function makeParametersObjectFromRegexResult(keys, regexResult) {
@@ -1061,8 +1568,10 @@ function setDefault(routes, defaultFn) {
 	routes.defaultFn = defaultFn
 }
 
-
-},{"./hash-location.js":18,"array.prototype.find":20,"path-to-regexp-with-reversible-keys":24,"querystring":49,"xtend":21}],20:[function(require,module,exports){
+function isHashLocation(hashLocation) {
+	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
+}
+},{"./hash-location.js":20,"array.prototype.find":22,"path-to-regexp-with-reversible-keys":26,"querystring":51,"xtend":23}],22:[function(require,module,exports){
 // Array.prototype.find - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: https://github.com/paulmillr/array.prototype.find
 // Fixes and tests supplied by Duncan Hall <http://duncanhall.net> 
@@ -1097,7 +1606,7 @@ function setDefault(routes, defaultFn) {
   }
 })(this);
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -1116,7 +1625,7 @@ function extend() {
     return target
 }
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 var parser = require('./path-parser')
 var stringifyQuerystring = require('querystring').stringify
 
@@ -1175,7 +1684,7 @@ function getParametersWithoutMatchingToken(parameters, tokenArray) {
 	}, {})
 }
 
-},{"./path-parser":23,"querystring":49}],23:[function(require,module,exports){
+},{"./path-parser":25,"querystring":51}],25:[function(require,module,exports){
 // This file to be replaced with an official implementation maintained by
 // the page.js crew if and when that becomes an option
 
@@ -1194,7 +1703,7 @@ module.exports = function(pathString) {
 	}
 }
 
-},{"path-to-regexp-with-reversible-keys":24}],24:[function(require,module,exports){
+},{"path-to-regexp-with-reversible-keys":26}],26:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -1426,12 +1935,12 @@ function pathToRegexp (path, keys, options, allTokens) {
   return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
 }
 
-},{"isarray":25}],25:[function(require,module,exports){
+},{"isarray":27}],27:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var Promise = require('rsvp').Promise;
 
 module.exports = function sequence(array, iterator, thisArg) {
@@ -1449,7 +1958,7 @@ module.exports = function sequence(array, iterator, thisArg) {
   return Promise.all(results)
 }
 
-},{"rsvp":27}],27:[function(require,module,exports){
+},{"rsvp":29}],29:[function(require,module,exports){
 (function (process){
 /*!
  * @overview RSVP - a tiny implementation of Promises/A+.
@@ -3124,93 +3633,172 @@ module.exports = function sequence(array, iterator, thisArg) {
 
 
 }).call(this,require('_process'))
-},{"_process":46}],28:[function(require,module,exports){
+},{"_process":48}],30:[function(require,module,exports){
 'use strict';
 
-module.exports = require('./lib/core.js')
-require('./lib/done.js')
-require('./lib/es6-extensions.js')
-require('./lib/node-extensions.js')
-},{"./lib/core.js":29,"./lib/done.js":30,"./lib/es6-extensions.js":31,"./lib/node-extensions.js":32}],29:[function(require,module,exports){
+module.exports = require('./lib')
+
+},{"./lib":35}],31:[function(require,module,exports){
 'use strict';
 
-var asap = require('asap')
+var asap = require('asap/raw');
 
-module.exports = Promise;
-function Promise(fn) {
-  if (typeof this !== 'object') throw new TypeError('Promises must be constructed via new')
-  if (typeof fn !== 'function') throw new TypeError('not a function')
-  var state = null
-  var value = null
-  var deferreds = []
-  var self = this
+function noop() {}
 
-  this.then = function(onFulfilled, onRejected) {
-    return new self.constructor(function(resolve, reject) {
-      handle(new Handler(onFulfilled, onRejected, resolve, reject))
-    })
+// States:
+//
+// 0 - pending
+// 1 - fulfilled with _value
+// 2 - rejected with _value
+// 3 - adopted the state of another promise, _value
+//
+// once the state is no longer pending (0) it is immutable
+
+// All `_` prefixed properties will be reduced to `_{random number}`
+// at build time to obfuscate them and discourage their use.
+// We don't use symbols or Object.defineProperty to fully hide them
+// because the performance isn't good enough.
+
+
+// to avoid using try/catch inside critical functions, we
+// extract them to here.
+var LAST_ERROR = null;
+var IS_ERROR = {};
+function getThen(obj) {
+  try {
+    return obj.then;
+  } catch (ex) {
+    LAST_ERROR = ex;
+    return IS_ERROR;
   }
-
-  function handle(deferred) {
-    if (state === null) {
-      deferreds.push(deferred)
-      return
-    }
-    asap(function() {
-      var cb = state ? deferred.onFulfilled : deferred.onRejected
-      if (cb === null) {
-        (state ? deferred.resolve : deferred.reject)(value)
-        return
-      }
-      var ret
-      try {
-        ret = cb(value)
-      }
-      catch (e) {
-        deferred.reject(e)
-        return
-      }
-      deferred.resolve(ret)
-    })
-  }
-
-  function resolve(newValue) {
-    try { //Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
-      if (newValue === self) throw new TypeError('A promise cannot be resolved with itself.')
-      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
-        var then = newValue.then
-        if (typeof then === 'function') {
-          doResolve(then.bind(newValue), resolve, reject)
-          return
-        }
-      }
-      state = true
-      value = newValue
-      finale()
-    } catch (e) { reject(e) }
-  }
-
-  function reject(newValue) {
-    state = false
-    value = newValue
-    finale()
-  }
-
-  function finale() {
-    for (var i = 0, len = deferreds.length; i < len; i++)
-      handle(deferreds[i])
-    deferreds = null
-  }
-
-  doResolve(fn, resolve, reject)
 }
 
+function tryCallOne(fn, a) {
+  try {
+    return fn(a);
+  } catch (ex) {
+    LAST_ERROR = ex;
+    return IS_ERROR;
+  }
+}
+function tryCallTwo(fn, a, b) {
+  try {
+    fn(a, b);
+  } catch (ex) {
+    LAST_ERROR = ex;
+    return IS_ERROR;
+  }
+}
 
-function Handler(onFulfilled, onRejected, resolve, reject){
-  this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null
-  this.onRejected = typeof onRejected === 'function' ? onRejected : null
-  this.resolve = resolve
-  this.reject = reject
+module.exports = Promise;
+
+function Promise(fn) {
+  if (typeof this !== 'object') {
+    throw new TypeError('Promises must be constructed via new');
+  }
+  if (typeof fn !== 'function') {
+    throw new TypeError('not a function');
+  }
+  this._32 = 0;
+  this._8 = null;
+  this._89 = [];
+  if (fn === noop) return;
+  doResolve(fn, this);
+}
+Promise._83 = noop;
+
+Promise.prototype.then = function(onFulfilled, onRejected) {
+  if (this.constructor !== Promise) {
+    return safeThen(this, onFulfilled, onRejected);
+  }
+  var res = new Promise(noop);
+  handle(this, new Handler(onFulfilled, onRejected, res));
+  return res;
+};
+
+function safeThen(self, onFulfilled, onRejected) {
+  return new self.constructor(function (resolve, reject) {
+    var res = new Promise(noop);
+    res.then(resolve, reject);
+    handle(self, new Handler(onFulfilled, onRejected, res));
+  });
+};
+function handle(self, deferred) {
+  while (self._32 === 3) {
+    self = self._8;
+  }
+  if (self._32 === 0) {
+    self._89.push(deferred);
+    return;
+  }
+  asap(function() {
+    var cb = self._32 === 1 ? deferred.onFulfilled : deferred.onRejected;
+    if (cb === null) {
+      if (self._32 === 1) {
+        resolve(deferred.promise, self._8);
+      } else {
+        reject(deferred.promise, self._8);
+      }
+      return;
+    }
+    var ret = tryCallOne(cb, self._8);
+    if (ret === IS_ERROR) {
+      reject(deferred.promise, LAST_ERROR);
+    } else {
+      resolve(deferred.promise, ret);
+    }
+  });
+}
+function resolve(self, newValue) {
+  // Promise Resolution Procedure: https://github.com/promises-aplus/promises-spec#the-promise-resolution-procedure
+  if (newValue === self) {
+    return reject(
+      self,
+      new TypeError('A promise cannot be resolved with itself.')
+    );
+  }
+  if (
+    newValue &&
+    (typeof newValue === 'object' || typeof newValue === 'function')
+  ) {
+    var then = getThen(newValue);
+    if (then === IS_ERROR) {
+      return reject(self, LAST_ERROR);
+    }
+    if (
+      then === self.then &&
+      newValue instanceof Promise
+    ) {
+      self._32 = 3;
+      self._8 = newValue;
+      finale(self);
+      return;
+    } else if (typeof then === 'function') {
+      doResolve(then.bind(newValue), self);
+      return;
+    }
+  }
+  self._32 = 1;
+  self._8 = newValue;
+  finale(self);
+}
+
+function reject(self, newValue) {
+  self._32 = 2;
+  self._8 = newValue;
+  finale(self);
+}
+function finale(self) {
+  for (var i = 0; i < self._89.length; i++) {
+    handle(self, self._89[i]);
+  }
+  self._89 = null;
+}
+
+function Handler(onFulfilled, onRejected, promise){
+  this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+  this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+  this.promise = promise;
 }
 
 /**
@@ -3219,195 +3807,230 @@ function Handler(onFulfilled, onRejected, resolve, reject){
  *
  * Makes no guarantees about asynchrony.
  */
-function doResolve(fn, onFulfilled, onRejected) {
+function doResolve(fn, promise) {
   var done = false;
-  try {
-    fn(function (value) {
-      if (done) return
-      done = true
-      onFulfilled(value)
-    }, function (reason) {
-      if (done) return
-      done = true
-      onRejected(reason)
-    })
-  } catch (ex) {
-    if (done) return
-    done = true
-    onRejected(ex)
+  var res = tryCallTwo(fn, function (value) {
+    if (done) return;
+    done = true;
+    resolve(promise, value);
+  }, function (reason) {
+    if (done) return;
+    done = true;
+    reject(promise, reason);
+  })
+  if (!done && res === IS_ERROR) {
+    done = true;
+    reject(promise, LAST_ERROR);
   }
 }
 
-},{"asap":33}],30:[function(require,module,exports){
+},{"asap/raw":39}],32:[function(require,module,exports){
 'use strict';
 
-var Promise = require('./core.js')
-var asap = require('asap')
+var Promise = require('./core.js');
 
-module.exports = Promise
+module.exports = Promise;
 Promise.prototype.done = function (onFulfilled, onRejected) {
-  var self = arguments.length ? this.then.apply(this, arguments) : this
+  var self = arguments.length ? this.then.apply(this, arguments) : this;
   self.then(null, function (err) {
-    asap(function () {
-      throw err
-    })
-  })
-}
-},{"./core.js":29,"asap":33}],31:[function(require,module,exports){
+    setTimeout(function () {
+      throw err;
+    }, 0);
+  });
+};
+
+},{"./core.js":31}],33:[function(require,module,exports){
 'use strict';
 
 //This file contains the ES6 extensions to the core Promises/A+ API
 
-var Promise = require('./core.js')
-var asap = require('asap')
+var Promise = require('./core.js');
+var asap = require('asap/raw');
 
-module.exports = Promise
+module.exports = Promise;
 
 /* Static Functions */
 
-function ValuePromise(value) {
-  this.then = function (onFulfilled) {
-    if (typeof onFulfilled !== 'function') return this
-    return new Promise(function (resolve, reject) {
-      asap(function () {
-        try {
-          resolve(onFulfilled(value))
-        } catch (ex) {
-          reject(ex);
-        }
-      })
-    })
-  }
+var TRUE = valuePromise(true);
+var FALSE = valuePromise(false);
+var NULL = valuePromise(null);
+var UNDEFINED = valuePromise(undefined);
+var ZERO = valuePromise(0);
+var EMPTYSTRING = valuePromise('');
+
+function valuePromise(value) {
+  var p = new Promise(Promise._83);
+  p._32 = 1;
+  p._8 = value;
+  return p;
 }
-ValuePromise.prototype = Promise.prototype
-
-var TRUE = new ValuePromise(true)
-var FALSE = new ValuePromise(false)
-var NULL = new ValuePromise(null)
-var UNDEFINED = new ValuePromise(undefined)
-var ZERO = new ValuePromise(0)
-var EMPTYSTRING = new ValuePromise('')
-
 Promise.resolve = function (value) {
-  if (value instanceof Promise) return value
+  if (value instanceof Promise) return value;
 
-  if (value === null) return NULL
-  if (value === undefined) return UNDEFINED
-  if (value === true) return TRUE
-  if (value === false) return FALSE
-  if (value === 0) return ZERO
-  if (value === '') return EMPTYSTRING
+  if (value === null) return NULL;
+  if (value === undefined) return UNDEFINED;
+  if (value === true) return TRUE;
+  if (value === false) return FALSE;
+  if (value === 0) return ZERO;
+  if (value === '') return EMPTYSTRING;
 
   if (typeof value === 'object' || typeof value === 'function') {
     try {
-      var then = value.then
+      var then = value.then;
       if (typeof then === 'function') {
-        return new Promise(then.bind(value))
+        return new Promise(then.bind(value));
       }
     } catch (ex) {
       return new Promise(function (resolve, reject) {
-        reject(ex)
-      })
+        reject(ex);
+      });
     }
   }
-
-  return new ValuePromise(value)
-}
+  return valuePromise(value);
+};
 
 Promise.all = function (arr) {
-  var args = Array.prototype.slice.call(arr)
+  var args = Array.prototype.slice.call(arr);
 
   return new Promise(function (resolve, reject) {
-    if (args.length === 0) return resolve([])
-    var remaining = args.length
+    if (args.length === 0) return resolve([]);
+    var remaining = args.length;
     function res(i, val) {
-      try {
-        if (val && (typeof val === 'object' || typeof val === 'function')) {
-          var then = val.then
+      if (val && (typeof val === 'object' || typeof val === 'function')) {
+        if (val instanceof Promise && val.then === Promise.prototype.then) {
+          while (val._32 === 3) {
+            val = val._8;
+          }
+          if (val._32 === 1) return res(i, val._8);
+          if (val._32 === 2) reject(val._8);
+          val.then(function (val) {
+            res(i, val);
+          }, reject);
+          return;
+        } else {
+          var then = val.then;
           if (typeof then === 'function') {
-            then.call(val, function (val) { res(i, val) }, reject)
-            return
+            var p = new Promise(then.bind(val));
+            p.then(function (val) {
+              res(i, val);
+            }, reject);
+            return;
           }
         }
-        args[i] = val
-        if (--remaining === 0) {
-          resolve(args);
-        }
-      } catch (ex) {
-        reject(ex)
+      }
+      args[i] = val;
+      if (--remaining === 0) {
+        resolve(args);
       }
     }
     for (var i = 0; i < args.length; i++) {
-      res(i, args[i])
+      res(i, args[i]);
     }
-  })
-}
+  });
+};
 
 Promise.reject = function (value) {
-  return new Promise(function (resolve, reject) { 
+  return new Promise(function (resolve, reject) {
     reject(value);
   });
-}
+};
 
 Promise.race = function (values) {
-  return new Promise(function (resolve, reject) { 
+  return new Promise(function (resolve, reject) {
     values.forEach(function(value){
       Promise.resolve(value).then(resolve, reject);
-    })
+    });
   });
-}
+};
 
 /* Prototype Methods */
 
 Promise.prototype['catch'] = function (onRejected) {
   return this.then(null, onRejected);
-}
+};
 
-},{"./core.js":29,"asap":33}],32:[function(require,module,exports){
+},{"./core.js":31,"asap/raw":39}],34:[function(require,module,exports){
 'use strict';
 
-//This file contains then/promise specific extensions that are only useful for node.js interop
+var Promise = require('./core.js');
 
-var Promise = require('./core.js')
-var asap = require('asap')
+module.exports = Promise;
+Promise.prototype['finally'] = function (f) {
+  return this.then(function (value) {
+    return Promise.resolve(f()).then(function () {
+      return value;
+    });
+  }, function (err) {
+    return Promise.resolve(f()).then(function () {
+      throw err;
+    });
+  });
+};
 
-module.exports = Promise
+},{"./core.js":31}],35:[function(require,module,exports){
+'use strict';
+
+module.exports = require('./core.js');
+require('./done.js');
+require('./finally.js');
+require('./es6-extensions.js');
+require('./node-extensions.js');
+
+},{"./core.js":31,"./done.js":32,"./es6-extensions.js":33,"./finally.js":34,"./node-extensions.js":36}],36:[function(require,module,exports){
+'use strict';
+
+// This file contains then/promise specific extensions that are only useful
+// for node.js interop
+
+var Promise = require('./core.js');
+var asap = require('asap');
+
+module.exports = Promise;
 
 /* Static Functions */
 
 Promise.denodeify = function (fn, argumentCount) {
-  argumentCount = argumentCount || Infinity
+  argumentCount = argumentCount || Infinity;
   return function () {
-    var self = this
-    var args = Array.prototype.slice.call(arguments)
+    var self = this;
+    var args = Array.prototype.slice.call(arguments);
     return new Promise(function (resolve, reject) {
       while (args.length && args.length > argumentCount) {
-        args.pop()
+        args.pop();
       }
       args.push(function (err, res) {
-        if (err) reject(err)
-        else resolve(res)
+        if (err) reject(err);
+        else resolve(res);
       })
-      var res = fn.apply(self, args)
-      if (res && (typeof res === 'object' || typeof res === 'function') && typeof res.then === 'function') {
-        resolve(res)
+      var res = fn.apply(self, args);
+      if (res &&
+        (
+          typeof res === 'object' ||
+          typeof res === 'function'
+        ) &&
+        typeof res.then === 'function'
+      ) {
+        resolve(res);
       }
     })
   }
 }
 Promise.nodeify = function (fn) {
   return function () {
-    var args = Array.prototype.slice.call(arguments)
-    var callback = typeof args[args.length - 1] === 'function' ? args.pop() : null
-    var ctx = this
+    var args = Array.prototype.slice.call(arguments);
+    var callback =
+      typeof args[args.length - 1] === 'function' ? args.pop() : null;
+    var ctx = this;
     try {
-      return fn.apply(this, arguments).nodeify(callback, ctx)
+      return fn.apply(this, arguments).nodeify(callback, ctx);
     } catch (ex) {
       if (callback === null || typeof callback == 'undefined') {
-        return new Promise(function (resolve, reject) { reject(ex) })
+        return new Promise(function (resolve, reject) {
+          reject(ex);
+        });
       } else {
         asap(function () {
-          callback.call(ctx, ex)
+          callback.call(ctx, ex);
         })
       }
     }
@@ -3415,137 +4038,417 @@ Promise.nodeify = function (fn) {
 }
 
 Promise.prototype.nodeify = function (callback, ctx) {
-  if (typeof callback != 'function') return this
+  if (typeof callback != 'function') return this;
 
   this.then(function (value) {
     asap(function () {
-      callback.call(ctx, null, value)
-    })
+      callback.call(ctx, null, value);
+    });
   }, function (err) {
     asap(function () {
-      callback.call(ctx, err)
-    })
-  })
+      callback.call(ctx, err);
+    });
+  });
 }
 
-},{"./core.js":29,"asap":33}],33:[function(require,module,exports){
-(function (process){
+},{"./core.js":31,"asap":37}],37:[function(require,module,exports){
+"use strict";
 
-// Use the fastest possible means to execute a task in a future turn
-// of the event loop.
+// rawAsap provides everything we need except exception management.
+var rawAsap = require("./raw");
+// RawTasks are recycled to reduce GC churn.
+var freeTasks = [];
+// We queue errors to ensure they are thrown in right order (FIFO).
+// Array-as-queue is good enough here, since we are just dealing with exceptions.
+var pendingErrors = [];
+var requestErrorThrow = rawAsap.makeRequestCallFromTimer(throwFirstError);
 
-// linked list of tasks (single, with head node)
-var head = {task: void 0, next: null};
-var tail = head;
-var flushing = false;
-var requestFlush = void 0;
-var isNodeJS = false;
-
-function flush() {
-    /* jshint loopfunc: true */
-
-    while (head.next) {
-        head = head.next;
-        var task = head.task;
-        head.task = void 0;
-        var domain = head.domain;
-
-        if (domain) {
-            head.domain = void 0;
-            domain.enter();
-        }
-
-        try {
-            task();
-
-        } catch (e) {
-            if (isNodeJS) {
-                // In node, uncaught exceptions are considered fatal errors.
-                // Re-throw them synchronously to interrupt flushing!
-
-                // Ensure continuation if the uncaught exception is suppressed
-                // listening "uncaughtException" events (as domains does).
-                // Continue in next event to avoid tick recursion.
-                if (domain) {
-                    domain.exit();
-                }
-                setTimeout(flush, 0);
-                if (domain) {
-                    domain.enter();
-                }
-
-                throw e;
-
-            } else {
-                // In browsers, uncaught exceptions are not fatal.
-                // Re-throw them asynchronously to avoid slow-downs.
-                setTimeout(function() {
-                   throw e;
-                }, 0);
-            }
-        }
-
-        if (domain) {
-            domain.exit();
-        }
+function throwFirstError() {
+    if (pendingErrors.length) {
+        throw pendingErrors.shift();
     }
-
-    flushing = false;
 }
 
-if (typeof process !== "undefined" && process.nextTick) {
-    // Node.js before 0.9. Note that some fake-Node environments, like the
-    // Mocha test runner, introduce a `process` global without a `nextTick`.
-    isNodeJS = true;
-
-    requestFlush = function () {
-        process.nextTick(flush);
-    };
-
-} else if (typeof setImmediate === "function") {
-    // In IE10, Node.js 0.9+, or https://github.com/NobleJS/setImmediate
-    if (typeof window !== "undefined") {
-        requestFlush = setImmediate.bind(window, flush);
-    } else {
-        requestFlush = function () {
-            setImmediate(flush);
-        };
-    }
-
-} else if (typeof MessageChannel !== "undefined") {
-    // modern browsers
-    // http://www.nonblocking.io/2011/06/windownexttick.html
-    var channel = new MessageChannel();
-    channel.port1.onmessage = flush;
-    requestFlush = function () {
-        channel.port2.postMessage(0);
-    };
-
-} else {
-    // old browsers
-    requestFlush = function () {
-        setTimeout(flush, 0);
-    };
-}
-
+/**
+ * Calls a task as soon as possible after returning, in its own event, with priority
+ * over other events like animation, reflow, and repaint. An error thrown from an
+ * event will not interrupt, nor even substantially slow down the processing of
+ * other events, but will be rather postponed to a lower priority event.
+ * @param {{call}} task A callable object, typically a function that takes no
+ * arguments.
+ */
+module.exports = asap;
 function asap(task) {
-    tail = tail.next = {
-        task: task,
-        domain: isNodeJS && process.domain,
-        next: null
-    };
+    var rawTask;
+    if (freeTasks.length) {
+        rawTask = freeTasks.pop();
+    } else {
+        rawTask = new RawTask();
+    }
+    rawTask.task = task;
+    rawAsap(rawTask);
+}
 
-    if (!flushing) {
-        flushing = true;
-        requestFlush();
+// We wrap tasks with recyclable task objects.  A task object implements
+// `call`, just like a function.
+function RawTask() {
+    this.task = null;
+}
+
+// The sole purpose of wrapping the task is to catch the exception and recycle
+// the task object after its single use.
+RawTask.prototype.call = function () {
+    try {
+        this.task.call();
+    } catch (error) {
+        if (asap.onerror) {
+            // This hook exists purely for testing purposes.
+            // Its name will be periodically randomized to break any code that
+            // depends on its existence.
+            asap.onerror(error);
+        } else {
+            // In a web browser, exceptions are not fatal. However, to avoid
+            // slowing down the queue of pending tasks, we rethrow the error in a
+            // lower priority turn.
+            pendingErrors.push(error);
+            requestErrorThrow();
+        }
+    } finally {
+        this.task = null;
+        freeTasks[freeTasks.length] = this;
     }
 };
 
-module.exports = asap;
+},{"./raw":38}],38:[function(require,module,exports){
+(function (global){
+"use strict";
 
+// Use the fastest means possible to execute a task in its own turn, with
+// priority over other events including IO, animation, reflow, and redraw
+// events in browsers.
+//
+// An exception thrown by a task will permanently interrupt the processing of
+// subsequent tasks. The higher level `asap` function ensures that if an
+// exception is thrown by a task, that the task queue will continue flushing as
+// soon as possible, but if you use `rawAsap` directly, you are responsible to
+// either ensure that no exceptions are thrown from your task, or to manually
+// call `rawAsap.requestFlush` if an exception is thrown.
+module.exports = rawAsap;
+function rawAsap(task) {
+    if (!queue.length) {
+        requestFlush();
+        flushing = true;
+    }
+    // Equivalent to push, but avoids a function call.
+    queue[queue.length] = task;
+}
+
+var queue = [];
+// Once a flush has been requested, no further calls to `requestFlush` are
+// necessary until the next `flush` completes.
+var flushing = false;
+// `requestFlush` is an implementation-specific method that attempts to kick
+// off a `flush` event as quickly as possible. `flush` will attempt to exhaust
+// the event queue before yielding to the browser's own event loop.
+var requestFlush;
+// The position of the next task to execute in the task queue. This is
+// preserved between calls to `flush` so that it can be resumed if
+// a task throws an exception.
+var index = 0;
+// If a task schedules additional tasks recursively, the task queue can grow
+// unbounded. To prevent memory exhaustion, the task queue will periodically
+// truncate already-completed tasks.
+var capacity = 1024;
+
+// The flush function processes all tasks that have been scheduled with
+// `rawAsap` unless and until one of those tasks throws an exception.
+// If a task throws an exception, `flush` ensures that its state will remain
+// consistent and will resume where it left off when called again.
+// However, `flush` does not make any arrangements to be called again if an
+// exception is thrown.
+function flush() {
+    while (index < queue.length) {
+        var currentIndex = index;
+        // Advance the index before calling the task. This ensures that we will
+        // begin flushing on the next task the task throws an error.
+        index = index + 1;
+        queue[currentIndex].call();
+        // Prevent leaking memory for long chains of recursive calls to `asap`.
+        // If we call `asap` within tasks scheduled by `asap`, the queue will
+        // grow, but to avoid an O(n) walk for every task we execute, we don't
+        // shift tasks off the queue after they have been executed.
+        // Instead, we periodically shift 1024 tasks off the queue.
+        if (index > capacity) {
+            // Manually shift all values starting at the index back to the
+            // beginning of the queue.
+            for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
+                queue[scan] = queue[scan + index];
+            }
+            queue.length -= index;
+            index = 0;
+        }
+    }
+    queue.length = 0;
+    index = 0;
+    flushing = false;
+}
+
+// `requestFlush` is implemented using a strategy based on data collected from
+// every available SauceLabs Selenium web driver worker at time of writing.
+// https://docs.google.com/spreadsheets/d/1mG-5UYGup5qxGdEMWkhP6BWCz053NUb2E1QoUTU16uA/edit#gid=783724593
+
+// Safari 6 and 6.1 for desktop, iPad, and iPhone are the only browsers that
+// have WebKitMutationObserver but not un-prefixed MutationObserver.
+// Must use `global` instead of `window` to work in both frames and web
+// workers. `global` is a provision of Browserify, Mr, Mrs, or Mop.
+var BrowserMutationObserver = global.MutationObserver || global.WebKitMutationObserver;
+
+// MutationObservers are desirable because they have high priority and work
+// reliably everywhere they are implemented.
+// They are implemented in all modern browsers.
+//
+// - Android 4-4.3
+// - Chrome 26-34
+// - Firefox 14-29
+// - Internet Explorer 11
+// - iPad Safari 6-7.1
+// - iPhone Safari 7-7.1
+// - Safari 6-7
+if (typeof BrowserMutationObserver === "function") {
+    requestFlush = makeRequestCallFromMutationObserver(flush);
+
+// MessageChannels are desirable because they give direct access to the HTML
+// task queue, are implemented in Internet Explorer 10, Safari 5.0-1, and Opera
+// 11-12, and in web workers in many engines.
+// Although message channels yield to any queued rendering and IO tasks, they
+// would be better than imposing the 4ms delay of timers.
+// However, they do not work reliably in Internet Explorer or Safari.
+
+// Internet Explorer 10 is the only browser that has setImmediate but does
+// not have MutationObservers.
+// Although setImmediate yields to the browser's renderer, it would be
+// preferrable to falling back to setTimeout since it does not have
+// the minimum 4ms penalty.
+// Unfortunately there appears to be a bug in Internet Explorer 10 Mobile (and
+// Desktop to a lesser extent) that renders both setImmediate and
+// MessageChannel useless for the purposes of ASAP.
+// https://github.com/kriskowal/q/issues/396
+
+// Timers are implemented universally.
+// We fall back to timers in workers in most engines, and in foreground
+// contexts in the following browsers.
+// However, note that even this simple case requires nuances to operate in a
+// broad spectrum of browsers.
+//
+// - Firefox 3-13
+// - Internet Explorer 6-9
+// - iPad Safari 4.3
+// - Lynx 2.8.7
+} else {
+    requestFlush = makeRequestCallFromTimer(flush);
+}
+
+// `requestFlush` requests that the high priority event queue be flushed as
+// soon as possible.
+// This is useful to prevent an error thrown in a task from stalling the event
+// queue if the exception handled by Node.js’s
+// `process.on("uncaughtException")` or by a domain.
+rawAsap.requestFlush = requestFlush;
+
+// To request a high priority event, we induce a mutation observer by toggling
+// the text of a text node between "1" and "-1".
+function makeRequestCallFromMutationObserver(callback) {
+    var toggle = 1;
+    var observer = new BrowserMutationObserver(callback);
+    var node = document.createTextNode("");
+    observer.observe(node, {characterData: true});
+    return function requestCall() {
+        toggle = -toggle;
+        node.data = toggle;
+    };
+}
+
+// The message channel technique was discovered by Malte Ubl and was the
+// original foundation for this library.
+// http://www.nonblocking.io/2011/06/windownexttick.html
+
+// Safari 6.0.5 (at least) intermittently fails to create message ports on a
+// page's first load. Thankfully, this version of Safari supports
+// MutationObservers, so we don't need to fall back in that case.
+
+// function makeRequestCallFromMessageChannel(callback) {
+//     var channel = new MessageChannel();
+//     channel.port1.onmessage = callback;
+//     return function requestCall() {
+//         channel.port2.postMessage(0);
+//     };
+// }
+
+// For reasons explained above, we are also unable to use `setImmediate`
+// under any circumstances.
+// Even if we were, there is another bug in Internet Explorer 10.
+// It is not sufficient to assign `setImmediate` to `requestFlush` because
+// `setImmediate` must be called *by name* and therefore must be wrapped in a
+// closure.
+// Never forget.
+
+// function makeRequestCallFromSetImmediate(callback) {
+//     return function requestCall() {
+//         setImmediate(callback);
+//     };
+// }
+
+// Safari 6.0 has a problem where timers will get lost while the user is
+// scrolling. This problem does not impact ASAP because Safari 6.0 supports
+// mutation observers, so that implementation is used instead.
+// However, if we ever elect to use timers in Safari, the prevalent work-around
+// is to add a scroll event listener that calls for a flush.
+
+// `setTimeout` does not call the passed callback if the delay is less than
+// approximately 7 in web workers in Firefox 8 through 18, and sometimes not
+// even then.
+
+function makeRequestCallFromTimer(callback) {
+    return function requestCall() {
+        // We dispatch a timeout with a specified delay of 0 for engines that
+        // can reliably accommodate that request. This will usually be snapped
+        // to a 4 milisecond delay, but once we're flushing, there's no delay
+        // between events.
+        var timeoutHandle = setTimeout(handleTimer, 0);
+        // However, since this timer gets frequently dropped in Firefox
+        // workers, we enlist an interval handle that will try to fire
+        // an event 20 times per second until it succeeds.
+        var intervalHandle = setInterval(handleTimer, 50);
+
+        function handleTimer() {
+            // Whichever timer succeeds will cancel both timers and
+            // execute the callback.
+            clearTimeout(timeoutHandle);
+            clearInterval(intervalHandle);
+            callback();
+        }
+    };
+}
+
+// This is for `asap.js` only.
+// Its name will be periodically randomized to break any code that depends on
+// its existence.
+rawAsap.makeRequestCallFromTimer = makeRequestCallFromTimer;
+
+// ASAP was originally a nextTick shim included in Q. This was factored out
+// into this ASAP package. It was later adapted to RSVP which made further
+// amendments. These decisions, particularly to marginalize MessageChannel and
+// to capture the MutationObserver implementation in a closure, were integrated
+// back into ASAP proper.
+// https://github.com/tildeio/rsvp.js/blob/cddf7232546a9cf858524b75cde6f9edf72620a7/lib/rsvp/asap.js
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],39:[function(require,module,exports){
+(function (process){
+"use strict";
+
+var domain; // The domain module is executed on demand
+var hasSetImmediate = typeof setImmediate === "function";
+
+// Use the fastest means possible to execute a task in its own turn, with
+// priority over other events including network IO events in Node.js.
+//
+// An exception thrown by a task will permanently interrupt the processing of
+// subsequent tasks. The higher level `asap` function ensures that if an
+// exception is thrown by a task, that the task queue will continue flushing as
+// soon as possible, but if you use `rawAsap` directly, you are responsible to
+// either ensure that no exceptions are thrown from your task, or to manually
+// call `rawAsap.requestFlush` if an exception is thrown.
+module.exports = rawAsap;
+function rawAsap(task) {
+    if (!queue.length) {
+        requestFlush();
+        flushing = true;
+    }
+    // Avoids a function call
+    queue[queue.length] = task;
+}
+
+var queue = [];
+// Once a flush has been requested, no further calls to `requestFlush` are
+// necessary until the next `flush` completes.
+var flushing = false;
+// The position of the next task to execute in the task queue. This is
+// preserved between calls to `flush` so that it can be resumed if
+// a task throws an exception.
+var index = 0;
+// If a task schedules additional tasks recursively, the task queue can grow
+// unbounded. To prevent memory excaustion, the task queue will periodically
+// truncate already-completed tasks.
+var capacity = 1024;
+
+// The flush function processes all tasks that have been scheduled with
+// `rawAsap` unless and until one of those tasks throws an exception.
+// If a task throws an exception, `flush` ensures that its state will remain
+// consistent and will resume where it left off when called again.
+// However, `flush` does not make any arrangements to be called again if an
+// exception is thrown.
+function flush() {
+    while (index < queue.length) {
+        var currentIndex = index;
+        // Advance the index before calling the task. This ensures that we will
+        // begin flushing on the next task the task throws an error.
+        index = index + 1;
+        queue[currentIndex].call();
+        // Prevent leaking memory for long chains of recursive calls to `asap`.
+        // If we call `asap` within tasks scheduled by `asap`, the queue will
+        // grow, but to avoid an O(n) walk for every task we execute, we don't
+        // shift tasks off the queue after they have been executed.
+        // Instead, we periodically shift 1024 tasks off the queue.
+        if (index > capacity) {
+            // Manually shift all values starting at the index back to the
+            // beginning of the queue.
+            for (var scan = 0, newLength = queue.length - index; scan < newLength; scan++) {
+                queue[scan] = queue[scan + index];
+            }
+            queue.length -= index;
+            index = 0;
+        }
+    }
+    queue.length = 0;
+    index = 0;
+    flushing = false;
+}
+
+rawAsap.requestFlush = requestFlush;
+function requestFlush() {
+    // Ensure flushing is not bound to any domain.
+    // It is not sufficient to exit the domain, because domains exist on a stack.
+    // To execute code outside of any domain, the following dance is necessary.
+    var parentDomain = process.domain;
+    if (parentDomain) {
+        if (!domain) {
+            // Lazy execute the domain module.
+            // Only employed if the user elects to use domains.
+            domain = require("domain");
+        }
+        domain.active = process.domain = null;
+    }
+
+    // `setImmediate` is slower that `process.nextTick`, but `process.nextTick`
+    // cannot handle recursion.
+    // `requestFlush` will only be called recursively from `asap.js`, to resume
+    // flushing after an error is thrown into a domain.
+    // Conveniently, `setImmediate` was introduced in the same version
+    // `process.nextTick` started throwing recursion errors.
+    if (flushing && hasSetImmediate) {
+        setImmediate(flush);
+    } else {
+        process.nextTick(flush);
+    }
+
+    if (parentDomain) {
+        domain.active = process.domain = parentDomain;
+    }
+}
 
 }).call(this,require('_process'))
-},{"_process":46}],34:[function(require,module,exports){
+},{"_process":48,"domain":46}],40:[function(require,module,exports){
 module.exports = function stateChangeLogic(stateComparisonResults) {
 	var hitChangingState = false
 	var hitDestroyedState = false
@@ -3576,7 +4479,7 @@ module.exports = function stateChangeLogic(stateComparisonResults) {
 	return output
 }
 
-},{}],35:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var combine = require('combine-arrays')
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
@@ -3633,7 +4536,7 @@ function stateComparison(parametersChanged, originalState, originalParameters, n
 	})
 }
 
-},{"./state-string-parser":37,"combine-arrays":16,"path-to-regexp-with-reversible-keys":24}],36:[function(require,module,exports){
+},{"./state-string-parser":43,"combine-arrays":15,"path-to-regexp-with-reversible-keys":26}],42:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var parse = require('./state-string-parser')
 
@@ -3723,7 +4626,7 @@ module.exports = function StateState() {
 	}
 }
 
-},{"./state-string-parser":37}],37:[function(require,module,exports){
+},{"./state-string-parser":43}],43:[function(require,module,exports){
 module.exports = function(stateString) {
 	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
 		if (stateNames.length) {
@@ -3734,7 +4637,7 @@ module.exports = function(stateString) {
 	}, [])
 }
 
-},{}],38:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 module.exports = function (emitter) {
 	var currentTransitionAttempt = null
 	var nextTransition = null
@@ -3789,7 +4692,7 @@ module.exports = function (emitter) {
 	}
 }
 
-},{}],39:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 // Array.prototype.findIndex - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: <https://github.com/paulmillr/Array.prototype.findIndex>
 (function (globals) {
@@ -3822,1270 +4725,75 @@ module.exports = function (emitter) {
   }
 }(this));
 
-},{}],40:[function(require,module,exports){
-/*!
-  * domready (c) Dustin Diaz 2014 - License MIT
-  */
-!function (name, definition) {
+},{}],46:[function(require,module,exports){
+/*global define:false require:false */
+module.exports = (function(){
+	// Import Events
+	var events = require('events')
 
-  if (typeof module != 'undefined') module.exports = definition()
-  else if (typeof define == 'function' && typeof define.amd == 'object') define(definition)
-  else this[name] = definition()
+	// Export Domain
+	var domain = {}
+	domain.createDomain = domain.create = function(){
+		var d = new events.EventEmitter()
 
-}('domready', function () {
+		function emitError(e) {
+			d.emit('error', e)
+		}
 
-  var fns = [], listener
-    , doc = document
-    , hack = doc.documentElement.doScroll
-    , domContentLoaded = 'DOMContentLoaded'
-    , loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState)
-
-
-  if (!loaded)
-  doc.addEventListener(domContentLoaded, listener = function () {
-    doc.removeEventListener(domContentLoaded, listener)
-    loaded = 1
-    while (listener = fns.shift()) listener()
-  })
-
-  return function (fn) {
-    loaded ? setTimeout(fn, 0) : fns.push(fn)
-  }
-
-});
-
-},{}],41:[function(require,module,exports){
-/**
- *
- * This function was taken from a stackoverflow answer:
- *
- * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
- *
- * Many thanks to:
- *
- * Briguy37 (http://stackoverflow.com/users/508537/briguy37)
- * broofa (http://stackoverflow.com/users/109538/broofa)
- *
- */
-
-module.exports = function() {
-    var d = new Date().getTime();
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
-    });
-};
-
-},{}],42:[function(require,module,exports){
-var riot = require('riot')
-var xtend = require('xtend')
-
-module.exports = function RiotStateRenderer(options) {
-	var defaultOpts = xtend(options)
-
-	return function makeRenderer(stateRouter) {
-		defaultOpts.makePath = makeRiotPath.bind(null, stateRouter.makePath)
-
-		defaultOpts.active = makeRiotPath.bind(null, stateRouter.stateIsActive)
-
-		stateRouter.on('stateChangeEnd', function() {
-			riot.update()
-		})
-
-		return {
-			render: function render(context, cb) {
-				var element = context.element
-				var template = context.template
-				var content = context.content
-				if (typeof element === 'string') {
-					element = document.querySelector(element)
-				}
-
+		d.add = function(emitter){
+			emitter.on('error', emitError)
+		}
+		d.remove = function(emitter){
+			emitter.removeListener('error', emitError)
+		}
+		d.bind = function(fn){
+			return function(){
+				var args = Array.prototype.slice.call(arguments)
 				try {
-					var tag = riot.mount(element, template, xtend(defaultOpts, content))[0]
-
-					if (!tag) {
-						console.error('Error creating riot tag', template, 'on', element)
-					}
-
-					cb(null, tag)
-				} catch (e) {
-					cb(e)
+					fn.apply(null, args)
 				}
-			},
-			reset: function reset(context, cb) {
-				var tag = context.domApi
-
-				tag.trigger('reset')
-				tag.opts = xtend(defaultOpts, context.content)
-				tag.update()
-				cb()
-			},
-			destroy: function destroy(tag, cb) {
-				tag.unmount(true)
-				cb()
-			},
-			getChildElement: function getChildElement(tag, cb) {
-				try {
-					var child = tag.root.querySelector('ui-view')
-					cb(null, child)
-				} catch (e) {
-					cb(e)
+				catch (err){
+					emitError(err)
 				}
 			}
 		}
-	}
-}
-
-// Since I can't figure out how to use object literals in a Riot expressions
-function makeRiotPath() {
-	try {
-		var args = Array.prototype.slice.call(arguments)
-		var makePath = args.shift()
-		var stateName = args.shift()
-		var opts = {}
-		for (var i = 0; i < args.length; i += 2) {
-			opts[args[i]] = args[i + 1]
+		d.intercept = function(fn){
+			return function(err){
+				if ( err ) {
+					emitError(err)
+				}
+				else {
+					var args = Array.prototype.slice.call(arguments, 1)
+					try {
+						fn.apply(null, args)
+					}
+					catch (err){
+						emitError(err)
+					}
+				}
+			}
 		}
-		return makePath(stateName, opts)
-	} catch (e) {
-		console.log(e)
-	}
-}
-
-},{"riot":44,"xtend":43}],43:[function(require,module,exports){
-arguments[4][21][0].apply(exports,arguments)
-},{"dup":21}],44:[function(require,module,exports){
-/* Riot v2.0.15, @license MIT, (c) 2015 Muut Inc. + contributors */
-
-;(function(window) {
-  // 'use strict' does not allow us to override the events properties https://github.com/muut/riotjs/blob/dev/lib/tag/update.js#L7-L10
-  // it leads to the following error on firefox "setting a property that has only a getter"
-  //'use strict'
-
-  var riot = { version: 'v2.0.15', settings: {} },
-      ieVersion = checkIE()
-
-riot.observable = function(el) {
-
-  el = el || {}
-
-  var callbacks = {},
-      _id = 0
-
-  el.on = function(events, fn) {
-    if (typeof fn == 'function') {
-      fn._id = typeof fn._id == 'undefined' ? _id++ : fn._id
-
-      events.replace(/\S+/g, function(name, pos) {
-        (callbacks[name] = callbacks[name] || []).push(fn)
-        fn.typed = pos > 0
-      })
-    }
-    return el
-  }
-
-  el.off = function(events, fn) {
-    if (events == '*') callbacks = {}
-    else {
-      events.replace(/\S+/g, function(name) {
-        if (fn) {
-          var arr = callbacks[name]
-          for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
-            if (cb._id == fn._id) { arr.splice(i, 1); i-- }
-          }
-        } else {
-          callbacks[name] = []
-        }
-      })
-    }
-    return el
-  }
-
-  // only single event supported
-  el.one = function(name, fn) {
-    function on() {
-      el.off(name, on)
-      fn.apply(el, arguments)
-    }
-    return el.on(name, on)
-  }
-
-  el.trigger = function(name) {
-    var args = [].slice.call(arguments, 1),
-        fns = callbacks[name] || []
-
-    for (var i = 0, fn; (fn = fns[i]); ++i) {
-      if (!fn.busy) {
-        fn.busy = 1
-        fn.apply(el, fn.typed ? [name].concat(args) : args)
-        if (fns[i] !== fn) { i-- }
-        fn.busy = 0
-      }
-    }
-
-    if (callbacks.all && name != 'all') {
-      el.trigger.apply(el, ['all', name].concat(args))
-    }
-
-    return el
-  }
-
-  return el
-
-}
-;(function(riot, evt, window) {
-
-  // browsers only
-  if (!window) return
-
-  var loc = window.location,
-      fns = riot.observable(),
-      win = window,
-      started = false,
-      current
-
-  function hash() {
-    return loc.href.split('#')[1] || ''
-  }
-
-  function parser(path) {
-    return path.split('/')
-  }
-
-  function emit(path) {
-    if (path.type) path = hash()
-
-    if (path != current) {
-      fns.trigger.apply(null, ['H'].concat(parser(path)))
-      current = path
-    }
-  }
-
-  var r = riot.route = function(arg) {
-    // string
-    if (arg[0]) {
-      loc.hash = arg
-      emit(arg)
-
-    // function
-    } else {
-      fns.on('H', arg)
-    }
-  }
-
-  r.exec = function(fn) {
-    fn.apply(null, parser(hash()))
-  }
-
-  r.parser = function(fn) {
-    parser = fn
-  }
-
-  r.stop = function () {
-    if (!started) return
-    win.removeEventListener ? win.removeEventListener(evt, emit, false) : win.detachEvent('on' + evt, emit)
-    fns.off('*')
-    started = false
-  }
-
-  r.start = function () {
-    if (started) return
-    win.addEventListener ? win.addEventListener(evt, emit, false) : win.attachEvent('on' + evt, emit)
-    started = true
-  }
-
-  // autostart the router
-  r.start()
-
-})(riot, 'hashchange', window)
-/*
-
-//// How it works?
-
-
-Three ways:
-
-1. Expressions: tmpl('{ value }', data).
-   Returns the result of evaluated expression as a raw object.
-
-2. Templates: tmpl('Hi { name } { surname }', data).
-   Returns a string with evaluated expressions.
-
-3. Filters: tmpl('{ show: !done, highlight: active }', data).
-   Returns a space separated list of trueish keys (mainly
-   used for setting html classes), e.g. "show highlight".
-
-
-// Template examples
-
-tmpl('{ title || "Untitled" }', data)
-tmpl('Results are { results ? "ready" : "loading" }', data)
-tmpl('Today is { new Date() }', data)
-tmpl('{ message.length > 140 && "Message is too long" }', data)
-tmpl('This item got { Math.round(rating) } stars', data)
-tmpl('<h1>{ title }</h1>{ body }', data)
-
-
-// Falsy expressions in templates
-
-In templates (as opposed to single expressions) all falsy values
-except zero (undefined/null/false) will default to empty string:
-
-tmpl('{ undefined } - { false } - { null } - { 0 }', {})
-// will return: " - - - 0"
-
-*/
-
-
-var brackets = (function(orig, s, b) {
-  return function(x) {
-
-    // make sure we use the current setting
-    s = riot.settings.brackets || orig
-    if (b != s) b = s.split(' ')
-
-    // if regexp given, rewrite it with current brackets (only if differ from default)
-    return x && x.test
-      ? s == orig
-        ? x : RegExp(x.source
-                      .replace(/\{/g, b[0].replace(/(?=.)/g, '\\'))
-                      .replace(/\}/g, b[1].replace(/(?=.)/g, '\\')),
-                    x.global ? 'g' : '')
-
-      // else, get specific bracket
-      : b[x]
-
-  }
-})('{ }')
-
-
-var tmpl = (function() {
-
-  var cache = {},
-      reVars = /(['"\/]).*?[^\\]\1|\.\w*|\w*:|\b(?:(?:new|typeof|in|instanceof) |(?:this|true|false|null|undefined)\b|function *\()|([a-z_$]\w*)/gi
-              // [ 1               ][ 2  ][ 3 ][ 4                                                                                  ][ 5       ]
-              // find variable names:
-              // 1. skip quoted strings and regexps: "a b", 'a b', 'a \'b\'', /a b/
-              // 2. skip object properties: .name
-              // 3. skip object literals: name:
-              // 4. skip javascript keywords
-              // 5. match var name
-
-  // build a template (or get it from cache), render with data
-  return function(str, data) {
-    return str && (cache[str] = cache[str] || tmpl(str))(data)
-  }
-
-
-  // create a template instance
-
-  function tmpl(s, p) {
-
-    // default template string to {}
-    s = (s || (brackets(0) + brackets(1)))
-
-      // temporarily convert \{ and \} to a non-character
-      .replace(brackets(/\\{/g), '\uFFF0')
-      .replace(brackets(/\\}/g), '\uFFF1')
-
-    // split string to expression and non-expresion parts
-    p = split(s, extract(s, brackets(/{/), brackets(/}/)))
-
-    return new Function('d', 'return ' + (
-
-      // is it a single expression or a template? i.e. {x} or <b>{x}</b>
-      !p[0] && !p[2] && !p[3]
-
-        // if expression, evaluate it
-        ? expr(p[1])
-
-        // if template, evaluate all expressions in it
-        : '[' + p.map(function(s, i) {
-
-            // is it an expression or a string (every second part is an expression)
-          return i % 2
-
-              // evaluate the expressions
-              ? expr(s, true)
-
-              // process string parts of the template:
-              : '"' + s
-
-                  // preserve new lines
-                  .replace(/\n/g, '\\n')
-
-                  // escape quotes
-                  .replace(/"/g, '\\"')
-
-                + '"'
-
-        }).join(',') + '].join("")'
-      )
-
-      // bring escaped { and } back
-      .replace(/\uFFF0/g, brackets(0))
-      .replace(/\uFFF1/g, brackets(1))
-
-    + ';')
-
-  }
-
-
-  // parse { ... } expression
-
-  function expr(s, n) {
-    s = s
-
-      // convert new lines to spaces
-      .replace(/\n/g, ' ')
-
-      // trim whitespace, brackets, strip comments
-      .replace(brackets(/^[{ ]+|[ }]+$|\/\*.+?\*\//g), '')
-
-    // is it an object literal? i.e. { key : value }
-    return /^\s*[\w- "']+ *:/.test(s)
-
-      // if object literal, return trueish keys
-      // e.g.: { show: isOpen(), done: item.done } -> "show done"
-      ? '[' +
-
-          // extract key:val pairs, ignoring any nested objects
-          extract(s,
-
-              // name part: name:, "name":, 'name':, name :
-              /["' ]*[\w- ]+["' ]*:/,
-
-              // expression part: everything upto a comma followed by a name (see above) or end of line
-              /,(?=["' ]*[\w- ]+["' ]*:)|}|$/
-              ).map(function(pair) {
-
-                // get key, val parts
-                return pair.replace(/^[ "']*(.+?)[ "']*: *(.+?),? *$/, function(_, k, v) {
-
-                  // wrap all conditional parts to ignore errors
-                  return v.replace(/[^&|=!><]+/g, wrap) + '?"' + k + '":"",'
-
-                })
-
-              }).join('')
-
-        + '].join(" ").trim()'
-
-      // if js expression, evaluate as javascript
-      : wrap(s, n)
-
-  }
-
-
-  // execute js w/o breaking on errors or undefined vars
-
-  function wrap(s, nonull) {
-    s = s.trim()
-    return !s ? '' : '(function(v){try{v='
-
-        // prefix vars (name => data.name)
-        + (s.replace(reVars, function(s, _, v) { return v ? '(d.'+v+'===undefined?'+(typeof window == 'undefined' ? 'global.' : 'window.')+v+':d.'+v+')' : s })
-
-          // break the expression if its empty (resulting in undefined value)
-          || 'x')
-
-      + '}finally{return '
-
-        // default to empty string for falsy values except zero
-        + (nonull === true ? '!v&&v!==0?"":v' : 'v')
-
-      + '}}).call(d)'
-  }
-
-
-  // split string by an array of substrings
-
-  function split(str, substrings) {
-    var parts = []
-    substrings.map(function(sub, i) {
-
-      // push matched expression and part before it
-      i = str.indexOf(sub)
-      parts.push(str.slice(0, i), sub)
-      str = str.slice(i + sub.length)
-    })
-
-    // push the remaining part
-    return parts.concat(str)
-  }
-
-
-  // match strings between opening and closing regexp, skipping any inner/nested matches
-
-  function extract(str, open, close) {
-
-    var start,
-        level = 0,
-        matches = [],
-        re = new RegExp('('+open.source+')|('+close.source+')', 'g')
-
-    str.replace(re, function(_, open, close, pos) {
-
-      // if outer inner bracket, mark position
-      if(!level && open) start = pos
-
-      // in(de)crease bracket level
-      level += open ? 1 : -1
-
-      // if outer closing bracket, grab the match
-      if(!level && close != null) matches.push(str.slice(start, pos+close.length))
-
-    })
-
-    return matches
-  }
-
-})()
-
-// { key, i in items} -> { key, i, items }
-function loopKeys(expr) {
-  var ret = { val: expr },
-      els = expr.split(/\s+in\s+/)
-
-  if (els[1]) {
-    ret.val = brackets(0) + els[1]
-    els = els[0].slice(brackets(0).length).trim().split(/,\s*/)
-    ret.key = els[0]
-    ret.pos = els[1]
-  }
-
-  return ret
-}
-
-function mkitem(expr, key, val) {
-  var item = {}
-  item[expr.key] = key
-  if (expr.pos) item[expr.pos] = val
-  return item
-}
-
-
-/* Beware: heavy stuff */
-function _each(dom, parent, expr) {
-
-  remAttr(dom, 'each')
-
-  var template = dom.outerHTML,
-      prev = dom.previousSibling,
-      root = dom.parentNode,
-      rendered = [],
-      tags = [],
-      checksum
-
-  expr = loopKeys(expr)
-
-  function add(pos, item, tag) {
-    rendered.splice(pos, 0, item)
-    tags.splice(pos, 0, tag)
-  }
-
-  // clean template code
-  parent.one('update', function() {
-    root.removeChild(dom)
-
-  }).one('premount', function() {
-    if (root.stub) root = parent.root
-
-  }).on('update', function() {
-
-    var items = tmpl(expr.val, parent)
-    if (!items) return
-
-    // object loop. any changes cause full redraw
-    if (!Array.isArray(items)) {
-      var testsum = JSON.stringify(items)
-      if (testsum == checksum) return
-      checksum = testsum
-
-      // clear old items
-      each(tags, function(tag) { tag.unmount() })
-      rendered = []
-      tags = []
-
-      items = Object.keys(items).map(function(key) {
-        return mkitem(expr, key, items[key])
-      })
-
-    }
-
-    // unmount redundant
-    each(rendered, function(item) {
-      if (item instanceof Object) {
-        // skip existing items
-        if (items.indexOf(item) > -1) {
-          return
-        }
-      } else {
-        // find all non-objects
-        var newItems = arrFindEquals(items, item),
-            oldItems = arrFindEquals(rendered, item)
-
-        // if more or equal amount, no need to remove
-        if (newItems.length >= oldItems.length) {
-          return
-        }
-      }
-      var pos = rendered.indexOf(item),
-          tag = tags[pos]
-
-      if (tag) {
-        tag.unmount()
-        rendered.splice(pos, 1)
-        tags.splice(pos, 1)
-        // to let "each" know that this item is removed
-        return false
-      }
-
-    })
-
-    // mount new / reorder
-    var prevBase = [].indexOf.call(root.childNodes, prev) + 1
-    each(items, function(item, i) {
-
-      // start index search from position based on the current i
-      var pos = items.indexOf(item, i),
-          oldPos = rendered.indexOf(item, i)
-
-      // if not found, search backwards from current i position
-      pos < 0 && (pos = items.lastIndexOf(item, i))
-      oldPos < 0 && (oldPos = rendered.lastIndexOf(item, i))
-
-      if (!(item instanceof Object)) {
-        // find all non-objects
-        var newItems = arrFindEquals(items, item),
-            oldItems = arrFindEquals(rendered, item)
-
-        // if more, should mount one new
-        if (newItems.length > oldItems.length) {
-          oldPos = -1
-        }
-      }
-
-      // mount new
-      var nodes = root.childNodes
-      if (oldPos < 0) {
-        if (!checksum && expr.key) var _item = mkitem(expr, item, pos)
-
-        var tag = new Tag({ tmpl: template }, {
-          before: nodes[prevBase + pos],
-          parent: parent,
-          root: root,
-          item: _item || item
-        })
-
-        tag.mount()
-
-        add(pos, item, tag)
-        return true
-      }
-
-      // change pos value
-      if (expr.pos && tags[oldPos][expr.pos] != pos) {
-        tags[oldPos].one('update', function(item) {
-          item[expr.pos] = pos
-        })
-        tags[oldPos].update()
-      }
-
-      // reorder
-      if (pos != oldPos) {
-        root.insertBefore(nodes[prevBase + oldPos], nodes[prevBase + (pos > oldPos ? pos + 1 : pos)])
-        return add(pos, rendered.splice(oldPos, 1)[0], tags.splice(oldPos, 1)[0])
-      }
-
-    })
-
-    rendered = items.slice()
-
-  })
-
-}
-
-
-function parseNamedElements(root, parent, childTags) {
-
-  walk(root, function(dom) {
-    if (dom.nodeType == 1) {
-      if(dom.parentNode && dom.parentNode.isLoop) dom.isLoop = 1
-      if(dom.getAttribute('each')) dom.isLoop = 1
-      // custom child tag
-      var child = getTag(dom)
-
-      if (child && !dom.isLoop) {
-        var tag = new Tag(child, { root: dom, parent: parent }, dom.innerHTML),
-          tagName = child.name,
-          ptag = parent,
-          cachedTag
-
-        while(!getTag(ptag.root)) {
-          if(!ptag.parent) break
-          ptag = ptag.parent
-        }
-        // fix for the parent attribute in the looped elements
-        tag.parent = ptag
-
-        cachedTag = ptag.tags[tagName]
-
-        // if there are multiple children tags having the same name
-        if (cachedTag) {
-          // if the parent tags property is not yet an array
-          // create it adding the first cached tag
-          if (!Array.isArray(cachedTag))
-            ptag.tags[tagName] = [cachedTag]
-          // add the new nested tag to the array
-          ptag.tags[tagName].push(tag)
-        } else {
-          ptag.tags[tagName] = tag
-        }
-
-        // empty the child node once we got its template
-        // to avoid that its children get compiled multiple times
-        dom.innerHTML = ''
-        childTags.push(tag)
-      }
-
-      each(dom.attributes, function(attr) {
-        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
-      })
-    }
-
-  })
-
-}
-
-function parseExpressions(root, tag, expressions) {
-
-  function addExpr(dom, val, extra) {
-    if (val.indexOf(brackets(0)) >= 0) {
-      var expr = { dom: dom, expr: val }
-      expressions.push(extend(expr, extra))
-    }
-  }
-
-  walk(root, function(dom) {
-    var type = dom.nodeType
-
-    // text node
-    if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
-    if (type != 1) return
-
-    /* element */
-
-    // loop
-    var attr = dom.getAttribute('each')
-    if (attr) { _each(dom, tag, attr); return false }
-
-    // attribute expressions
-    each(dom.attributes, function(attr) {
-      var name = attr.name,
-        bool = name.split('__')[1]
-
-      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
-      if (bool) { remAttr(dom, name); return false }
-
-    })
-
-    // skip custom tags
-    if (getTag(dom)) return false
-
-  })
-
-}
-function Tag(impl, conf, innerHTML) {
-
-  var self = riot.observable(this),
-      opts = inherit(conf.opts) || {},
-      dom = mkdom(impl.tmpl),
-      parent = conf.parent,
-      expressions = [],
-      childTags = [],
-      root = conf.root,
-      item = conf.item,
-      fn = impl.fn,
-      tagName = root.tagName.toLowerCase(),
-      attr = {},
-      loopDom
-
-  if (fn && root._tag) {
-    root._tag.unmount(true)
-  }
-  // keep a reference to the tag just created
-  // so we will be able to mount this tag multiple times
-  root._tag = this
-
-  // create a unique id to this tag
-  // it could be handy to use it also to improve the virtual dom rendering speed
-  this._id = ~~(new Date().getTime() * Math.random())
-
-  extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
-
-  // grab attributes
-  each(root.attributes, function(el) {
-    attr[el.name] = el.value
-  })
-
-
-  if (dom.innerHTML && !/select/.test(tagName))
-    // replace all the yield tags with the tag inner html
-    dom.innerHTML = replaceYield(dom.innerHTML, innerHTML)
-
-
-  // options
-  function updateOpts() {
-    each(Object.keys(attr), function(name) {
-      opts[name] = tmpl(attr[name], parent || self)
-    })
-  }
-
-  this.update = function(data, init) {
-    extend(self, data, item)
-    updateOpts()
-    self.trigger('update', item)
-    update(expressions, self, item)
-    self.trigger('updated')
-  }
-
-  this.mount = function() {
-
-    updateOpts()
-
-    // initialiation
-    fn && fn.call(self, opts)
-
-    toggle(true)
-
-    // parse layout after init. fn may calculate args for nested custom tags
-    parseExpressions(dom, self, expressions)
-
-    if (!self.parent) self.update()
-
-    // internal use only, fixes #403
-    self.trigger('premount')
-
-    if (fn) {
-      while (dom.firstChild) root.appendChild(dom.firstChild)
-
-    } else {
-      loopDom = dom.firstChild
-      root.insertBefore(loopDom, conf.before || null) // null needed for IE8
-    }
-
-    if (root.stub) self.root = root = parent.root
-    self.trigger('mount')
-
-  }
-
-
-  this.unmount = function(keepRootTag) {
-    var el = fn ? root : loopDom,
-        p = el.parentNode
-
-    if (p) {
-
-      if (parent) {
-        // remove this tag from the parent tags object
-        // if there are multiple nested tags with same name..
-        // remove this element form the array
-        if (Array.isArray(parent.tags[tagName])) {
-          each(parent.tags[tagName], function(tag, i) {
-            if (tag._id == self._id)
-              parent.tags[tagName].splice(i, 1)
-          })
-        } else
-          // otherwise just delete the tag instance
-          delete parent.tags[tagName]
-      } else {
-        while (el.firstChild) el.removeChild(el.firstChild)
-      }
-
-      if (!keepRootTag)
-        p.removeChild(el)
-
-    }
-
-
-    self.trigger('unmount')
-    toggle()
-    self.off('*')
-    // somehow ie8 does not like `delete root._tag`
-    root._tag = null
-
-  }
-
-  function toggle(isMount) {
-
-    // mount/unmount children
-    each(childTags, function(child) { child[isMount ? 'mount' : 'unmount']() })
-
-    // listen/unlisten parent (events flow one way from parent to children)
-    if (parent) {
-      var evt = isMount ? 'on' : 'off'
-      parent[evt]('update', self.update)[evt]('unmount', self.unmount)
-    }
-  }
-
-  // named elements available for fn
-  parseNamedElements(dom, this, childTags)
-
-
-}
-
-function setEventHandler(name, handler, dom, tag, item) {
-
-  dom[name] = function(e) {
-
-    // cross browser event fix
-    e = e || window.event
-    e.which = e.which || e.charCode || e.keyCode
-    e.target = e.target || e.srcElement
-    e.currentTarget = dom
-    e.item = item
-
-    // prevent default behaviour (by default)
-    if (handler.call(tag, e) !== true && !/radio|check/.test(dom.type)) {
-      e.preventDefault && e.preventDefault()
-      e.returnValue = false
-    }
-
-    var el = item ? tag.parent : tag
-    el.update()
-
-  }
-
-}
-
-// used by if- attribute
-function insertTo(root, node, before) {
-  if (root) {
-    root.insertBefore(before, node)
-    root.removeChild(node)
-  }
-}
-
-// item = currently looped item
-function update(expressions, tag, item) {
-
-  each(expressions, function(expr, i) {
-
-    var dom = expr.dom,
-        attrName = expr.attr,
-        value = tmpl(expr.expr, tag),
-        parent = expr.dom.parentNode
-
-    if (value == null) value = ''
-
-    // leave out riot- prefixes from strings inside textarea
-    if (parent && parent.tagName == 'TEXTAREA') value = value.replace(/riot-/g, '')
-
-    // no change
-    if (expr.value === value) return
-    expr.value = value
-
-    // text node
-    if (!attrName) return dom.nodeValue = value
-
-    // remove original attribute
-    remAttr(dom, attrName)
-
-    // event handler
-    if (typeof value == 'function') {
-      setEventHandler(attrName, value, dom, tag, item)
-
-    // if- conditional
-    } else if (attrName == 'if') {
-      var stub = expr.stub
-
-      // add to DOM
-      if (value) {
-        stub && insertTo(stub.parentNode, stub, dom)
-
-      // remove from DOM
-      } else {
-        stub = expr.stub = stub || document.createTextNode('')
-        insertTo(dom.parentNode, dom, stub)
-      }
-
-    // show / hide
-    } else if (/^(show|hide)$/.test(attrName)) {
-      if (attrName == 'hide') value = !value
-      dom.style.display = value ? '' : 'none'
-
-    // field value
-    } else if (attrName == 'value') {
-      dom.value = value
-
-    // <img src="{ expr }">
-    } else if (attrName.slice(0, 5) == 'riot-') {
-      attrName = attrName.slice(5)
-      value ? dom.setAttribute(attrName, value) : remAttr(dom, attrName)
-
-    } else {
-      if (expr.bool) {
-        dom[attrName] = value
-        if (!value) return
-        value = attrName
-      }
-
-      if (typeof value != 'object') dom.setAttribute(attrName, value)
-
-    }
-
-  })
-
-}
-function each(els, fn) {
-  for (var i = 0, len = (els || []).length, el; i < len; i++) {
-    el = els[i]
-    // return false -> remove current item during loop
-    if (el != null && fn(el, i) === false) i--
-  }
-  return els
-}
-
-function remAttr(dom, name) {
-  dom.removeAttribute(name)
-}
-
-// max 2 from objects allowed
-function extend(obj, from, from2) {
-  from && each(Object.keys(from), function(key) {
-    obj[key] = from[key]
-  })
-  return from2 ? extend(obj, from2) : obj
-}
-
-function checkIE() {
-  if (window) {
-    var ua = navigator.userAgent
-    var msie = ua.indexOf('MSIE ')
-    if (msie > 0) {
-      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
-    }
-    else {
-      return 0
-    }
-  }
-}
-
-function optionInnerHTML(el, html) {
-  var opt = document.createElement('option'),
-      valRegx = /value=[\"'](.+?)[\"']/,
-      selRegx = /selected=[\"'](.+?)[\"']/,
-      valuesMatch = html.match(valRegx),
-      selectedMatch = html.match(selRegx)
-
-  opt.innerHTML = html
-
-  if (valuesMatch) {
-    opt.value = valuesMatch[1]
-  }
-
-  if (selectedMatch) {
-    opt.setAttribute('riot-selected', selectedMatch[1])
-  }
-
-  el.appendChild(opt)
-}
-
-function mkdom(template) {
-  var tagName = template.trim().slice(1, 3).toLowerCase(),
-      rootTag = /td|th/.test(tagName) ? 'tr' : tagName == 'tr' ? 'tbody' : 'div',
-      el = document.createElement(rootTag)
-
-  el.stub = true
-
-  if (tagName === 'op' && ieVersion && ieVersion < 10) {
-    optionInnerHTML(el, template)
-  } else {
-    el.innerHTML = template
-  }
-  return el
-}
-
-function walk(dom, fn) {
-  if (dom) {
-    if (fn(dom) === false) walk(dom.nextSibling, fn)
-    else {
-      dom = dom.firstChild
-
-      while (dom) {
-        walk(dom, fn)
-        dom = dom.nextSibling
-      }
-    }
-  }
-}
-
-function replaceYield (tmpl, innerHTML) {
-  return tmpl.replace(/<(yield)\/?>(<\/\1>)?/gim, innerHTML || '')
-}
-
-function $$(selector, ctx) {
-  ctx = ctx || document
-  return ctx.querySelectorAll(selector)
-}
-
-function arrDiff(arr1, arr2) {
-  return arr1.filter(function(el) {
-    return arr2.indexOf(el) < 0
-  })
-}
-
-function arrFindEquals(arr, el) {
-  return arr.filter(function (_el) {
-    return _el === el
-  })
-}
-
-function inherit(parent) {
-  function Child() {}
-  Child.prototype = parent
-  return new Child()
-}
-
-/*
- Virtual dom is an array of custom tags on the document.
- Updates and unmounts propagate downwards from parent to children.
-*/
-
-var virtualDom = [],
-    tagImpl = {}
-
-
-function getTag(dom) {
-  return tagImpl[dom.getAttribute('riot-tag') || dom.tagName.toLowerCase()]
-}
-
-function injectStyle(css) {
-  var node = document.createElement('style')
-  node.innerHTML = css
-  document.head.appendChild(node)
-}
-
-function mountTo(root, tagName, opts) {
-  var tag = tagImpl[tagName],
-      innerHTML = root.innerHTML
-
-  // clear the inner html
-  root.innerHTML = ''
-
-  if (tag && root) tag = new Tag(tag, { root: root, opts: opts }, innerHTML)
-
-  if (tag && tag.mount) {
-    tag.mount()
-    virtualDom.push(tag)
-    return tag.on('unmount', function() {
-      virtualDom.splice(virtualDom.indexOf(tag), 1)
-    })
-  }
-
-}
-
-riot.tag = function(name, html, css, fn) {
-  if (typeof css == 'function') fn = css
-  else if (css) injectStyle(css)
-  tagImpl[name] = { name: name, tmpl: html, fn: fn }
-  return name
-}
-
-riot.mount = function(selector, tagName, opts) {
-
-  var el,
-      selctAllTags = function(sel) {
-        sel = Object.keys(tagImpl).join(', ')
-        sel.split(',').map(function(t) {
-          sel += ', *[riot-tag="'+ t.trim() + '"]'
-        })
-        return sel
-      },
-      tags = []
-
-  if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
-
-  // crawl the DOM to find the tag
-  if(typeof selector == 'string') {
-    if (selector == '*') {
-      // select all the tags registered
-      // and also the tags found with the riot-tag attribute set
-      selector = selctAllTags(selector)
-    }
-    // or just the ones named like the selector
-    el = $$(selector)
-  }
-  // probably you have passed already a tag or a NodeList
-  else
-    el = selector
-
-  // select all the registered and mount them inside their root elements
-  if (tagName == '*') {
-    // get all custom tags
-    tagName = selctAllTags(selector)
-    // if the root el it's just a single tag
-    if (el.tagName) {
-      el = $$(tagName, el)
-    } else {
-      var nodeList = []
-      // select all the children for all the different root elements
-      each(el, function(tag) {
-        nodeList = $$(tagName, tag)
-      })
-      el = nodeList
-    }
-    // get rid of the tagName
-    tagName = 0
-  }
-
-  function push(root) {
-    var name = tagName || root.getAttribute('riot-tag') || root.tagName.toLowerCase(),
-        tag = mountTo(root, name, opts)
-
-    if (tag) tags.push(tag)
-  }
-
-  // DOM node
-  if (el.tagName)
-    push(selector)
-  // selector or NodeList
-  else
-    each(el, push)
-
-  return tags
-
-}
-
-// update everything
-riot.update = function() {
-  return each(virtualDom, function(tag) {
-    tag.update()
-  })
-}
-
-// @deprecated
-riot.mountTo = riot.mount
-
-
-
-  // share methods for other riot parts, e.g. compiler
-  riot.util = { brackets: brackets, tmpl: tmpl }
-
-  // support CommonJS, AMD & browser
-  if (typeof exports === 'object')
-    module.exports = riot
-  else if (typeof define === 'function' && define.amd)
-    define(function() { return riot })
-  else
-    window.riot = riot
-
-})(typeof window != 'undefined' ? window : undefined);
-
-},{}],45:[function(require,module,exports){
+		d.run = function(fn){
+			try {
+				fn()
+			}
+			catch (err) {
+				emitError(err)
+			}
+			return this
+		};
+		d.dispose = function(){
+			this.removeAllListeners()
+			return this
+		};
+		d.enter = d.exit = function(){
+			return this
+		}
+		return d
+	};
+	return domain
+}).call(this)
+},{"events":47}],47:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5388,43 +5096,76 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],46:[function(require,module,exports){
+},{}],48:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
 var queue = [];
 var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
 
 function drainQueue() {
     if (draining) {
         return;
     }
+    var timeout = setTimeout(cleanUpNextTick);
     draining = true;
-    var currentQueue;
+
     var len = queue.length;
     while(len) {
         currentQueue = queue;
         queue = [];
-        var i = -1;
-        while (++i < len) {
-            currentQueue[i]();
+        while (++queueIndex < len) {
+            currentQueue[queueIndex].run();
         }
+        queueIndex = -1;
         len = queue.length;
     }
+    currentQueue = null;
     draining = false;
+    clearTimeout(timeout);
 }
+
 process.nextTick = function (fun) {
-    queue.push(fun);
-    if (!draining) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
         setTimeout(drainQueue, 0);
     }
 };
 
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
 process.title = 'browser';
 process.browser = true;
 process.env = {};
 process.argv = [];
 process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
 
 function noop() {}
 
@@ -5447,7 +5188,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],47:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5533,7 +5274,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],48:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5620,10 +5361,1441 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],49:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":47,"./encode":48}]},{},[11]);
+},{"./decode":49,"./encode":50}],52:[function(require,module,exports){
+/*!
+  * domready (c) Dustin Diaz 2014 - License MIT
+  */
+!function (name, definition) {
+
+  if (typeof module != 'undefined') module.exports = definition()
+  else if (typeof define == 'function' && typeof define.amd == 'object') define(definition)
+  else this[name] = definition()
+
+}('domready', function () {
+
+  var fns = [], listener
+    , doc = document
+    , hack = doc.documentElement.doScroll
+    , domContentLoaded = 'DOMContentLoaded'
+    , loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState)
+
+
+  if (!loaded)
+  doc.addEventListener(domContentLoaded, listener = function () {
+    doc.removeEventListener(domContentLoaded, listener)
+    loaded = 1
+    while (listener = fns.shift()) listener()
+  })
+
+  return function (fn) {
+    loaded ? setTimeout(fn, 0) : fns.push(fn)
+  }
+
+});
+
+},{}],53:[function(require,module,exports){
+/**
+ *
+ * This function was taken from a stackoverflow answer:
+ *
+ * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+ *
+ * Many thanks to:
+ *
+ * Briguy37 (http://stackoverflow.com/users/508537/briguy37)
+ * broofa (http://stackoverflow.com/users/109538/broofa)
+ *
+ */
+
+module.exports = function() {
+    var d = new Date().getTime();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+    });
+};
+
+},{}],54:[function(require,module,exports){
+var riot = require('riot')
+var xtend = require('xtend')
+
+module.exports = function RiotStateRenderer(options) {
+	var defaultOpts = xtend(options)
+
+	return function makeRenderer(stateRouter) {
+		defaultOpts.makePath = makeRiotPath.bind(null, stateRouter.makePath)
+
+		defaultOpts.active = makeRiotPath.bind(null, stateRouter.stateIsActive)
+
+		stateRouter.on('stateChangeEnd', function() {
+			riot.update()
+		})
+
+		return {
+			render: function render(context, cb) {
+				var element = context.element
+				var template = context.template
+				var content = context.content
+				if (typeof element === 'string') {
+					element = document.querySelector(element)
+				}
+
+				try {
+					var tag = riot.mount(element, template, xtend(defaultOpts, content))[0]
+
+					if (!tag) {
+						console.error('Error creating riot tag', template, 'on', element)
+					}
+
+					cb(null, tag)
+				} catch (e) {
+					cb(e)
+				}
+			},
+			reset: function reset(context, cb) {
+				var tag = context.domApi
+
+				tag.trigger('reset')
+				tag.opts = xtend(defaultOpts, context.content)
+				tag.update()
+				cb()
+			},
+			destroy: function destroy(tag, cb) {
+				tag.unmount(true)
+				cb()
+			},
+			getChildElement: function getChildElement(tag, cb) {
+				try {
+					var child = tag.root.querySelector('ui-view')
+					cb(null, child)
+				} catch (e) {
+					cb(e)
+				}
+			}
+		}
+	}
+}
+
+// Since I can't figure out how to use object literals in a Riot expressions
+function makeRiotPath() {
+	try {
+		var args = Array.prototype.slice.call(arguments)
+		var makePath = args.shift()
+		var stateName = args.shift()
+		var opts = {}
+		for (var i = 0; i < args.length; i += 2) {
+			opts[args[i]] = args[i + 1]
+		}
+		return makePath(stateName, opts)
+	} catch (e) {
+		console.log(e)
+	}
+}
+
+},{"riot":56,"xtend":55}],55:[function(require,module,exports){
+arguments[4][23][0].apply(exports,arguments)
+},{"dup":23}],56:[function(require,module,exports){
+/* Riot v2.1.0, @license MIT, (c) 2015 Muut Inc. + contributors */
+
+;(function(window) {
+  // 'use strict' does not allow us to override the events properties https://github.com/muut/riotjs/blob/dev/lib/tag/update.js#L7-L10
+  // it leads to the following error on firefox "setting a property that has only a getter"
+  //'use strict'
+
+
+  var riot = { version: 'v2.1.0', settings: {} }
+
+
+riot.observable = function(el) {
+
+  el = el || {}
+
+  var callbacks = {},
+      _id = 0
+
+  el.on = function(events, fn) {
+    if (typeof fn == 'function') {
+      fn._id = typeof fn._id == 'undefined' ? _id++ : fn._id
+
+      events.replace(/\S+/g, function(name, pos) {
+        (callbacks[name] = callbacks[name] || []).push(fn)
+        fn.typed = pos > 0
+      })
+    }
+    return el
+  }
+
+  el.off = function(events, fn) {
+    if (events == '*') callbacks = {}
+    else {
+      events.replace(/\S+/g, function(name) {
+        if (fn) {
+          var arr = callbacks[name]
+          for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
+            if (cb._id == fn._id) { arr.splice(i, 1); i-- }
+          }
+        } else {
+          callbacks[name] = []
+        }
+      })
+    }
+    return el
+  }
+
+  // only single event supported
+  el.one = function(name, fn) {
+    function on() {
+      el.off(name, on)
+      fn.apply(el, arguments)
+    }
+    return el.on(name, on)
+  }
+
+  el.trigger = function(name) {
+    var args = [].slice.call(arguments, 1),
+        fns = callbacks[name] || []
+
+    for (var i = 0, fn; (fn = fns[i]); ++i) {
+      if (!fn.busy) {
+        fn.busy = 1
+        fn.apply(el, fn.typed ? [name].concat(args) : args)
+        if (fns[i] !== fn) { i-- }
+        fn.busy = 0
+      }
+    }
+
+    if (callbacks.all && name != 'all') {
+      el.trigger.apply(el, ['all', name].concat(args))
+    }
+
+    return el
+  }
+
+  return el
+
+}
+riot.mixin = (function() {
+  var registeredMixins = {}
+  return function(name, mixin) {
+    if (!mixin) return registeredMixins[name]
+      else registeredMixins[name] = mixin
+  }
+})()
+
+;(function(riot, evt, window) {
+
+  // browsers only
+  if (!window) return
+
+  var loc = window.location,
+      fns = riot.observable(),
+      win = window,
+      started = false,
+      current
+
+  function hash() {
+    return loc.href.split('#')[1] || ''
+  }
+
+  function parser(path) {
+    return path.split('/')
+  }
+
+  function emit(path) {
+    if (path.type) path = hash()
+
+    if (path != current) {
+      fns.trigger.apply(null, ['H'].concat(parser(path)))
+      current = path
+    }
+  }
+
+  var r = riot.route = function(arg) {
+    // string
+    if (arg[0]) {
+      loc.hash = arg
+      emit(arg)
+
+    // function
+    } else {
+      fns.on('H', arg)
+    }
+  }
+
+  r.exec = function(fn) {
+    fn.apply(null, parser(hash()))
+  }
+
+  r.parser = function(fn) {
+    parser = fn
+  }
+
+  r.stop = function () {
+    if (!started) return
+    win.removeEventListener ? win.removeEventListener(evt, emit, false) : win.detachEvent('on' + evt, emit)
+    fns.off('*')
+    started = false
+  }
+
+  r.start = function () {
+    if (started) return
+    win.addEventListener ? win.addEventListener(evt, emit, false) : win.attachEvent('on' + evt, emit)
+    started = true
+  }
+
+  // autostart the router
+  r.start()
+
+})(riot, 'hashchange', window)
+/*
+
+//// How it works?
+
+
+Three ways:
+
+1. Expressions: tmpl('{ value }', data).
+   Returns the result of evaluated expression as a raw object.
+
+2. Templates: tmpl('Hi { name } { surname }', data).
+   Returns a string with evaluated expressions.
+
+3. Filters: tmpl('{ show: !done, highlight: active }', data).
+   Returns a space separated list of trueish keys (mainly
+   used for setting html classes), e.g. "show highlight".
+
+
+// Template examples
+
+tmpl('{ title || "Untitled" }', data)
+tmpl('Results are { results ? "ready" : "loading" }', data)
+tmpl('Today is { new Date() }', data)
+tmpl('{ message.length > 140 && "Message is too long" }', data)
+tmpl('This item got { Math.round(rating) } stars', data)
+tmpl('<h1>{ title }</h1>{ body }', data)
+
+
+// Falsy expressions in templates
+
+In templates (as opposed to single expressions) all falsy values
+except zero (undefined/null/false) will default to empty string:
+
+tmpl('{ undefined } - { false } - { null } - { 0 }', {})
+// will return: " - - - 0"
+
+*/
+
+
+var brackets = (function(orig, s, b) {
+  return function(x) {
+
+    // make sure we use the current setting
+    s = riot.settings.brackets || orig
+    if (b != s) b = s.split(' ')
+
+    // if regexp given, rewrite it with current brackets (only if differ from default)
+    return x && x.test
+      ? s == orig
+        ? x : RegExp(x.source
+                      .replace(/\{/g, b[0].replace(/(?=.)/g, '\\'))
+                      .replace(/\}/g, b[1].replace(/(?=.)/g, '\\')),
+                    x.global ? 'g' : '')
+
+      // else, get specific bracket
+      : b[x]
+
+  }
+})('{ }')
+
+
+var tmpl = (function() {
+
+  var cache = {},
+      reVars = /(['"\/]).*?[^\\]\1|\.\w*|\w*:|\b(?:(?:new|typeof|in|instanceof) |(?:this|true|false|null|undefined)\b|function *\()|([a-z_$]\w*)/gi
+              // [ 1               ][ 2  ][ 3 ][ 4                                                                                  ][ 5       ]
+              // find variable names:
+              // 1. skip quoted strings and regexps: "a b", 'a b', 'a \'b\'', /a b/
+              // 2. skip object properties: .name
+              // 3. skip object literals: name:
+              // 4. skip javascript keywords
+              // 5. match var name
+
+  // build a template (or get it from cache), render with data
+  return function(str, data) {
+    return str && (cache[str] = cache[str] || tmpl(str))(data)
+  }
+
+
+  // create a template instance
+
+  function tmpl(s, p) {
+
+    // default template string to {}
+    s = (s || (brackets(0) + brackets(1)))
+
+      // temporarily convert \{ and \} to a non-character
+      .replace(brackets(/\\{/g), '\uFFF0')
+      .replace(brackets(/\\}/g), '\uFFF1')
+
+    // split string to expression and non-expresion parts
+    p = split(s, extract(s, brackets(/{/), brackets(/}/)))
+
+    return new Function('d', 'return ' + (
+
+      // is it a single expression or a template? i.e. {x} or <b>{x}</b>
+      !p[0] && !p[2] && !p[3]
+
+        // if expression, evaluate it
+        ? expr(p[1])
+
+        // if template, evaluate all expressions in it
+        : '[' + p.map(function(s, i) {
+
+            // is it an expression or a string (every second part is an expression)
+          return i % 2
+
+              // evaluate the expressions
+              ? expr(s, true)
+
+              // process string parts of the template:
+              : '"' + s
+
+                  // preserve new lines
+                  .replace(/\n/g, '\\n')
+
+                  // escape quotes
+                  .replace(/"/g, '\\"')
+
+                + '"'
+
+        }).join(',') + '].join("")'
+      )
+
+      // bring escaped { and } back
+      .replace(/\uFFF0/g, brackets(0))
+      .replace(/\uFFF1/g, brackets(1))
+
+    + ';')
+
+  }
+
+
+  // parse { ... } expression
+
+  function expr(s, n) {
+    s = s
+
+      // convert new lines to spaces
+      .replace(/\n/g, ' ')
+
+      // trim whitespace, brackets, strip comments
+      .replace(brackets(/^[{ ]+|[ }]+$|\/\*.+?\*\//g), '')
+
+    // is it an object literal? i.e. { key : value }
+    return /^\s*[\w- "']+ *:/.test(s)
+
+      // if object literal, return trueish keys
+      // e.g.: { show: isOpen(), done: item.done } -> "show done"
+      ? '[' +
+
+          // extract key:val pairs, ignoring any nested objects
+          extract(s,
+
+              // name part: name:, "name":, 'name':, name :
+              /["' ]*[\w- ]+["' ]*:/,
+
+              // expression part: everything upto a comma followed by a name (see above) or end of line
+              /,(?=["' ]*[\w- ]+["' ]*:)|}|$/
+              ).map(function(pair) {
+
+                // get key, val parts
+                return pair.replace(/^[ "']*(.+?)[ "']*: *(.+?),? *$/, function(_, k, v) {
+
+                  // wrap all conditional parts to ignore errors
+                  return v.replace(/[^&|=!><]+/g, wrap) + '?"' + k + '":"",'
+
+                })
+
+              }).join('')
+
+        + '].join(" ").trim()'
+
+      // if js expression, evaluate as javascript
+      : wrap(s, n)
+
+  }
+
+
+  // execute js w/o breaking on errors or undefined vars
+
+  function wrap(s, nonull) {
+    s = s.trim()
+    return !s ? '' : '(function(v){try{v='
+
+        // prefix vars (name => data.name)
+        + (s.replace(reVars, function(s, _, v) { return v ? '(d.'+v+'===undefined?'+(typeof window == 'undefined' ? 'global.' : 'window.')+v+':d.'+v+')' : s })
+
+          // break the expression if its empty (resulting in undefined value)
+          || 'x')
+      + '}catch(e){'
+      + '}finally{return '
+
+        // default to empty string for falsy values except zero
+        + (nonull === true ? '!v&&v!==0?"":v' : 'v')
+
+      + '}}).call(d)'
+  }
+
+
+  // split string by an array of substrings
+
+  function split(str, substrings) {
+    var parts = []
+    substrings.map(function(sub, i) {
+
+      // push matched expression and part before it
+      i = str.indexOf(sub)
+      parts.push(str.slice(0, i), sub)
+      str = str.slice(i + sub.length)
+    })
+
+    // push the remaining part
+    return parts.concat(str)
+  }
+
+
+  // match strings between opening and closing regexp, skipping any inner/nested matches
+
+  function extract(str, open, close) {
+
+    var start,
+        level = 0,
+        matches = [],
+        re = new RegExp('('+open.source+')|('+close.source+')', 'g')
+
+    str.replace(re, function(_, open, close, pos) {
+
+      // if outer inner bracket, mark position
+      if(!level && open) start = pos
+
+      // in(de)crease bracket level
+      level += open ? 1 : -1
+
+      // if outer closing bracket, grab the match
+      if(!level && close != null) matches.push(str.slice(start, pos+close.length))
+
+    })
+
+    return matches
+  }
+
+})()
+
+// { key, i in items} -> { key, i, items }
+function loopKeys(expr) {
+  var ret = { val: expr },
+      els = expr.split(/\s+in\s+/)
+
+  if (els[1]) {
+    ret.val = brackets(0) + els[1]
+    els = els[0].slice(brackets(0).length).trim().split(/,\s*/)
+    ret.key = els[0]
+    ret.pos = els[1]
+  }
+
+  return ret
+}
+
+function mkitem(expr, key, val) {
+  var item = {}
+  item[expr.key] = key
+  if (expr.pos) item[expr.pos] = val
+  return item
+}
+
+
+/* Beware: heavy stuff */
+function _each(dom, parent, expr) {
+
+  remAttr(dom, 'each')
+
+  var template = dom.outerHTML,
+      prev = dom.previousSibling,
+      root = dom.parentNode,
+      rendered = [],
+      tags = [],
+      checksum
+
+  expr = loopKeys(expr)
+
+  function add(pos, item, tag) {
+    rendered.splice(pos, 0, item)
+    tags.splice(pos, 0, tag)
+  }
+
+  // clean template code
+  parent.one('update', function() {
+    root.removeChild(dom)
+
+  }).one('premount', function() {
+    if (root.stub) root = parent.root
+
+  }).on('update', function() {
+
+    var items = tmpl(expr.val, parent)
+    if (!items) return
+
+    // object loop. any changes cause full redraw
+    if (!Array.isArray(items)) {
+      var testsum = JSON.stringify(items)
+
+      if (testsum == checksum) return
+      checksum = testsum
+
+      // clear old items
+      each(tags, function(tag) { tag.unmount() })
+      rendered = []
+      tags = []
+
+      items = Object.keys(items).map(function(key) {
+        return mkitem(expr, key, items[key])
+      })
+
+    }
+
+    // unmount redundant
+    each(rendered, function(item) {
+      if (item instanceof Object) {
+        // skip existing items
+        if (items.indexOf(item) > -1) {
+          return
+        }
+      } else {
+        // find all non-objects
+        var newItems = arrFindEquals(items, item),
+            oldItems = arrFindEquals(rendered, item)
+
+        // if more or equal amount, no need to remove
+        if (newItems.length >= oldItems.length) {
+          return
+        }
+      }
+      var pos = rendered.indexOf(item),
+          tag = tags[pos]
+
+      if (tag) {
+        tag.unmount()
+        rendered.splice(pos, 1)
+        tags.splice(pos, 1)
+        // to let "each" know that this item is removed
+        return false
+      }
+
+    })
+
+    // mount new / reorder
+    var prevBase = [].indexOf.call(root.childNodes, prev) + 1
+    each(items, function(item, i) {
+
+      // start index search from position based on the current i
+      var pos = items.indexOf(item, i),
+          oldPos = rendered.indexOf(item, i)
+
+      // if not found, search backwards from current i position
+      pos < 0 && (pos = items.lastIndexOf(item, i))
+      oldPos < 0 && (oldPos = rendered.lastIndexOf(item, i))
+
+      if (!(item instanceof Object)) {
+        // find all non-objects
+        var newItems = arrFindEquals(items, item),
+            oldItems = arrFindEquals(rendered, item)
+
+        // if more, should mount one new
+        if (newItems.length > oldItems.length) {
+          oldPos = -1
+        }
+      }
+
+      // mount new
+      var nodes = root.childNodes
+      if (oldPos < 0) {
+        if (!checksum && expr.key) var _item = mkitem(expr, item, pos)
+
+        var tag = new Tag({ tmpl: template }, {
+          before: nodes[prevBase + pos],
+          parent: parent,
+          root: root,
+          item: _item || item
+        })
+
+        tag.mount()
+
+        add(pos, item, tag)
+        return true
+      }
+
+      // change pos value
+      if (expr.pos && tags[oldPos][expr.pos] != pos) {
+        tags[oldPos].one('update', function(item) {
+          item[expr.pos] = pos
+        })
+        tags[oldPos].update()
+      }
+
+      // reorder
+      if (pos != oldPos) {
+        root.insertBefore(nodes[prevBase + oldPos], nodes[prevBase + (pos > oldPos ? pos + 1 : pos)])
+        return add(pos, rendered.splice(oldPos, 1)[0], tags.splice(oldPos, 1)[0])
+      }
+
+    })
+
+    rendered = items.slice()
+
+  }).one('updated', function() {
+    walk(root, function(dom) {
+      each(dom.attributes, function(attr) {
+        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
+      })
+    })
+  })
+
+}
+
+
+function parseNamedElements(root, parent, childTags) {
+
+  walk(root, function(dom) {
+    if (dom.nodeType == 1) {
+      dom.isLoop = 0
+      if(dom.parentNode && dom.parentNode.isLoop) dom.isLoop = 1
+      if(dom.getAttribute('each')) dom.isLoop = 1
+      // custom child tag
+      var child = getTag(dom)
+
+      if (child && !dom.isLoop) {
+        var tag = new Tag(child, { root: dom, parent: parent }, dom.innerHTML),
+            namedTag = dom.getAttribute('name'),
+            tagName = namedTag && namedTag.indexOf(brackets(0)) < 0 ? namedTag : child.name,
+            ptag = parent,
+            cachedTag
+
+        while(!getTag(ptag.root)) {
+          if(!ptag.parent) break
+          ptag = ptag.parent
+        }
+        // fix for the parent attribute in the looped elements
+        tag.parent = ptag
+
+        cachedTag = ptag.tags[tagName]
+
+        // if there are multiple children tags having the same name
+        if (cachedTag) {
+          // if the parent tags property is not yet an array
+          // create it adding the first cached tag
+          if (!Array.isArray(cachedTag))
+            ptag.tags[tagName] = [cachedTag]
+          // add the new nested tag to the array
+          ptag.tags[tagName].push(tag)
+        } else {
+          ptag.tags[tagName] = tag
+        }
+
+        // empty the child node once we got its template
+        // to avoid that its children get compiled multiple times
+        dom.innerHTML = ''
+        childTags.push(tag)
+      }
+
+      if(!dom.isLoop)
+        each(dom.attributes, function(attr) {
+          if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
+        })
+    }
+
+  })
+
+}
+
+function parseExpressions(root, tag, expressions) {
+
+  function addExpr(dom, val, extra) {
+    if (val.indexOf(brackets(0)) >= 0) {
+      var expr = { dom: dom, expr: val }
+      expressions.push(extend(expr, extra))
+    }
+  }
+
+  walk(root, function(dom) {
+    var type = dom.nodeType
+
+    // text node
+    if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
+    if (type != 1) return
+
+    /* element */
+
+    // loop
+    var attr = dom.getAttribute('each')
+    if (attr) { _each(dom, tag, attr); return false }
+
+    // attribute expressions
+    each(dom.attributes, function(attr) {
+      var name = attr.name,
+        bool = name.split('__')[1]
+
+      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
+      if (bool) { remAttr(dom, name); return false }
+
+    })
+
+    // skip custom tags
+    if (getTag(dom)) return false
+
+  })
+
+}
+function Tag(impl, conf, innerHTML) {
+
+  var self = riot.observable(this),
+      opts = inherit(conf.opts) || {},
+      dom = mkdom(impl.tmpl),
+      parent = conf.parent,
+      expressions = [],
+      childTags = [],
+      root = conf.root,
+      item = conf.item,
+      fn = impl.fn,
+      tagName = root.tagName.toLowerCase(),
+      attr = {},
+      loopDom,
+      TAG_ATTRIBUTES = /([\w\-]+)\s?=\s?['"]([^'"]+)["']/gim
+
+  if (fn && root._tag) {
+    root._tag.unmount(true)
+  }
+
+  if(impl.attrs) {
+    var attrs = impl.attrs.match(TAG_ATTRIBUTES)
+
+    each(attrs, function(a) {
+      var kv = a.split(/\s?=\s?/)
+      root.setAttribute(kv[0], kv[1].replace(/['"]/g, ''))
+    })
+
+  }
+  // keep a reference to the tag just created
+  // so we will be able to mount this tag multiple times
+  root._tag = this
+
+  // create a unique id to this tag
+  // it could be handy to use it also to improve the virtual dom rendering speed
+  this._id = fastAbs(~~(new Date().getTime() * Math.random()))
+
+  extend(this, { parent: parent, root: root, opts: opts, tags: {} }, item)
+
+  // grab attributes
+  each(root.attributes, function(el) {
+    attr[el.name] = el.value
+  })
+
+
+  if (dom.innerHTML && !/select/.test(tagName) && !/tbody/.test(tagName) && !/tr/.test(tagName))
+    // replace all the yield tags with the tag inner html
+    dom.innerHTML = replaceYield(dom.innerHTML, innerHTML)
+
+
+  // options
+  function updateOpts() {
+    each(Object.keys(attr), function(name) {
+      opts[name] = tmpl(attr[name], parent || self)
+    })
+  }
+
+  this.update = function(data, init) {
+    extend(self, data, item)
+    updateOpts()
+    self.trigger('update', item)
+    update(expressions, self, item)
+    self.trigger('updated')
+  }
+
+  this.mixin = function() {
+    each(arguments, function(mix) {
+      mix = 'string' == typeof mix ? riot.mixin(mix) : mix
+      each(Object.keys(mix), function(key) {
+        // bind methods to self
+        if ('init' != key)
+          self[key] = 'function' == typeof mix[key] ? mix[key].bind(self) : mix[key]
+      })
+      // init method will be called automatically
+      if (mix.init) mix.init.bind(self)()
+    })
+  }
+
+  this.mount = function() {
+
+    updateOpts()
+
+    // initialiation
+    fn && fn.call(self, opts)
+
+    toggle(true)
+
+    // parse layout after init. fn may calculate args for nested custom tags
+    parseExpressions(dom, self, expressions)
+
+    if (!self.parent) self.update()
+
+    // internal use only, fixes #403
+    self.trigger('premount')
+
+    if (fn) {
+      while (dom.firstChild) root.appendChild(dom.firstChild)
+
+    } else {
+      loopDom = dom.firstChild
+      root.insertBefore(loopDom, conf.before || null) // null needed for IE8
+    }
+
+    if (root.stub) self.root = root = parent.root
+
+    // if it's not a child tag we can trigger its mount event
+    if (!self.parent) self.trigger('mount')
+    // otherwise we need to wait that the parent event gets triggered
+    else self.parent.one('mount', function() { self.trigger('mount') })
+  }
+
+
+  this.unmount = function(keepRootTag) {
+    var el = fn ? root : loopDom,
+        p = el.parentNode
+
+    if (p) {
+
+      if (parent) {
+        // remove this tag from the parent tags object
+        // if there are multiple nested tags with same name..
+        // remove this element form the array
+        if (Array.isArray(parent.tags[tagName])) {
+          each(parent.tags[tagName], function(tag, i) {
+            if (tag._id == self._id)
+              parent.tags[tagName].splice(i, 1)
+          })
+        } else
+          // otherwise just delete the tag instance
+          parent.tags[tagName] = undefined
+      } else {
+        while (el.firstChild) el.removeChild(el.firstChild)
+      }
+
+      if (!keepRootTag)
+        p.removeChild(el)
+
+    }
+
+
+    self.trigger('unmount')
+    toggle()
+    self.off('*')
+    // somehow ie8 does not like `delete root._tag`
+    root._tag = null
+
+  }
+
+  function toggle(isMount) {
+
+    // mount/unmount children
+    each(childTags, function(child) { child[isMount ? 'mount' : 'unmount']() })
+
+    // listen/unlisten parent (events flow one way from parent to children)
+    if (parent) {
+      var evt = isMount ? 'on' : 'off'
+      parent[evt]('update', self.update)[evt]('unmount', self.unmount)
+    }
+  }
+
+  // named elements available for fn
+  parseNamedElements(dom, this, childTags)
+
+
+}
+
+function setEventHandler(name, handler, dom, tag, item) {
+
+  dom[name] = function(e) {
+
+    // cross browser event fix
+    e = e || window.event
+    e.which = e.which || e.charCode || e.keyCode
+    e.target = e.target || e.srcElement
+    e.currentTarget = dom
+    e.item = item
+
+    // prevent default behaviour (by default)
+    if (handler.call(tag, e) !== true && !/radio|check/.test(dom.type)) {
+      e.preventDefault && e.preventDefault()
+      e.returnValue = false
+    }
+
+    if (!e.preventUpdate) {
+      var el = item ? tag.parent : tag
+      el.update()
+    }
+
+  }
+
+}
+
+// used by if- attribute
+function insertTo(root, node, before) {
+  if (root) {
+    root.insertBefore(before, node)
+    root.removeChild(node)
+  }
+}
+
+// item = currently looped item
+function update(expressions, tag, item) {
+
+  each(expressions, function(expr, i) {
+
+    var dom = expr.dom,
+        attrName = expr.attr,
+        value = tmpl(expr.expr, tag),
+        parent = expr.dom.parentNode
+
+    if (value == null) value = ''
+
+    // leave out riot- prefixes from strings inside textarea
+    if (parent && parent.tagName == 'TEXTAREA') value = value.replace(/riot-/g, '')
+
+    // no change
+    if (expr.value === value) return
+    expr.value = value
+
+    // text node
+    if (!attrName) return dom.nodeValue = value.toString()
+
+    // remove original attribute
+    remAttr(dom, attrName)
+
+    // event handler
+    if (typeof value == 'function') {
+      setEventHandler(attrName, value, dom, tag, item)
+
+    // if- conditional
+    } else if (attrName == 'if') {
+      var stub = expr.stub
+
+      // add to DOM
+      if (value) {
+        stub && insertTo(stub.parentNode, stub, dom)
+
+      // remove from DOM
+      } else {
+        stub = expr.stub = stub || document.createTextNode('')
+        insertTo(dom.parentNode, dom, stub)
+      }
+
+    // show / hide
+    } else if (/^(show|hide)$/.test(attrName)) {
+      if (attrName == 'hide') value = !value
+      dom.style.display = value ? '' : 'none'
+
+    // field value
+    } else if (attrName == 'value') {
+      dom.value = value
+
+    // <img src="{ expr }">
+    } else if (attrName.slice(0, 5) == 'riot-') {
+      attrName = attrName.slice(5)
+      value ? dom.setAttribute(attrName, value) : remAttr(dom, attrName)
+
+    } else {
+      if (expr.bool) {
+        dom[attrName] = value
+        if (!value) return
+        value = attrName
+      }
+
+      if (typeof value != 'object') dom.setAttribute(attrName, value)
+
+    }
+
+  })
+
+}
+
+function each(els, fn) {
+  for (var i = 0, len = (els || []).length, el; i < len; i++) {
+    el = els[i]
+    // return false -> remove current item during loop
+    if (el != null && fn(el, i) === false) i--
+  }
+  return els
+}
+
+function remAttr(dom, name) {
+  dom.removeAttribute(name)
+}
+
+function fastAbs(nr) {
+  return (nr ^ (nr >> 31)) - (nr >> 31)
+}
+
+// max 2 from objects allowed
+function extend(obj, from, from2) {
+  from && each(Object.keys(from), function(key) {
+    obj[key] = from[key]
+  })
+  return from2 ? extend(obj, from2) : obj
+}
+
+function checkIE() {
+  if (window) {
+    var ua = navigator.userAgent
+    var msie = ua.indexOf('MSIE ')
+    if (msie > 0) {
+      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
+    }
+    else {
+      return 0
+    }
+  }
+}
+
+function optionInnerHTML(el, html) {
+  var opt = document.createElement('option'),
+      valRegx = /value=[\"'](.+?)[\"']/,
+      selRegx = /selected=[\"'](.+?)[\"']/,
+      valuesMatch = html.match(valRegx),
+      selectedMatch = html.match(selRegx)
+
+  opt.innerHTML = html
+
+  if (valuesMatch) {
+    opt.value = valuesMatch[1]
+  }
+
+  if (selectedMatch) {
+    opt.setAttribute('riot-selected', selectedMatch[1])
+  }
+
+  el.appendChild(opt)
+}
+
+function tbodyInnerHTML(el, html, tagName) {
+  var div = document.createElement('div')
+  div.innerHTML = '<table>' + html + '</table>'
+
+  if (/td|th/.test(tagName)) {
+    el.appendChild(div.firstChild.firstChild.firstChild.firstChild)
+  } else {
+    el.appendChild(div.firstChild.firstChild.firstChild)
+  }
+}
+
+function mkdom(template) {
+  var tagName = template.trim().slice(1, 3).toLowerCase(),
+      rootTag = /td|th/.test(tagName) ? 'tr' : tagName == 'tr' ? 'tbody' : 'div',
+      el = mkEl(rootTag)
+
+  el.stub = true
+
+  if (tagName === 'op' && ieVersion && ieVersion < 10) {
+    optionInnerHTML(el, template)
+  } else if ((rootTag === 'tbody' || rootTag === 'tr') && ieVersion && ieVersion < 10) {
+    tbodyInnerHTML(el, template, tagName)
+  } else
+    el.innerHTML = template
+
+  return el
+}
+
+function walk(dom, fn) {
+  if (dom) {
+    if (fn(dom) === false) walk(dom.nextSibling, fn)
+    else {
+      dom = dom.firstChild
+
+      while (dom) {
+        walk(dom, fn)
+        dom = dom.nextSibling
+      }
+    }
+  }
+}
+
+function mkEl(name) {
+  return document.createElement(name)
+}
+
+function replaceYield (tmpl, innerHTML) {
+  return tmpl.replace(/<(yield)\/?>(<\/\1>)?/gim, innerHTML || '')
+}
+
+function $$(selector, ctx) {
+  ctx = ctx || document
+  return ctx.querySelectorAll(selector)
+}
+
+function arrDiff(arr1, arr2) {
+  return arr1.filter(function(el) {
+    return arr2.indexOf(el) < 0
+  })
+}
+
+function arrFindEquals(arr, el) {
+  return arr.filter(function (_el) {
+    return _el === el
+  })
+}
+
+function inherit(parent) {
+  function Child() {}
+  Child.prototype = parent
+  return new Child()
+}
+/**
+ *
+ * Hacks needed for the old internet explorer versions [lower than IE10]
+ *
+ */
+
+var ieVersion = checkIE()
+
+function checkIE() {
+  if (window) {
+    var ua = navigator.userAgent
+    var msie = ua.indexOf('MSIE ')
+    if (msie > 0) {
+      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
+    }
+    else {
+      return 0
+    }
+  }
+}
+
+function tbodyInnerHTML(el, html, tagName) {
+  var div = mkEl('div'),
+      loops = /td|th/.test(tagName) ? 3 : 2,
+      child
+
+  div.innerHTML = '<table>' + html + '</table>'
+  child = div.firstChild
+
+  while(loops--) {
+    child = child.firstChild
+  }
+
+  el.appendChild(child)
+
+}
+
+function optionInnerHTML(el, html) {
+  var opt = mkEl('option'),
+      valRegx = /value=[\"'](.+?)[\"']/,
+      selRegx = /selected=[\"'](.+?)[\"']/,
+      valuesMatch = html.match(valRegx),
+      selectedMatch = html.match(selRegx)
+
+  opt.innerHTML = html
+
+  if (valuesMatch) {
+    opt.value = valuesMatch[1]
+  }
+
+  if (selectedMatch) {
+    opt.setAttribute('riot-selected', selectedMatch[1])
+  }
+
+  el.appendChild(opt)
+}
+
+/*
+ Virtual dom is an array of custom tags on the document.
+ Updates and unmounts propagate downwards from parent to children.
+*/
+
+var virtualDom = [],
+    tagImpl = {},
+    styleNode
+
+
+function getTag(dom) {
+  return tagImpl[dom.getAttribute('riot-tag') || dom.tagName.toLowerCase()]
+}
+
+function injectStyle(css) {
+
+  styleNode = styleNode || mkEl('style')
+
+  if (!document.head) return
+
+  if(styleNode.styleSheet)
+    styleNode.styleSheet.cssText += css
+  else
+    styleNode.innerHTML += css
+
+  if (!styleNode._rendered)
+    if (styleNode.styleSheet)
+      document.body.appendChild(styleNode)
+    else
+      document.head.appendChild(styleNode)
+
+  styleNode._rendered = true
+
+}
+
+function mountTo(root, tagName, opts) {
+  var tag = tagImpl[tagName],
+      innerHTML = root.innerHTML
+
+  // clear the inner html
+  root.innerHTML = ''
+
+  if (tag && root) tag = new Tag(tag, { root: root, opts: opts }, innerHTML)
+
+  if (tag && tag.mount) {
+    tag.mount()
+    virtualDom.push(tag)
+    return tag.on('unmount', function() {
+      virtualDom.splice(virtualDom.indexOf(tag), 1)
+    })
+  }
+
+}
+
+riot.tag = function(name, html, css, attrs, fn) {
+  if (typeof attrs == 'function') {
+    fn = attrs
+    if(/^[\w\-]+\s?=/.test(css)) {attrs = css; css = ''} else attrs = ''
+  }
+  if (typeof css == 'function') fn = css
+  else if (css) injectStyle(css)
+  tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
+  return name
+}
+
+riot.mount = function(selector, tagName, opts) {
+
+  var el,
+      selctAllTags = function() {
+        var keys = Object.keys(tagImpl)
+        var list = keys.join(', ')
+        each(keys, function(t) {
+          list += ', *[riot-tag="'+ t.trim() + '"]'
+        })
+        return list
+      },
+      allTags,
+      tags = []
+
+  if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
+
+  // crawl the DOM to find the tag
+  if(typeof selector == 'string') {
+    if (selector == '*') {
+      // select all the tags registered
+      // and also the tags found with the riot-tag attribute set
+      selector = allTags = selctAllTags()
+    } else {
+      selector.split(',').map(function(t) {
+        selector += ', *[riot-tag="'+ t.trim() + '"]'
+      })
+
+    }
+    // or just the ones named like the selector
+    el = $$(selector)
+  }
+  // probably you have passed already a tag or a NodeList
+  else
+    el = selector
+
+  // select all the registered and mount them inside their root elements
+  if (tagName == '*') {
+    // get all custom tags
+    tagName = allTags || selctAllTags()
+    // if the root el it's just a single tag
+    if (el.tagName) {
+      el = $$(tagName, el)
+    } else {
+      var nodeList = []
+      // select all the children for all the different root elements
+      each(el, function(tag) {
+        nodeList = $$(tagName, tag)
+      })
+      el = nodeList
+    }
+    // get rid of the tagName
+    tagName = 0
+  }
+
+  function push(root) {
+    if(tagName && !root.getAttribute('riot-tag')) root.setAttribute('riot-tag', tagName)
+
+    var name = tagName || root.getAttribute('riot-tag') || root.tagName.toLowerCase(),
+        tag = mountTo(root, name, opts)
+
+    if (tag) tags.push(tag)
+  }
+
+  // DOM node
+  if (el.tagName)
+    push(selector)
+  // selector or NodeList
+  else
+    each(el, push)
+
+  return tags
+
+}
+
+// update everything
+riot.update = function() {
+  return each(virtualDom, function(tag) {
+    tag.update()
+  })
+}
+
+// @deprecated
+riot.mountTo = riot.mount
+
+
+  // share methods for other riot parts, e.g. compiler
+  riot.util = { brackets: brackets, tmpl: tmpl }
+
+  // support CommonJS, AMD & browser
+  if (typeof exports === 'object')
+    module.exports = riot
+  else if (typeof define === 'function' && define.amd)
+    define(function() { return riot })
+  else
+    window.riot = riot
+
+})(typeof window != 'undefined' ? window : undefined);
+
+},{}],57:[function(require,module,exports){
+var StateRouter = require('abstract-state-router')
+var riotRenderer = require('riot-state-renderer')
+var domready = require('domready')
+
+var stateRouter = StateRouter(riotRenderer(), 'body')
+
+require('./login/login')(stateRouter)
+require('./app/app')(stateRouter)
+
+domready(function() {
+	stateRouter.evaluateCurrentRoute('login')
+})
+
+},{"./app/app":4,"./login/login":11,"abstract-state-router":14,"domready":52,"riot-state-renderer":54}]},{},[57]);
