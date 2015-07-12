@@ -16,3 +16,4 @@ At this point you can `npm run build` to build a deployable version of all three
 - `npm run watchriot`
 - `npm run watchractive`
 - `npm run watchvirtualdom`
+- `npm run watchko`

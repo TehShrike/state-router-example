@@ -1,0 +1,24 @@
+<nav class="navbar navbar-default">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<ul class="nav navbar-nav">
+				<li data-bind="css: {active: $page.stateIsActive('app.topics')}">
+					<a data-bind="attr: {href: $page.makePath('app.topics')}">Basic todo app!</a>
+				</li>
+				<li data-bind="css: {active: $page.stateIsActive('app.about')}">
+					<a data-bind="attr: {href: $page.makePath('app.about')}">About the state router</a>
+				</li>
+				<li>
+					<a data-bind="attr: {href: $page.makePath('login')}, click: $page.logout">"Log out"</a>
+				</li>
+			</ul>
+		</div>
+		<div class="nav navbar-right">
+			<p class="navbar-text">
+				Logged in as <span data-bind="text: $page.username"></span>
+			</p>
+		</div>
+	</div>
+</nav>
+
+<ui-view></ui-view>

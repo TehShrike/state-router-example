@@ -1,0 +1,50 @@
+<h1 data-bind="text: $page.topicName"></h1>
+
+<table class="table table-striped">
+	<thead>
+		<tr>
+			<th>
+				Task name
+			</th>
+			<th style="width: 100px">
+				Complete
+			</th>
+			<th style="width: 87px">
+				Remove
+			</th>
+		</tr>
+	</thead>
+	<tbody>
+		<!--ko foreach: {data: $page.tasks, as: 'task'}-->
+			<tr>
+				<td class="center-y" data-bind="css: {'text-muted': task.done}">
+					<span class="center-y">
+						<span data-bind="text: task.name"></span> &nbsp;
+						<!--ko if: task.done-->
+						<span class="glyphicon glyphicon-ok text-success"></span>
+						<!--/ko-->
+					</span>
+
+				</td>
+				<td>
+					<!--ko if: task.done-->
+						<button class="btn btn-primary full-width" data-bind="click: $page.restoreTask">Restore</button>
+					<!--/ko-->
+
+					<!--ko ifnot: task.done-->
+						<button class="btn btn-success full-width" data-bind="click: $page.completeTask">Complete</button>
+					<!--/ko-->
+				</td>
+				<td>
+					<button class="btn btn-danger full-width" data-bind="click: $page.removeTask">Remove</button>
+				</td>
+			</tr>
+		<!--/ko-->
+		<tr>
+			<td>
+				<input type="text" class="form-control add-new-task" placeholder="New task" data-bind="value: $page.newTaskName, event: {keyup: $page.onCreateTask}, hasFocus: true">
+			</td>
+		</tr>
+	</tbody>
+</table>
+
