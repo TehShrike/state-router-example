@@ -169,7 +169,7 @@ function initializeDummyData() {
 
 
 }).call(this,require('_process'))
-},{"_process":48,"events":47,"random-uuid-v4":53}],2:[function(require,module,exports){
+},{"_process":49,"events":48,"random-uuid-v4":54}],2:[function(require,module,exports){
 require('./about.tag')
 
 module.exports = function(stateRouter) {
@@ -183,11 +183,11 @@ module.exports = function(stateRouter) {
 
 },{"./about.tag":3}],3:[function(require,module,exports){
 var riot = require('riot');
-riot.tag('about', '<div class="container"> <div class="row"> <div class="col-sm-offset-2 col-sm-8"> <div class="jumbotron"> <h1>About this example</h1> </div> </div> </div> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <p> Pretty sweet, isn\'t it? Here, let me give some examples or something. </p> </div> </div> </div>', function(opts) {
+module.exports = riot.tag('about', '<div class="container"> <div class="row"> <div class="col-sm-offset-2 col-sm-8"> <div class="jumbotron"> <h1>About this example</h1> </div> </div> </div> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <p> Pretty sweet, isn\'t it? Here, let me give some examples or something. </p> </div> </div> </div>', function(opts) {
 
 });
 
-},{"riot":56}],4:[function(require,module,exports){
+},{"riot":57}],4:[function(require,module,exports){
 require('array.prototype.findindex')
 var model = require('model.js')
 
@@ -225,18 +225,18 @@ module.exports = function(stateRouter) {
 	require('./topics/topics')(stateRouter)
 }
 
-},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":45,"model.js":1}],5:[function(require,module,exports){
+},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":46,"model.js":1}],5:[function(require,module,exports){
 var riot = require('riot');
-riot.tag('app', '<nav class="navbar navbar-default"> <div class="container-fluid"> <div class="navbar-header"> <ul class="nav navbar-nav"> <li class="{ active: opts.active(\'app.topics\') }"> <a href="{ opts.makePath(\'app.topics\') }">Basic todo app!</a> </li> <li class="{ active: opts.active(\'app.about\') }"> <a href="{ opts.makePath(\'app.about\') }">About the state router</a> </li> <li> <a href="{ opts.makePath(\'login\') }" on-click="logout">"Log out"</a> </li> </ul> </div> <div class="nav navbar-right"> <p class="navbar-text"> Logged in as { currentUser.name } </p> </div> </div> </nav> <ui-view></ui-view>', function(opts) {
+module.exports = riot.tag('app', '<nav class="navbar navbar-default"> <div class="container-fluid"> <div class="navbar-header"> <ul class="nav navbar-nav"> <li class="{ active: opts.active(\'app.topics\') }"> <a href="{ opts.makePath(\'app.topics\') }">Basic todo app!</a> </li> <li class="{ active: opts.active(\'app.about\') }"> <a href="{ opts.makePath(\'app.about\') }">About the state router</a> </li> <li> <a href="{ opts.makePath(\'login\') }" on-click="logout">"Log out"</a> </li> </ul> </div> <div class="nav navbar-right"> <p class="navbar-text"> Logged in as { currentUser.name } </p> </div> </div> </nav> <ui-view></ui-view>', function(opts) {
 
 });
-},{"riot":56}],6:[function(require,module,exports){
+},{"riot":57}],6:[function(require,module,exports){
 var riot = require('riot');
-riot.tag('no-task-selected', '<span> <p> This is a very basic todo app to show off route states. </p> <p> Click on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing! </p> </span>', function(opts) {
+module.exports = riot.tag('no-task-selected', '<span> <p> This is a very basic todo app to show off route states. </p> <p> Click on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing! </p> </span>', function(opts) {
 
 });
 
-},{"riot":56}],7:[function(require,module,exports){
+},{"riot":57}],7:[function(require,module,exports){
 var model = require('model.js')
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
@@ -296,7 +296,7 @@ module.exports = function(stateRouter) {
 
 },{"./no-task-selected.tag":6,"./tasks.tag":8,"model.js":1}],8:[function(require,module,exports){
 var riot = require('riot');
-riot.tag('tasks', '<h1>{opts.topic.name}</h1> <table class="table table-striped"> <thead> <tr> <th> Task name </th> <th style="width: 100px"> Complete </th> <th style="width: 87px"> Remove </th> </tr> </thead> <tbody> <tr each="{ opts.tasks }">  <td class=" center-y"> <span class="center-y"> {name} &nbsp;<span if="{ done }" class="glyphicon glyphicon-ok text-success"></span> </span> </td> <td> <button type="button" if="{ done }" class="btn btn-primary full-width" onclick="{ parent.onRestore }">Restore</button> <button type="button" if="{ !done }" class="btn btn-success full-width" onclick="{ parent.onComplete }">Complete</button> </td> <td> <button class="btn btn-danger full-width" onclick="{ parent.onRemove }"> Remove </button> </td> </tr> <tr> <td> <input type="text" class="form-control add-new-task" placeholder="New task" onkeyup="{ newTaskKeyup }" name="newTaskName"> </td> </tr> </tbody> </table>', function(opts) {
+module.exports = riot.tag('tasks', '<h1>{opts.topic.name}</h1> <table class="table table-striped"> <thead> <tr> <th> Task name </th> <th style="width: 100px"> Complete </th> <th style="width: 87px"> Remove </th> </tr> </thead> <tbody> <tr each="{ opts.tasks }">  <td class=" center-y"> <span class="center-y"> {name} &nbsp;<span if="{ done }" class="glyphicon glyphicon-ok text-success"></span> </span> </td> <td> <button type="button" if="{ done }" class="btn btn-primary full-width" onclick="{ parent.onRestore }">Restore</button> <button type="button" if="{ !done }" class="btn btn-success full-width" onclick="{ parent.onComplete }">Complete</button> </td> <td> <button class="btn btn-danger full-width" onclick="{ parent.onRemove }"> Remove </button> </td> </tr> <tr> <td> <input type="text" class="form-control add-new-task" placeholder="New task" onkeyup="{ newTaskKeyup }" name="newTaskName"> </td> </tr> </tbody> </table>', function(opts) {
 
 	this.newTaskKeyup = function(e) {
 		var newTaskName = this.newTaskName.value
@@ -321,7 +321,7 @@ riot.tag('tasks', '<h1>{opts.topic.name}</h1> <table class="table table-striped"
 
 });
 
-},{"riot":56}],9:[function(require,module,exports){
+},{"riot":57}],9:[function(require,module,exports){
 (function (process){
 var model = require('model.js')
 
@@ -387,9 +387,9 @@ module.exports = function(stateRouter) {
 }
 
 }).call(this,require('_process'))
-},{"./tasks/tasks":7,"./topics.tag":10,"_process":48,"model.js":1}],10:[function(require,module,exports){
+},{"./tasks/tasks":7,"./topics.tag":10,"_process":49,"model.js":1}],10:[function(require,module,exports){
 var riot = require('riot');
-riot.tag('topics', '<div class="container"> <div class="row"> <div class="col-sm-4"> <div class="list-group"> <a each="{ opts.topics }" href="{ parent.opts.makePath(\'app.topics.tasks\', \'topicId\', id) }" class="list-group-item { parent.opts.active(\'app.topics.tasks\', \'topicId\', id) ? \'active\' : \'\' }"> {name} <span class="badge">{ parent.opts.tasksUndone[id] }</span> </a> </div> <form action="" onsubmit="{ onAddTopic }"> <div class="table"> <div class="table-row-group"> <div class="table-row"> <div class="table-cell"> <input if="{ opts.addingTopic }" type="text" class="new-topic-name form-control" placeholder="Topic name" name="newTopic"> </div> <div class="table-cell" style="width: 60px; vertical-align: top"> <button type="submit" class="btn btn-default pull-right">Add</button> </div> </div> </div> </div> </form> </div> <div class="col-sm-8"> <ui-view></ui-view> </div> </div> </div>', function(opts) {
+module.exports = riot.tag('topics', '<div class="container"> <div class="row"> <div class="col-sm-4"> <div class="list-group"> <a each="{ opts.topics }" href="{ parent.opts.makePath(\'app.topics.tasks\', \'topicId\', id) }" class="list-group-item { parent.opts.active(\'app.topics.tasks\', \'topicId\', id) ? \'active\' : \'\' }"> {name} <span class="badge">{ parent.opts.tasksUndone[id] }</span> </a> </div> <form action="" onsubmit="{ onAddTopic }"> <div class="table"> <div class="table-row-group"> <div class="table-row"> <div class="table-cell"> <input if="{ opts.addingTopic }" type="text" class="new-topic-name form-control" placeholder="Topic name" name="newTopic"> </div> <div class="table-cell" style="width: 60px; vertical-align: top"> <button type="submit" class="btn btn-default pull-right">Add</button> </div> </div> </div> </div> </form> </div> <div class="col-sm-8"> <ui-view></ui-view> </div> </div> </div>', function(opts) {
 
 	this.opts.addingTopic = false
 
@@ -412,7 +412,21 @@ riot.tag('topics', '<div class="container"> <div class="row"> <div class="col-sm
 
 });
 
-},{"riot":56}],11:[function(require,module,exports){
+},{"riot":57}],11:[function(require,module,exports){
+var StateRouter = require('abstract-state-router')
+var riotRenderer = require('riot-state-renderer')
+var domready = require('domready')
+
+var stateRouter = StateRouter(riotRenderer(), 'body')
+
+require('./login/login')(stateRouter)
+require('./app/app')(stateRouter)
+
+domready(function() {
+	stateRouter.evaluateCurrentRoute('login')
+})
+
+},{"./app/app":4,"./login/login":12,"abstract-state-router":14,"domready":53,"riot-state-renderer":55}],12:[function(require,module,exports){
 var model = require('model.js')
 
 require('./login.tag')
@@ -435,9 +449,9 @@ module.exports = function(stateRouter) {
 	})
 }
 
-},{"./login.tag":12,"model.js":1}],12:[function(require,module,exports){
+},{"./login.tag":13,"model.js":1}],13:[function(require,module,exports){
 var riot = require('riot');
-riot.tag('login', '<div class="container-fluid"> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <h1>Welcome to the abstract-state-router demo!</h1> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-3 col-sm-6"> <div class="well"> <p class="lead"> This is a demo webapp showing off basic usage of the <a href="https://github.com/TehShrike/abstract-state-router">abstract-state-router</a> library using a few different templating libraries. </p> </div> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-4 col-sm-4"> <div class="form-group panel"> <form onsubmit="{ login }" class="panel-body" action=""> <label> Put in whatever username you feel like: <input type="text" class="form-control" name="username"> </label> <button type="submit" class="btn btn-primary">"Log in"</button> </form> </div> </div> </div> </div>', function(opts) {
+module.exports = riot.tag('login', '<div class="container-fluid"> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <h1>Welcome to the abstract-state-router demo!</h1> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-3 col-sm-6"> <div class="well"> <p class="lead"> This is a demo webapp showing off basic usage of the <a href="https://github.com/TehShrike/abstract-state-router">abstract-state-router</a> library using a few different templating libraries. </p> </div> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-4 col-sm-4"> <div class="form-group panel"> <form onsubmit="{ login }" class="panel-body" action=""> <label> Put in whatever username you feel like: <input type="text" class="form-control" name="username"> </label> <button type="submit" class="btn btn-primary">"Log in"</button> </form> </div> </div> </div> </div>', function(opts) {
 
 	this.login = function() {
 		opts.login(this.username.value)
@@ -447,38 +461,21 @@ riot.tag('login', '<div class="container-fluid"> <div class="row"> <div class="c
 
 });
 
-},{"riot":56}],13:[function(require,module,exports){
-module.exports = function CurrentState() {
-	var current = null
-
-	return {
-		get: function() {
-			return current
-		},
-		set: function(name, parameters) {
-			current = {
-				name: name,
-				parameters: parameters
-			}
-		}
-	}
-}
-
-},{}],14:[function(require,module,exports){
+},{"riot":57}],14:[function(require,module,exports){
 (function (process){
-var StateState = require('./state-state')
+var StateState = require('./lib/state-state')
 var extend = require('extend')
 var Promise = require('promise')
-var StateComparison = require('./state-comparison')
-var CurrentState = require('./current-state')
-var stateChangeLogic = require('./state-change-logic')
+var StateComparison = require('./lib/state-comparison')
+var CurrentState = require('./lib/current-state')
+var stateChangeLogic = require('./lib/state-change-logic')
 var newHashBrownRouter = require('hash-brown-router')
 var EventEmitter = require('events').EventEmitter
 var series = require('promise-map-series')
-var parse = require('./state-string-parser')
+var parse = require('./lib/state-string-parser')
 var combine = require('combine-arrays')
 var buildPath = require('page-path-builder')
-var StateTransitionManager = require('./state-transition-manager')
+var StateTransitionManager = require('./lib/state-transition-manager')
 var debug = require('debug')('abstract-state-router')
 
 module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOptions) {
@@ -565,14 +562,27 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 	}
 
 	function onRouteChange(state, parameters) {
-		var fullStateName = prototypalStateHolder.applyDefaultChildStates(state.name)
+		try {
+			var finalDestinationStateName = prototypalStateHolder.applyDefaultChildStates(state.name)
 
-		if (fullStateName !== state.name) {
-			stateProviderEmitter.go(fullStateName, parameters, { replace: true })
-		} else {
-			stateProviderEmitter.emit('stateChangeAttempt', function stateGo(transition) {
-				attemptStateChange(fullStateName, parameters, transition)
-			})
+			if (finalDestinationStateName === state.name) {
+				emitEventAndAttemptStateChange(finalDestinationStateName, parameters)
+			} else {
+				// There are default child states that need to be applied
+
+				var theRouteWeNeedToEndUpAt = makePath(finalDestinationStateName, parameters)
+				var currentRoute = stateRouterOptions.router.location.get()
+
+				if (theRouteWeNeedToEndUpAt === currentRoute) {
+					// the child state has the same route as the current one, just start navigating there
+					emitEventAndAttemptStateChange(finalDestinationStateName, parameters)
+				} else {
+					// change the url to match the full default child state route
+					stateProviderEmitter.go(finalDestinationStateName, parameters, { replace: true })
+				}
+			}
+		} catch (err) {
+			handleError('stateError', err)
 		}
 	}
 
@@ -593,6 +603,12 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 
 	function getStatesToResolve(stateChanges) {
 		return stateChanges.change.concat(stateChanges.create).map(prototypalStateHolder.get)
+	}
+
+	function emitEventAndAttemptStateChange(newStateName, parameters) {
+		stateProviderEmitter.emit('stateChangeAttempt', function stateGo(transition) {
+			attemptStateChange(newStateName, parameters, transition)
+		})
 	}
 
 	function attemptStateChange(newStateName, parameters, transition) {
@@ -709,8 +725,8 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 
 		return promiseMe(makePath, newStateName, parameters).then(goFunction, handleError.bind(null, 'stateChangeError'))
 	}
-	stateProviderEmitter.evaluateCurrentRoute = function evaluateCurrentRoute(defaultRoute, defaultParams) {
-		return promiseMe(makePath, defaultRoute, defaultParams).then(function(defaultPath) {
+	stateProviderEmitter.evaluateCurrentRoute = function evaluateCurrentRoute(defaultState, defaultParams) {
+		return promiseMe(makePath, defaultState, defaultParams).then(function(defaultPath) {
 			stateRouterOptions.router.evaluateCurrent(defaultPath)
 		}).catch(function(err) {
 			handleError('stateError', err)
@@ -812,7 +828,268 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./current-state":13,"./state-change-logic":40,"./state-comparison":41,"./state-state":42,"./state-string-parser":43,"./state-transition-manager":44,"_process":48,"combine-arrays":15,"debug":16,"events":47,"extend":19,"hash-brown-router":21,"page-path-builder":24,"promise":30,"promise-map-series":28}],15:[function(require,module,exports){
+},{"./lib/current-state":15,"./lib/state-change-logic":16,"./lib/state-comparison":17,"./lib/state-state":18,"./lib/state-string-parser":19,"./lib/state-transition-manager":20,"_process":49,"combine-arrays":21,"debug":22,"events":48,"extend":25,"hash-brown-router":27,"page-path-builder":30,"promise":36,"promise-map-series":34}],15:[function(require,module,exports){
+module.exports = function CurrentState() {
+	var current = null
+
+	return {
+		get: function() {
+			return current
+		},
+		set: function(name, parameters) {
+			current = {
+				name: name,
+				parameters: parameters
+			}
+		}
+	}
+}
+
+},{}],16:[function(require,module,exports){
+module.exports = function stateChangeLogic(stateComparisonResults) {
+	var hitChangingState = false
+	var hitDestroyedState = false
+
+	var output = {
+		destroy: [],
+		change: [],
+		create: []
+	}
+
+	stateComparisonResults.forEach(function(state) {
+		hitChangingState = hitChangingState || state.stateParametersChanged
+		hitDestroyedState = hitDestroyedState || state.stateNameChanged
+
+		if (state.nameBefore) {
+			if (hitDestroyedState) {
+				output.destroy.push(state.nameBefore)
+			} else if (hitChangingState) {
+				output.change.push(state.nameBefore)
+			}
+		}
+
+		if (state.nameAfter && hitDestroyedState) {
+			output.create.push(state.nameAfter)
+		}
+	})
+
+	return output
+}
+
+},{}],17:[function(require,module,exports){
+var stateStringParser = require('./state-string-parser')
+var combine = require('combine-arrays')
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+
+module.exports = function StateComparison(stateState) {
+	var getPathParameters = pathParameters()
+
+	var parametersChanged = parametersThatMatterWereChanged.bind(null, stateState, getPathParameters)
+
+	return stateComparison.bind(null, parametersChanged)
+}
+
+function pathParameters() {
+	var parameters = {}
+
+	return function getPathParameters(path) {
+		if (!path) {
+			return []
+		}
+
+		if (!parameters[path]) {
+			parameters[path] = pathToRegexp(path).keys.map(function(key) {
+				return key.name
+			})
+		}
+
+		return parameters[path]
+	}
+}
+
+function parametersThatMatterWereChanged(stateState, getPathParameters, stateName, fromParameters, toParameters) {
+	var state = stateState.get(stateName)
+	var querystringParameters = state.querystringParameters || []
+	var parameters = getPathParameters(state.route).concat(querystringParameters)
+
+	return Array.isArray(parameters) && parameters.some(function(key) {
+		return fromParameters[key] !== toParameters[key]
+	})
+}
+
+function stateComparison(parametersChanged, originalState, originalParameters, newState, newParameters) {
+	var states = combine({
+		start: stateStringParser(originalState),
+		end: stateStringParser(newState)
+	})
+
+	return states.map(function(states) {
+		return {
+			nameBefore: states.start,
+			nameAfter: states.end,
+			stateNameChanged: states.start !== states.end,
+			stateParametersChanged: states.start === states.end && parametersChanged(states.start, originalParameters, newParameters)
+		}
+	})
+}
+
+},{"./state-string-parser":19,"combine-arrays":21,"path-to-regexp-with-reversible-keys":32}],18:[function(require,module,exports){
+var stateStringParser = require('./state-string-parser')
+var parse = require('./state-string-parser')
+
+module.exports = function StateState() {
+	var states = {}
+
+	function getHierarchy(name) {
+		var names = stateStringParser(name)
+
+		return names.map(function(name) {
+			if (!states[name]) {
+				throw new Error('State ' + name + ' not found')
+			}
+			return states[name]
+		})
+	}
+
+	function getParent(name) {
+		var parentName = getParentName(name)
+
+		return parentName && states[parentName]
+	}
+
+	function getParentName(name) {
+		var names = stateStringParser(name)
+
+		if (names.length > 1) {
+			var secondToLast = names.length - 2
+
+			return names[secondToLast]
+		} else {
+			return null
+		}
+	}
+
+	function guaranteeAllStatesExist(newStateName) {
+		var stateNames = parse(newStateName)
+		var statesThatDontExist = stateNames.filter(function(name) {
+			return !states[name]
+		})
+
+		if (statesThatDontExist.length > 0) {
+			throw new Error('State ' + statesThatDontExist[statesThatDontExist.length - 1] + ' does not exist')
+		}
+	}
+
+	function buildFullStateRoute(stateName) {
+		return getHierarchy(stateName).map(function(state) {
+			return '/' + (state.route || '')
+		}).join('').replace(/\/{2,}/g, '/')
+	}
+
+	function applyDefaultChildStates(stateName) {
+		var state = states[stateName]
+
+		function getDefaultChildStateName() {
+			return state && (typeof state.defaultChild === 'function'
+				? state.defaultChild()
+				: state.defaultChild)
+		}
+
+		var defaultChildStateName = getDefaultChildStateName()
+
+		if (!defaultChildStateName) {
+			return stateName
+		}
+
+		var fullStateName = stateName + '.' + defaultChildStateName
+
+		return applyDefaultChildStates(fullStateName)
+	}
+
+
+	return {
+		add: function(name, state) {
+			states[name] = state
+		},
+		get: function(name) {
+			return name && states[name]
+		},
+		getHierarchy: getHierarchy,
+		getParent: getParent,
+		getParentName: getParentName,
+		guaranteeAllStatesExist: guaranteeAllStatesExist,
+		buildFullStateRoute: buildFullStateRoute,
+		applyDefaultChildStates: applyDefaultChildStates
+	}
+}
+
+},{"./state-string-parser":19}],19:[function(require,module,exports){
+module.exports = function(stateString) {
+	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
+		if (stateNames.length) {
+			latestNameChunk = stateNames[stateNames.length - 1] + '.' + latestNameChunk
+		}
+		stateNames.push(latestNameChunk)
+		return stateNames
+	}, [])
+}
+
+},{}],20:[function(require,module,exports){
+module.exports = function (emitter) {
+	var currentTransitionAttempt = null
+	var nextTransition = null
+
+	function doneTransitioning() {
+		currentTransitionAttempt = null
+		if (nextTransition) {
+			beginNextTransitionAttempt()
+		}
+	}
+
+	function isTransitioning() {
+		return !!currentTransitionAttempt
+	}
+
+	function beginNextTransitionAttempt() {
+		currentTransitionAttempt = nextTransition
+		nextTransition = null
+		currentTransitionAttempt.beginStateChange()
+	}
+
+	function cancelCurrentTransition() {
+		currentTransitionAttempt.transition.cancelled = true
+		var err = new Error('State transition cancelled by the state transition manager')
+		err.wasCancelledBySomeoneElse = true
+		emitter.emit('stateChangeCancelled', err)
+	}
+
+	emitter.on('stateChangeAttempt', function(beginStateChange) {
+		nextTransition = createStateTransitionAttempt(beginStateChange)
+
+		if (isTransitioning() && currentTransitionAttempt.transition.cancellable) {
+			cancelCurrentTransition()
+		} else if (!isTransitioning()) {
+			beginNextTransitionAttempt()
+		}
+	})
+
+	emitter.on('stateChangeError', doneTransitioning)
+	emitter.on('stateChangeCancelled', doneTransitioning)
+	emitter.on('stateChangeEnd', doneTransitioning)
+
+	function createStateTransitionAttempt(beginStateChange) {
+		var transition = {
+			cancelled: false,
+			cancellable: true
+		}
+		return {
+			transition: transition,
+			beginStateChange: beginStateChange.bind(null, transition)
+		}
+	}
+}
+
+},{}],21:[function(require,module,exports){
 module.exports = function(obj) {
 	var keys = Object.keys(obj)
 
@@ -844,7 +1121,7 @@ module.exports = function(obj) {
 	return output
 }
 
-},{}],16:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -1014,7 +1291,7 @@ function localstorage(){
   } catch (e) {}
 }
 
-},{"./debug":17}],17:[function(require,module,exports){
+},{"./debug":23}],23:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -1213,7 +1490,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":18}],18:[function(require,module,exports){
+},{"ms":24}],24:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -1340,7 +1617,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],19:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 var hasOwn = Object.prototype.hasOwnProperty;
 var toStr = Object.prototype.toString;
 var undefined;
@@ -1431,7 +1708,7 @@ module.exports = function extend() {
 };
 
 
-},{}],20:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 var EventEmitter = require('events').EventEmitter
 
 module.exports = function HashLocation(window) {
@@ -1453,7 +1730,12 @@ module.exports = function HashLocation(window) {
 }
 
 function replace(window, newPath) {
-	window.location.replace(window.location.origin + window.location.pathname + '#' + newPath)
+	window.location.replace(everythingBeforeTheSlash(window.location.href) + '#' + newPath)
+}
+
+function everythingBeforeTheSlash(url) {
+	var hashIndex = url.indexOf('#')
+	return hashIndex === -1 ? url : url.substring(0, hashIndex)
 }
 
 function go(window, newPath) {
@@ -1468,7 +1750,7 @@ function removeHashFromPath(path) {
 	return (path && path[0] === '#') ? path.substr(1) : path
 }
 
-},{"events":47}],21:[function(require,module,exports){
+},{"events":48}],27:[function(require,module,exports){
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
 var qs = require('querystring')
 var xtend = require('xtend')
@@ -1503,7 +1785,8 @@ module.exports = function Router(opts, hashLocation) {
 		evaluateCurrent: evaluateCurrentPathOrGoToDefault.bind(null, routes, hashLocation),
 		setDefault: setDefault.bind(null, routes),
 		replace: hashLocation.replace,
-		go: hashLocation.go
+		go: hashLocation.go,
+		location: hashLocation
 	}
 }
 
@@ -1571,7 +1854,7 @@ function setDefault(routes, defaultFn) {
 function isHashLocation(hashLocation) {
 	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
 }
-},{"./hash-location.js":20,"array.prototype.find":22,"path-to-regexp-with-reversible-keys":26,"querystring":51,"xtend":23}],22:[function(require,module,exports){
+},{"./hash-location.js":26,"array.prototype.find":28,"path-to-regexp-with-reversible-keys":32,"querystring":52,"xtend":29}],28:[function(require,module,exports){
 // Array.prototype.find - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: https://github.com/paulmillr/array.prototype.find
 // Fixes and tests supplied by Duncan Hall <http://duncanhall.net> 
@@ -1606,7 +1889,7 @@ function isHashLocation(hashLocation) {
   }
 })(this);
 
-},{}],23:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports = extend
 
 function extend() {
@@ -1625,7 +1908,7 @@ function extend() {
     return target
 }
 
-},{}],24:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var parser = require('./path-parser')
 var stringifyQuerystring = require('querystring').stringify
 
@@ -1684,7 +1967,7 @@ function getParametersWithoutMatchingToken(parameters, tokenArray) {
 	}, {})
 }
 
-},{"./path-parser":25,"querystring":51}],25:[function(require,module,exports){
+},{"./path-parser":31,"querystring":52}],31:[function(require,module,exports){
 // This file to be replaced with an official implementation maintained by
 // the page.js crew if and when that becomes an option
 
@@ -1703,7 +1986,7 @@ module.exports = function(pathString) {
 	}
 }
 
-},{"path-to-regexp-with-reversible-keys":26}],26:[function(require,module,exports){
+},{"path-to-regexp-with-reversible-keys":32}],32:[function(require,module,exports){
 var isArray = require('isarray');
 
 /**
@@ -1935,12 +2218,12 @@ function pathToRegexp (path, keys, options, allTokens) {
   return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
 }
 
-},{"isarray":27}],27:[function(require,module,exports){
+},{"isarray":33}],33:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],28:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var Promise = require('rsvp').Promise;
 
 module.exports = function sequence(array, iterator, thisArg) {
@@ -1958,14 +2241,14 @@ module.exports = function sequence(array, iterator, thisArg) {
   return Promise.all(results)
 }
 
-},{"rsvp":29}],29:[function(require,module,exports){
-(function (process){
+},{"rsvp":35}],35:[function(require,module,exports){
+(function (process,global){
 /*!
  * @overview RSVP - a tiny implementation of Promises/A+.
  * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors
  * @license   Licensed under MIT license
  *            See https://raw.githubusercontent.com/tildeio/rsvp.js/master/LICENSE
- * @version   3.0.18
+ * @version   3.0.20
  */
 
 (function() {
@@ -2095,6 +2378,10 @@ module.exports = function sequence(array, iterator, thisArg) {
         @param {Function} callback function to be called when the event is triggered.
       */
       'on': function(eventName, callback) {
+        if (typeof callback !== 'function') {
+          throw new TypeError('Callback must be a function');
+        }
+
         var allCallbacks = lib$rsvp$events$$callbacksFor(this), callbacks;
 
         callbacks = allCallbacks[eventName];
@@ -2189,7 +2476,7 @@ module.exports = function sequence(array, iterator, thisArg) {
         @for RSVP.EventTarget
         @private
         @param {String} eventName name of the event to be triggered
-        @param {Any} options optional value to be passed to any event handlers for
+        @param {*} options optional value to be passed to any event handlers for
         the given `eventName`
       */
       'trigger': function(eventName, options) {
@@ -2252,19 +2539,19 @@ module.exports = function sequence(array, iterator, thisArg) {
 
     function lib$rsvp$instrument$$instrument(eventName, promise, child) {
       if (1 === lib$rsvp$instrument$$queue.push({
-          name: eventName,
-          payload: {
-            key: promise._guidKey,
-            id:  promise._id,
-            eventName: eventName,
-            detail: promise._result,
-            childId: child && child._id,
-            label: promise._label,
-            timeStamp: lib$rsvp$utils$$now(),
-            error: lib$rsvp$config$$config["instrument-with-stack"] ? new Error(promise._label) : null
-          }})) {
-            lib$rsvp$instrument$$scheduleFlush();
-          }
+        name: eventName,
+        payload: {
+          key: promise._guidKey,
+          id:  promise._id,
+          eventName: eventName,
+          detail: promise._result,
+          childId: child && child._id,
+          label: promise._label,
+          timeStamp: lib$rsvp$utils$$now(),
+          error: lib$rsvp$config$$config["instrument-with-stack"] ? new Error(promise._label) : null
+        }})) {
+          lib$rsvp$instrument$$scheduleFlush();
+        }
       }
     var lib$rsvp$instrument$$default = lib$rsvp$instrument$$instrument;
 
@@ -2517,7 +2804,7 @@ module.exports = function sequence(array, iterator, thisArg) {
           value: value
         };
       } else {
-        return {
+         return {
           state: 'rejected',
           reason: value
         };
@@ -2525,28 +2812,30 @@ module.exports = function sequence(array, iterator, thisArg) {
     }
 
     function lib$rsvp$enumerator$$Enumerator(Constructor, input, abortOnReject, label) {
-      this._instanceConstructor = Constructor;
-      this.promise = new Constructor(lib$rsvp$$internal$$noop, label);
-      this._abortOnReject = abortOnReject;
+      var enumerator = this;
 
-      if (this._validateInput(input)) {
-        this._input     = input;
-        this.length     = input.length;
-        this._remaining = input.length;
+      enumerator._instanceConstructor = Constructor;
+      enumerator.promise = new Constructor(lib$rsvp$$internal$$noop, label);
+      enumerator._abortOnReject = abortOnReject;
 
-        this._init();
+      if (enumerator._validateInput(input)) {
+        enumerator._input     = input;
+        enumerator.length     = input.length;
+        enumerator._remaining = input.length;
 
-        if (this.length === 0) {
-          lib$rsvp$$internal$$fulfill(this.promise, this._result);
+        enumerator._init();
+
+        if (enumerator.length === 0) {
+          lib$rsvp$$internal$$fulfill(enumerator.promise, enumerator._result);
         } else {
-          this.length = this.length || 0;
-          this._enumerate();
-          if (this._remaining === 0) {
-            lib$rsvp$$internal$$fulfill(this.promise, this._result);
+          enumerator.length = enumerator.length || 0;
+          enumerator._enumerate();
+          if (enumerator._remaining === 0) {
+            lib$rsvp$$internal$$fulfill(enumerator.promise, enumerator._result);
           }
         }
       } else {
-        lib$rsvp$$internal$$reject(this.promise, this._validationError());
+        lib$rsvp$$internal$$reject(enumerator.promise, enumerator._validationError());
       }
     }
 
@@ -2565,45 +2854,48 @@ module.exports = function sequence(array, iterator, thisArg) {
     };
 
     lib$rsvp$enumerator$$Enumerator.prototype._enumerate = function() {
-      var length  = this.length;
-      var promise = this.promise;
-      var input   = this._input;
+      var enumerator = this;
+      var length     = enumerator.length;
+      var promise    = enumerator.promise;
+      var input      = enumerator._input;
 
       for (var i = 0; promise._state === lib$rsvp$$internal$$PENDING && i < length; i++) {
-        this._eachEntry(input[i], i);
+        enumerator._eachEntry(input[i], i);
       }
     };
 
     lib$rsvp$enumerator$$Enumerator.prototype._eachEntry = function(entry, i) {
-      var c = this._instanceConstructor;
+      var enumerator = this;
+      var c = enumerator._instanceConstructor;
       if (lib$rsvp$utils$$isMaybeThenable(entry)) {
         if (entry.constructor === c && entry._state !== lib$rsvp$$internal$$PENDING) {
           entry._onError = null;
-          this._settledAt(entry._state, i, entry._result);
+          enumerator._settledAt(entry._state, i, entry._result);
         } else {
-          this._willSettleAt(c.resolve(entry), i);
+          enumerator._willSettleAt(c.resolve(entry), i);
         }
       } else {
-        this._remaining--;
-        this._result[i] = this._makeResult(lib$rsvp$$internal$$FULFILLED, i, entry);
+        enumerator._remaining--;
+        enumerator._result[i] = enumerator._makeResult(lib$rsvp$$internal$$FULFILLED, i, entry);
       }
     };
 
     lib$rsvp$enumerator$$Enumerator.prototype._settledAt = function(state, i, value) {
-      var promise = this.promise;
+      var enumerator = this;
+      var promise = enumerator.promise;
 
       if (promise._state === lib$rsvp$$internal$$PENDING) {
-        this._remaining--;
+        enumerator._remaining--;
 
-        if (this._abortOnReject && state === lib$rsvp$$internal$$REJECTED) {
+        if (enumerator._abortOnReject && state === lib$rsvp$$internal$$REJECTED) {
           lib$rsvp$$internal$$reject(promise, value);
         } else {
-          this._result[i] = this._makeResult(state, i, value);
+          enumerator._result[i] = enumerator._makeResult(state, i, value);
         }
       }
 
-      if (this._remaining === 0) {
-        lib$rsvp$$internal$$fulfill(promise, this._result);
+      if (enumerator._remaining === 0) {
+        lib$rsvp$$internal$$fulfill(promise, enumerator._result);
       }
     };
 
@@ -2685,119 +2977,17 @@ module.exports = function sequence(array, iterator, thisArg) {
       throw new TypeError("Failed to construct 'Promise': Please use the 'new' operator, this object constructor cannot be called as a function.");
     }
 
-    /**
-      Promise objects represent the eventual result of an asynchronous operation. The
-      primary way of interacting with a promise is through its `then` method, which
-      registers callbacks to receive either a promise’s eventual value or the reason
-      why the promise cannot be fulfilled.
-
-      Terminology
-      -----------
-
-      - `promise` is an object or function with a `then` method whose behavior conforms to this specification.
-      - `thenable` is an object or function that defines a `then` method.
-      - `value` is any legal JavaScript value (including undefined, a thenable, or a promise).
-      - `exception` is a value that is thrown using the throw statement.
-      - `reason` is a value that indicates why a promise was rejected.
-      - `settled` the final resting state of a promise, fulfilled or rejected.
-
-      A promise can be in one of three states: pending, fulfilled, or rejected.
-
-      Promises that are fulfilled have a fulfillment value and are in the fulfilled
-      state.  Promises that are rejected have a rejection reason and are in the
-      rejected state.  A fulfillment value is never a thenable.
-
-      Promises can also be said to *resolve* a value.  If this value is also a
-      promise, then the original promise's settled state will match the value's
-      settled state.  So a promise that *resolves* a promise that rejects will
-      itself reject, and a promise that *resolves* a promise that fulfills will
-      itself fulfill.
-
-
-      Basic Usage:
-      ------------
-
-      ```js
-      var promise = new Promise(function(resolve, reject) {
-        // on success
-        resolve(value);
-
-        // on failure
-        reject(reason);
-      });
-
-      promise.then(function(value) {
-        // on fulfillment
-      }, function(reason) {
-        // on rejection
-      });
-      ```
-
-      Advanced Usage:
-      ---------------
-
-      Promises shine when abstracting away asynchronous interactions such as
-      `XMLHttpRequest`s.
-
-      ```js
-      function getJSON(url) {
-        return new Promise(function(resolve, reject){
-          var xhr = new XMLHttpRequest();
-
-          xhr.open('GET', url);
-          xhr.onreadystatechange = handler;
-          xhr.responseType = 'json';
-          xhr.setRequestHeader('Accept', 'application/json');
-          xhr.send();
-
-          function handler() {
-            if (this.readyState === this.DONE) {
-              if (this.status === 200) {
-                resolve(this.response);
-              } else {
-                reject(new Error('getJSON: `' + url + '` failed with status: [' + this.status + ']'));
-              }
-            }
-          };
-        });
-      }
-
-      getJSON('/posts.json').then(function(json) {
-        // on fulfillment
-      }, function(reason) {
-        // on rejection
-      });
-      ```
-
-      Unlike callbacks, promises are great composable primitives.
-
-      ```js
-      Promise.all([
-        getJSON('/posts'),
-        getJSON('/comments')
-      ]).then(function(values){
-        values[0] // => postsJSON
-        values[1] // => commentsJSON
-
-        return values;
-      });
-      ```
-
-      @class RSVP.Promise
-      @param {function} resolver
-      @param {String} label optional string for labeling the promise.
-      Useful for tooling.
-      @constructor
-    */
     function lib$rsvp$promise$$Promise(resolver, label) {
-      this._id = lib$rsvp$promise$$counter++;
-      this._label = label;
-      this._state = undefined;
-      this._result = undefined;
-      this._subscribers = [];
+      var promise = this;
+
+      promise._id = lib$rsvp$promise$$counter++;
+      promise._label = label;
+      promise._state = undefined;
+      promise._result = undefined;
+      promise._subscribers = [];
 
       if (lib$rsvp$config$$config.instrument) {
-        lib$rsvp$instrument$$default('created', this);
+        lib$rsvp$instrument$$default('created', promise);
       }
 
       if (lib$rsvp$$internal$$noop !== resolver) {
@@ -2805,11 +2995,11 @@ module.exports = function sequence(array, iterator, thisArg) {
           lib$rsvp$promise$$needsResolver();
         }
 
-        if (!(this instanceof lib$rsvp$promise$$Promise)) {
+        if (!(promise instanceof lib$rsvp$promise$$Promise)) {
           lib$rsvp$promise$$needsNew();
         }
 
-        lib$rsvp$$internal$$initializePromise(this, resolver);
+        lib$rsvp$$internal$$initializePromise(promise, resolver);
       }
     }
 
@@ -2828,13 +3018,12 @@ module.exports = function sequence(array, iterator, thisArg) {
       _guidKey: lib$rsvp$promise$$guidKey,
 
       _onError: function (reason) {
-        lib$rsvp$config$$config.async(function(promise) {
-          setTimeout(function() {
-            if (promise._onError) {
-              lib$rsvp$config$$config['trigger']('error', reason);
-            }
-          }, 0);
-        }, this);
+        var promise = this;
+        lib$rsvp$config$$config.after(function() {
+          if (promise._onError) {
+            lib$rsvp$config$$config['trigger']('error', reason);
+          }
+        });
       },
 
     /**
@@ -3025,8 +3214,8 @@ module.exports = function sequence(array, iterator, thisArg) {
       ```
 
       @method then
-      @param {Function} onFulfilled
-      @param {Function} onRejected
+      @param {Function} onFulfillment
+      @param {Function} onRejection
       @param {String} label optional string for labeling the promise.
       Useful for tooling.
       @return {Promise}
@@ -3037,14 +3226,14 @@ module.exports = function sequence(array, iterator, thisArg) {
 
         if (state === lib$rsvp$$internal$$FULFILLED && !onFulfillment || state === lib$rsvp$$internal$$REJECTED && !onRejection) {
           if (lib$rsvp$config$$config.instrument) {
-            lib$rsvp$instrument$$default('chained', this, this);
+            lib$rsvp$instrument$$default('chained', parent, parent);
           }
-          return this;
+          return parent;
         }
 
         parent._onError = null;
 
-        var child = new this.constructor(lib$rsvp$$internal$$noop, label);
+        var child = new parent.constructor(lib$rsvp$$internal$$noop, label);
         var result = parent._result;
 
         if (lib$rsvp$config$$config.instrument) {
@@ -3092,7 +3281,7 @@ module.exports = function sequence(array, iterator, thisArg) {
       @return {Promise}
     */
       'catch': function(onRejection, label) {
-        return this.then(null, onRejection, label);
+        return this.then(undefined, onRejection, label);
       },
 
     /**
@@ -3136,9 +3325,10 @@ module.exports = function sequence(array, iterator, thisArg) {
       @return {Promise}
     */
       'finally': function(callback, label) {
-        var constructor = this.constructor;
+        var promise = this;
+        var constructor = promise.constructor;
 
-        return this.then(function(value) {
+        return promise.then(function(value) {
           return constructor.resolve(callback()).then(function(){
             return value;
           });
@@ -3189,7 +3379,8 @@ module.exports = function sequence(array, iterator, thisArg) {
     var lib$rsvp$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
     var lib$rsvp$asap$$browserGlobal = lib$rsvp$asap$$browserWindow || {};
     var lib$rsvp$asap$$BrowserMutationObserver = lib$rsvp$asap$$browserGlobal.MutationObserver || lib$rsvp$asap$$browserGlobal.WebKitMutationObserver;
-    var lib$rsvp$asap$$isNode = typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
+    var lib$rsvp$asap$$isNode = typeof window === 'undefined' &&
+      typeof process !== 'undefined' && {}.toString.call(process) === '[object process]';
 
     // test for web worker but not in IE10
     var lib$rsvp$asap$$isWorker = typeof Uint8ClampedArray !== 'undefined' &&
@@ -3283,7 +3474,7 @@ module.exports = function sequence(array, iterator, thisArg) {
       lib$rsvp$asap$$scheduleFlush = lib$rsvp$asap$$useSetTimeout();
     }
     function lib$rsvp$defer$$defer(label) {
-      var deferred = { };
+      var deferred = {};
 
       deferred['promise'] = new lib$rsvp$promise$$default(function(resolve, reject) {
         deferred['resolve'] = resolve;
@@ -3346,9 +3537,10 @@ module.exports = function sequence(array, iterator, thisArg) {
     };
 
     lib$rsvp$promise$hash$$PromiseHash.prototype._enumerate = function() {
-      var promise = this.promise;
-      var input   = this._input;
-      var results = [];
+      var enumerator = this;
+      var promise    = enumerator.promise;
+      var input      = enumerator._input;
+      var results    = [];
 
       for (var key in input) {
         if (promise._state === lib$rsvp$$internal$$PENDING && Object.prototype.hasOwnProperty.call(input, key)) {
@@ -3360,12 +3552,12 @@ module.exports = function sequence(array, iterator, thisArg) {
       }
 
       var length = results.length;
-      this._remaining = length;
+      enumerator._remaining = length;
       var result;
 
       for (var i = 0; promise._state === lib$rsvp$$internal$$PENDING && i < length; i++) {
         result = results[i];
-        this._eachEntry(result.entry, result.position);
+        enumerator._eachEntry(result.entry, result.position);
       }
     };
 
@@ -3554,6 +3746,20 @@ module.exports = function sequence(array, iterator, thisArg) {
         return false;
       }
     }
+    var lib$rsvp$platform$$platform;
+
+    /* global self */
+    if (typeof self === 'object') {
+      lib$rsvp$platform$$platform = self;
+
+    /* global global */
+    } else if (typeof global === 'object') {
+      lib$rsvp$platform$$platform = global;
+    } else {
+      throw new Error('no global: `self` or `global` found');
+    }
+
+    var lib$rsvp$platform$$default = lib$rsvp$platform$$platform;
     function lib$rsvp$race$$race(array, label) {
       return lib$rsvp$promise$$default.race(array, label);
     }
@@ -3574,8 +3780,11 @@ module.exports = function sequence(array, iterator, thisArg) {
     }
     var lib$rsvp$rethrow$$default = lib$rsvp$rethrow$$rethrow;
 
-    // default async is asap;
+    // defaults
     lib$rsvp$config$$config.async = lib$rsvp$asap$$default;
+    lib$rsvp$config$$config.after = function(cb) {
+      setTimeout(cb, 0);
+    };
     var lib$rsvp$$cast = lib$rsvp$resolve$$default;
     function lib$rsvp$$async(callback, arg) {
       lib$rsvp$config$$config.async(callback, arg);
@@ -3626,19 +3835,19 @@ module.exports = function sequence(array, iterator, thisArg) {
       define(function() { return lib$rsvp$umd$$RSVP; });
     } else if (typeof module !== 'undefined' && module['exports']) {
       module['exports'] = lib$rsvp$umd$$RSVP;
-    } else if (typeof this !== 'undefined') {
-      this['RSVP'] = lib$rsvp$umd$$RSVP;
+    } else if (typeof lib$rsvp$platform$$default !== 'undefined') {
+      lib$rsvp$platform$$default['RSVP'] = lib$rsvp$umd$$RSVP;
     }
 }).call(this);
 
 
-}).call(this,require('_process'))
-},{"_process":48}],30:[function(require,module,exports){
+}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"_process":49}],36:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./lib')
 
-},{"./lib":35}],31:[function(require,module,exports){
+},{"./lib":41}],37:[function(require,module,exports){
 'use strict';
 
 var asap = require('asap/raw');
@@ -3699,13 +3908,13 @@ function Promise(fn) {
   if (typeof fn !== 'function') {
     throw new TypeError('not a function');
   }
-  this._32 = 0;
-  this._8 = null;
-  this._89 = [];
+  this._41 = 0;
+  this._86 = null;
+  this._17 = [];
   if (fn === noop) return;
   doResolve(fn, this);
 }
-Promise._83 = noop;
+Promise._1 = noop;
 
 Promise.prototype.then = function(onFulfilled, onRejected) {
   if (this.constructor !== Promise) {
@@ -3724,24 +3933,24 @@ function safeThen(self, onFulfilled, onRejected) {
   });
 };
 function handle(self, deferred) {
-  while (self._32 === 3) {
-    self = self._8;
+  while (self._41 === 3) {
+    self = self._86;
   }
-  if (self._32 === 0) {
-    self._89.push(deferred);
+  if (self._41 === 0) {
+    self._17.push(deferred);
     return;
   }
   asap(function() {
-    var cb = self._32 === 1 ? deferred.onFulfilled : deferred.onRejected;
+    var cb = self._41 === 1 ? deferred.onFulfilled : deferred.onRejected;
     if (cb === null) {
-      if (self._32 === 1) {
-        resolve(deferred.promise, self._8);
+      if (self._41 === 1) {
+        resolve(deferred.promise, self._86);
       } else {
-        reject(deferred.promise, self._8);
+        reject(deferred.promise, self._86);
       }
       return;
     }
-    var ret = tryCallOne(cb, self._8);
+    var ret = tryCallOne(cb, self._86);
     if (ret === IS_ERROR) {
       reject(deferred.promise, LAST_ERROR);
     } else {
@@ -3769,8 +3978,8 @@ function resolve(self, newValue) {
       then === self.then &&
       newValue instanceof Promise
     ) {
-      self._32 = 3;
-      self._8 = newValue;
+      self._41 = 3;
+      self._86 = newValue;
       finale(self);
       return;
     } else if (typeof then === 'function') {
@@ -3778,21 +3987,21 @@ function resolve(self, newValue) {
       return;
     }
   }
-  self._32 = 1;
-  self._8 = newValue;
+  self._41 = 1;
+  self._86 = newValue;
   finale(self);
 }
 
 function reject(self, newValue) {
-  self._32 = 2;
-  self._8 = newValue;
+  self._41 = 2;
+  self._86 = newValue;
   finale(self);
 }
 function finale(self) {
-  for (var i = 0; i < self._89.length; i++) {
-    handle(self, self._89[i]);
+  for (var i = 0; i < self._17.length; i++) {
+    handle(self, self._17[i]);
   }
-  self._89 = null;
+  self._17 = null;
 }
 
 function Handler(onFulfilled, onRejected, promise){
@@ -3824,7 +4033,7 @@ function doResolve(fn, promise) {
   }
 }
 
-},{"asap/raw":39}],32:[function(require,module,exports){
+},{"asap/raw":45}],38:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./core.js');
@@ -3839,7 +4048,7 @@ Promise.prototype.done = function (onFulfilled, onRejected) {
   });
 };
 
-},{"./core.js":31}],33:[function(require,module,exports){
+},{"./core.js":37}],39:[function(require,module,exports){
 'use strict';
 
 //This file contains the ES6 extensions to the core Promises/A+ API
@@ -3859,9 +4068,9 @@ var ZERO = valuePromise(0);
 var EMPTYSTRING = valuePromise('');
 
 function valuePromise(value) {
-  var p = new Promise(Promise._83);
-  p._32 = 1;
-  p._8 = value;
+  var p = new Promise(Promise._1);
+  p._41 = 1;
+  p._86 = value;
   return p;
 }
 Promise.resolve = function (value) {
@@ -3898,11 +4107,11 @@ Promise.all = function (arr) {
     function res(i, val) {
       if (val && (typeof val === 'object' || typeof val === 'function')) {
         if (val instanceof Promise && val.then === Promise.prototype.then) {
-          while (val._32 === 3) {
-            val = val._8;
+          while (val._41 === 3) {
+            val = val._86;
           }
-          if (val._32 === 1) return res(i, val._8);
-          if (val._32 === 2) reject(val._8);
+          if (val._41 === 1) return res(i, val._86);
+          if (val._41 === 2) reject(val._86);
           val.then(function (val) {
             res(i, val);
           }, reject);
@@ -3949,7 +4158,7 @@ Promise.prototype['catch'] = function (onRejected) {
   return this.then(null, onRejected);
 };
 
-},{"./core.js":31,"asap/raw":39}],34:[function(require,module,exports){
+},{"./core.js":37,"asap/raw":45}],40:[function(require,module,exports){
 'use strict';
 
 var Promise = require('./core.js');
@@ -3967,7 +4176,7 @@ Promise.prototype['finally'] = function (f) {
   });
 };
 
-},{"./core.js":31}],35:[function(require,module,exports){
+},{"./core.js":37}],41:[function(require,module,exports){
 'use strict';
 
 module.exports = require('./core.js');
@@ -3976,7 +4185,7 @@ require('./finally.js');
 require('./es6-extensions.js');
 require('./node-extensions.js');
 
-},{"./core.js":31,"./done.js":32,"./es6-extensions.js":33,"./finally.js":34,"./node-extensions.js":36}],36:[function(require,module,exports){
+},{"./core.js":37,"./done.js":38,"./es6-extensions.js":39,"./finally.js":40,"./node-extensions.js":42}],42:[function(require,module,exports){
 'use strict';
 
 // This file contains then/promise specific extensions that are only useful
@@ -4051,7 +4260,7 @@ Promise.prototype.nodeify = function (callback, ctx) {
   });
 }
 
-},{"./core.js":31,"asap":37}],37:[function(require,module,exports){
+},{"./core.js":37,"asap":43}],43:[function(require,module,exports){
 "use strict";
 
 // rawAsap provides everything we need except exception management.
@@ -4119,7 +4328,7 @@ RawTask.prototype.call = function () {
     }
 };
 
-},{"./raw":38}],38:[function(require,module,exports){
+},{"./raw":44}],44:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -4343,7 +4552,7 @@ rawAsap.makeRequestCallFromTimer = makeRequestCallFromTimer;
 // https://github.com/tildeio/rsvp.js/blob/cddf7232546a9cf858524b75cde6f9edf72620a7/lib/rsvp/asap.js
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (process){
 "use strict";
 
@@ -4448,251 +4657,7 @@ function requestFlush() {
 }
 
 }).call(this,require('_process'))
-},{"_process":48,"domain":46}],40:[function(require,module,exports){
-module.exports = function stateChangeLogic(stateComparisonResults) {
-	var hitChangingState = false
-	var hitDestroyedState = false
-
-	var output = {
-		destroy: [],
-		change: [],
-		create: []
-	}
-
-	stateComparisonResults.forEach(function(state) {
-		hitChangingState = hitChangingState || state.stateParametersChanged
-		hitDestroyedState = hitDestroyedState || state.stateNameChanged
-
-		if (state.nameBefore) {
-			if (hitDestroyedState) {
-				output.destroy.push(state.nameBefore)
-			} else if (hitChangingState) {
-				output.change.push(state.nameBefore)
-			}
-		}
-
-		if (state.nameAfter && hitDestroyedState) {
-			output.create.push(state.nameAfter)
-		}
-	})
-
-	return output
-}
-
-},{}],41:[function(require,module,exports){
-var stateStringParser = require('./state-string-parser')
-var combine = require('combine-arrays')
-var pathToRegexp = require('path-to-regexp-with-reversible-keys')
-
-module.exports = function StateComparison(stateState) {
-	var getPathParameters = pathParameters()
-
-	var parametersChanged = parametersThatMatterWereChanged.bind(null, stateState, getPathParameters)
-
-	return stateComparison.bind(null, parametersChanged)
-}
-
-function pathParameters() {
-	var parameters = {}
-
-	return function getPathParameters(path) {
-		if (!path) {
-			return []
-		}
-
-		if (!parameters[path]) {
-			parameters[path] = pathToRegexp(path).keys.map(function(key) {
-				return key.name
-			})
-		}
-
-		return parameters[path]
-	}
-}
-
-function parametersThatMatterWereChanged(stateState, getPathParameters, stateName, fromParameters, toParameters) {
-	var state = stateState.get(stateName)
-	var querystringParameters = state.querystringParameters || []
-	var parameters = getPathParameters(state.route).concat(querystringParameters)
-
-	return Array.isArray(parameters) && parameters.some(function(key) {
-		return fromParameters[key] !== toParameters[key]
-	})
-}
-
-function stateComparison(parametersChanged, originalState, originalParameters, newState, newParameters) {
-	var states = combine({
-		start: stateStringParser(originalState),
-		end: stateStringParser(newState)
-	})
-
-	return states.map(function(states) {
-		return {
-			nameBefore: states.start,
-			nameAfter: states.end,
-			stateNameChanged: states.start !== states.end,
-			stateParametersChanged: states.start === states.end && parametersChanged(states.start, originalParameters, newParameters)
-		}
-	})
-}
-
-},{"./state-string-parser":43,"combine-arrays":15,"path-to-regexp-with-reversible-keys":26}],42:[function(require,module,exports){
-var stateStringParser = require('./state-string-parser')
-var parse = require('./state-string-parser')
-
-module.exports = function StateState() {
-	var states = {}
-
-	function getHierarchy(name) {
-		var names = stateStringParser(name)
-
-		return names.map(function(name) {
-			if (!states[name]) {
-				throw new Error('State ' + name + ' not found')
-			}
-			return states[name]
-		})
-	}
-
-	function getParent(name) {
-		var parentName = getParentName(name)
-
-		return parentName && states[parentName]
-	}
-
-	function getParentName(name) {
-		var names = stateStringParser(name)
-
-		if (names.length > 1) {
-			var secondToLast = names.length - 2
-
-			return names[secondToLast]
-		} else {
-			return null
-		}
-	}
-
-	function guaranteeAllStatesExist(newStateName) {
-		var stateNames = parse(newStateName)
-		var statesThatDontExist = stateNames.filter(function(name) {
-			return !states[name]
-		})
-
-		if (statesThatDontExist.length > 0) {
-			throw new Error('State ' + statesThatDontExist[statesThatDontExist.length - 1] + ' does not exist')
-		}
-	}
-
-	function buildFullStateRoute(stateName) {
-		return getHierarchy(stateName).map(function(state) {
-			return '/' + (state.route || '')
-		}).join('').replace(/\/{2,}/g, '/')
-	}
-
-	function applyDefaultChildStates(stateName) {
-		var state = states[stateName]
-
-		function getDefaultChildStateName() {
-			return state && (typeof state.defaultChild === 'function'
-				? state.defaultChild()
-				: state.defaultChild)
-		}
-
-		var defaultChildStateName = getDefaultChildStateName()
-
-		if (!defaultChildStateName) {
-			return stateName
-		}
-
-		var fullStateName = stateName + '.' + defaultChildStateName
-
-		return applyDefaultChildStates(fullStateName)
-	}
-
-
-	return {
-		add: function(name, state) {
-			states[name] = state
-		},
-		get: function(name) {
-			return name && states[name]
-		},
-		getHierarchy: getHierarchy,
-		getParent: getParent,
-		getParentName: getParentName,
-		guaranteeAllStatesExist: guaranteeAllStatesExist,
-		buildFullStateRoute: buildFullStateRoute,
-		applyDefaultChildStates: applyDefaultChildStates
-	}
-}
-
-},{"./state-string-parser":43}],43:[function(require,module,exports){
-module.exports = function(stateString) {
-	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
-		if (stateNames.length) {
-			latestNameChunk = stateNames[stateNames.length - 1] + '.' + latestNameChunk
-		}
-		stateNames.push(latestNameChunk)
-		return stateNames
-	}, [])
-}
-
-},{}],44:[function(require,module,exports){
-module.exports = function (emitter) {
-	var currentTransitionAttempt = null
-	var nextTransition = null
-
-	function doneTransitioning() {
-		currentTransitionAttempt = null
-		if (nextTransition) {
-			beginNextTransitionAttempt()
-		}
-	}
-
-	function isTransitioning() {
-		return !!currentTransitionAttempt
-	}
-
-	function beginNextTransitionAttempt() {
-		currentTransitionAttempt = nextTransition
-		nextTransition = null
-		currentTransitionAttempt.beginStateChange()
-	}
-
-	function cancelCurrentTransition() {
-		currentTransitionAttempt.transition.cancelled = true
-		var err = new Error('State transition cancelled by the state transition manager')
-		err.wasCancelledBySomeoneElse = true
-		emitter.emit('stateChangeCancelled', err)
-	}
-
-	emitter.on('stateChangeAttempt', function(beginStateChange) {
-		nextTransition = createStateTransitionAttempt(beginStateChange)
-
-		if (isTransitioning() && currentTransitionAttempt.transition.cancellable) {
-			cancelCurrentTransition()
-		} else if (!isTransitioning()) {
-			beginNextTransitionAttempt()
-		}
-	})
-
-	emitter.on('stateChangeError', doneTransitioning)
-	emitter.on('stateChangeCancelled', doneTransitioning)
-	emitter.on('stateChangeEnd', doneTransitioning)
-
-	function createStateTransitionAttempt(beginStateChange) {
-		var transition = {
-			cancelled: false,
-			cancellable: true
-		}
-		return {
-			transition: transition,
-			beginStateChange: beginStateChange.bind(null, transition)
-		}
-	}
-}
-
-},{}],45:[function(require,module,exports){
+},{"_process":49,"domain":47}],46:[function(require,module,exports){
 // Array.prototype.findIndex - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: <https://github.com/paulmillr/Array.prototype.findIndex>
 (function (globals) {
@@ -4725,7 +4690,7 @@ module.exports = function (emitter) {
   }
 }(this));
 
-},{}],46:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 /*global define:false require:false */
 module.exports = (function(){
 	// Import Events
@@ -4793,7 +4758,7 @@ module.exports = (function(){
 	};
 	return domain
 }).call(this)
-},{"events":47}],47:[function(require,module,exports){
+},{"events":48}],48:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5096,7 +5061,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -5188,7 +5153,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],49:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5274,7 +5239,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],50:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -5361,13 +5326,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":49,"./encode":50}],52:[function(require,module,exports){
+},{"./decode":50,"./encode":51}],53:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -5399,7 +5364,7 @@ exports.encode = exports.stringify = require('./encode');
 
 });
 
-},{}],53:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 /**
  *
  * This function was taken from a stackoverflow answer:
@@ -5422,7 +5387,7 @@ module.exports = function() {
     });
 };
 
-},{}],54:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 var riot = require('riot')
 var xtend = require('xtend')
 
@@ -5452,6 +5417,9 @@ module.exports = function RiotStateRenderer(options) {
 
 					if (!tag) {
 						console.error('Error creating riot tag', template, 'on', element)
+					}
+					if (tag.root.attributes['riot-tag'] && tag.root.attributes['riot-tag'].value !== template) {
+						tag.root.attributes['riot-tag'].value = template;
 					}
 
 					cb(null, tag)
@@ -5498,20 +5466,33 @@ function makeRiotPath() {
 		console.log(e)
 	}
 }
+},{"riot":57,"xtend":56}],56:[function(require,module,exports){
+arguments[4][29][0].apply(exports,arguments)
+},{"dup":29}],57:[function(require,module,exports){
+/* Riot v2.2.2, @license MIT, (c) 2015 Muut Inc. + contributors */
 
-},{"riot":56,"xtend":55}],55:[function(require,module,exports){
-arguments[4][23][0].apply(exports,arguments)
-},{"dup":23}],56:[function(require,module,exports){
-/* Riot v2.1.0, @license MIT, (c) 2015 Muut Inc. + contributors */
+;(function(window, undefined) {
+  'use strict'
+  var riot = { version: 'v2.2.2', settings: {} }
 
-;(function(window) {
-  // 'use strict' does not allow us to override the events properties https://github.com/muut/riotjs/blob/dev/lib/tag/update.js#L7-L10
-  // it leads to the following error on firefox "setting a property that has only a getter"
-  //'use strict'
+  // This globals 'const' helps code size reduction
 
+  // for typeof == '' comparisons
+  var T_STRING = 'string',
+      T_OBJECT = 'object',
+      T_UNDEF  = 'undefined'
 
-  var riot = { version: 'v2.1.0', settings: {} }
+  // for IE8 and rest of the world
+  /* istanbul ignore next */
+  var isArray = Array.isArray || (function () {
+    var _ts = Object.prototype.toString
+    return function (v) { return _ts.call(v) === '[object Array]' }
+  })()
 
+  // Version# for IE 8-11, 0 for others
+  var ieVersion = (function (win) {
+    return (window && window.document || {}).documentMode | 0
+  })()
 
 riot.observable = function(el) {
 
@@ -5521,8 +5502,8 @@ riot.observable = function(el) {
       _id = 0
 
   el.on = function(events, fn) {
-    if (typeof fn == 'function') {
-      fn._id = typeof fn._id == 'undefined' ? _id++ : fn._id
+    if (isFunction(fn)) {
+      if (typeof fn.id === T_UNDEF) fn._id = _id++
 
       events.replace(/\S+/g, function(name, pos) {
         (callbacks[name] = callbacks[name] || []).push(fn)
@@ -5539,7 +5520,7 @@ riot.observable = function(el) {
         if (fn) {
           var arr = callbacks[name]
           for (var i = 0, cb; (cb = arr && arr[i]); ++i) {
-            if (cb._id == fn._id) { arr.splice(i, 1); i-- }
+            if (cb._id == fn._id) arr.splice(i--, 1)
           }
         } else {
           callbacks[name] = []
@@ -5582,21 +5563,22 @@ riot.observable = function(el) {
 
 }
 riot.mixin = (function() {
-  var registeredMixins = {}
+  var mixins = {}
+
   return function(name, mixin) {
-    if (!mixin) return registeredMixins[name]
-      else registeredMixins[name] = mixin
+    if (!mixin) return mixins[name]
+    mixins[name] = mixin
   }
+
 })()
 
-;(function(riot, evt, window) {
+;(function(riot, evt, win) {
 
   // browsers only
-  if (!window) return
+  if (!win) return
 
-  var loc = window.location,
+  var loc = win.location,
       fns = riot.observable(),
-      win = window,
       started = false,
       current
 
@@ -5693,24 +5675,32 @@ tmpl('{ undefined } - { false } - { null } - { 0 }', {})
 */
 
 
-var brackets = (function(orig, s, b) {
+var brackets = (function(orig) {
+
+  var cachedBrackets,
+      r,
+      b,
+      re = /[{}]/g
+
   return function(x) {
 
     // make sure we use the current setting
-    s = riot.settings.brackets || orig
-    if (b != s) b = s.split(' ')
+    var s = riot.settings.brackets || orig
+
+    // recreate cached vars if needed
+    if (cachedBrackets !== s) {
+      cachedBrackets = s
+      b = s.split(' ')
+      r = b.map(function (e) { return e.replace(/(?=.)/g, '\\') })
+    }
 
     // if regexp given, rewrite it with current brackets (only if differ from default)
-    return x && x.test
-      ? s == orig
-        ? x : RegExp(x.source
-                      .replace(/\{/g, b[0].replace(/(?=.)/g, '\\'))
-                      .replace(/\}/g, b[1].replace(/(?=.)/g, '\\')),
-                    x.global ? 'g' : '')
-
+    return x instanceof RegExp ? (
+        s === orig ? x :
+        new RegExp(x.source.replace(re, function(b) { return r[~~(b === '}')] }), x.global ? 'g' : '')
+      ) :
       // else, get specific bracket
-      : b[x]
-
+      b[x]
   }
 })('{ }')
 
@@ -5883,13 +5873,13 @@ var tmpl = (function() {
     str.replace(re, function(_, open, close, pos) {
 
       // if outer inner bracket, mark position
-      if(!level && open) start = pos
+      if (!level && open) start = pos
 
       // in(de)crease bracket level
       level += open ? 1 : -1
 
       // if outer closing bracket, grab the match
-      if(!level && close != null) matches.push(str.slice(start, pos+close.length))
+      if (!level && close != null) matches.push(str.slice(start, pos+close.length))
 
     })
 
@@ -5900,17 +5890,9 @@ var tmpl = (function() {
 
 // { key, i in items} -> { key, i, items }
 function loopKeys(expr) {
-  var ret = { val: expr },
-      els = expr.split(/\s+in\s+/)
-
-  if (els[1]) {
-    ret.val = brackets(0) + els[1]
-    els = els[0].slice(brackets(0).length).trim().split(/,\s*/)
-    ret.key = els[0]
-    ret.pos = els[1]
-  }
-
-  return ret
+  var b0 = brackets(0),
+      els = expr.slice(b0.length).match(/^\s*(\S+?)\s*(?:,\s*(\S+))?\s+in\s+(.+)$/)
+  return els ? { key: els[1], pos: els[2], val: b0 + els[3] } : { val: expr }
 }
 
 function mkitem(expr, key, val) {
@@ -5926,146 +5908,90 @@ function _each(dom, parent, expr) {
 
   remAttr(dom, 'each')
 
-  var template = dom.outerHTML,
-      prev = dom.previousSibling,
+  var tagName = getTagName(dom),
+      template = dom.outerHTML,
+      hasImpl = !!tagImpl[tagName],
+      impl = tagImpl[tagName] || {
+        tmpl: template
+      },
       root = dom.parentNode,
-      rendered = [],
+      placeholder = document.createComment('riot placeholder'),
       tags = [],
+      child = getTag(dom),
       checksum
+
+  root.insertBefore(placeholder, dom)
 
   expr = loopKeys(expr)
 
-  function add(pos, item, tag) {
-    rendered.splice(pos, 0, item)
-    tags.splice(pos, 0, tag)
-  }
-
   // clean template code
-  parent.one('update', function() {
-    root.removeChild(dom)
-
-  }).one('premount', function() {
-    if (root.stub) root = parent.root
-
-  }).on('update', function() {
-
-    var items = tmpl(expr.val, parent)
-    if (!items) return
-
-    // object loop. any changes cause full redraw
-    if (!Array.isArray(items)) {
-      var testsum = JSON.stringify(items)
-
-      if (testsum == checksum) return
-      checksum = testsum
-
-      // clear old items
-      each(tags, function(tag) { tag.unmount() })
-      rendered = []
-      tags = []
-
-      items = Object.keys(items).map(function(key) {
-        return mkitem(expr, key, items[key])
-      })
-
-    }
-
-    // unmount redundant
-    each(rendered, function(item) {
-      if (item instanceof Object) {
-        // skip existing items
-        if (items.indexOf(item) > -1) {
-          return
-        }
-      } else {
-        // find all non-objects
-        var newItems = arrFindEquals(items, item),
-            oldItems = arrFindEquals(rendered, item)
-
-        // if more or equal amount, no need to remove
-        if (newItems.length >= oldItems.length) {
-          return
-        }
-      }
-      var pos = rendered.indexOf(item),
-          tag = tags[pos]
-
-      if (tag) {
-        tag.unmount()
-        rendered.splice(pos, 1)
-        tags.splice(pos, 1)
-        // to let "each" know that this item is removed
-        return false
-      }
-
+  parent
+    .one('premount', function () {
+      if (root.stub) root = parent.root
+      // remove the original DOM node
+      dom.parentNode.removeChild(dom)
     })
+    .on('update', function () {
+      var items = tmpl(expr.val, parent)
 
-    // mount new / reorder
-    var prevBase = [].indexOf.call(root.childNodes, prev) + 1
-    each(items, function(item, i) {
+      // object loop. any changes cause full redraw
+      if (!isArray(items)) {
 
-      // start index search from position based on the current i
-      var pos = items.indexOf(item, i),
-          oldPos = rendered.indexOf(item, i)
+        checksum = items ? JSON.stringify(items) : ''
 
-      // if not found, search backwards from current i position
-      pos < 0 && (pos = items.lastIndexOf(item, i))
-      oldPos < 0 && (oldPos = rendered.lastIndexOf(item, i))
+        items = !items ? [] :
+          Object.keys(items).map(function (key) {
+            return mkitem(expr, key, items[key])
+          })
+      }
 
-      if (!(item instanceof Object)) {
-        // find all non-objects
-        var newItems = arrFindEquals(items, item),
-            oldItems = arrFindEquals(rendered, item)
+      var frag = document.createDocumentFragment(),
+          i = tags.length,
+          j = items.length
 
-        // if more, should mount one new
-        if (newItems.length > oldItems.length) {
-          oldPos = -1
+      // unmount leftover items
+      while (i > j) {
+        tags[--i].unmount()
+        tags.splice(i, 1)
+      }
+
+      for (i = 0; i < j; ++i) {
+        var _item = !checksum && !!expr.key ? mkitem(expr, items[i], i) : items[i]
+
+        if (!tags[i]) {
+          // mount new
+          (tags[i] = new Tag(impl, {
+              parent: parent,
+              isLoop: true,
+              hasImpl: hasImpl,
+              root: hasImpl ? dom.cloneNode() : root,
+              item: _item
+            }, dom.innerHTML)
+          ).mount()
+
+          frag.appendChild(tags[i].root)
+        } else
+          tags[i].update(_item)
+
+        tags[i]._item = _item
+
+      }
+
+      root.insertBefore(frag, placeholder)
+
+      if (child) parent.tags[tagName] = tags
+
+    }).one('updated', function() {
+      var keys = Object.keys(parent)// only set new values
+      walk(root, function(node) {
+        // only set element node and not isLoop
+        if (node.nodeType == 1 && !node.isLoop && !node._looped) {
+          node._visited = false // reset _visited for loop node
+          node._looped = true // avoid set multiple each
+          setNamed(node, parent, keys)
         }
-      }
-
-      // mount new
-      var nodes = root.childNodes
-      if (oldPos < 0) {
-        if (!checksum && expr.key) var _item = mkitem(expr, item, pos)
-
-        var tag = new Tag({ tmpl: template }, {
-          before: nodes[prevBase + pos],
-          parent: parent,
-          root: root,
-          item: _item || item
-        })
-
-        tag.mount()
-
-        add(pos, item, tag)
-        return true
-      }
-
-      // change pos value
-      if (expr.pos && tags[oldPos][expr.pos] != pos) {
-        tags[oldPos].one('update', function(item) {
-          item[expr.pos] = pos
-        })
-        tags[oldPos].update()
-      }
-
-      // reorder
-      if (pos != oldPos) {
-        root.insertBefore(nodes[prevBase + oldPos], nodes[prevBase + (pos > oldPos ? pos + 1 : pos)])
-        return add(pos, rendered.splice(oldPos, 1)[0], tags.splice(oldPos, 1)[0])
-      }
-
-    })
-
-    rendered = items.slice()
-
-  }).one('updated', function() {
-    walk(root, function(dom) {
-      each(dom.attributes, function(attr) {
-        if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
       })
     })
-  })
 
 }
 
@@ -6074,23 +6000,22 @@ function parseNamedElements(root, parent, childTags) {
 
   walk(root, function(dom) {
     if (dom.nodeType == 1) {
-      dom.isLoop = 0
-      if(dom.parentNode && dom.parentNode.isLoop) dom.isLoop = 1
-      if(dom.getAttribute('each')) dom.isLoop = 1
+      dom.isLoop = dom.isLoop || (dom.parentNode && dom.parentNode.isLoop || dom.getAttribute('each')) ? 1 : 0
+
       // custom child tag
       var child = getTag(dom)
 
       if (child && !dom.isLoop) {
         var tag = new Tag(child, { root: dom, parent: parent }, dom.innerHTML),
-            namedTag = dom.getAttribute('name'),
-            tagName = namedTag && namedTag.indexOf(brackets(0)) < 0 ? namedTag : child.name,
+            tagName = getTagName(dom),
             ptag = parent,
             cachedTag
 
-        while(!getTag(ptag.root)) {
-          if(!ptag.parent) break
+        while (!getTag(ptag.root)) {
+          if (!ptag.parent) break
           ptag = ptag.parent
         }
+
         // fix for the parent attribute in the looped elements
         tag.parent = ptag
 
@@ -6100,7 +6025,7 @@ function parseNamedElements(root, parent, childTags) {
         if (cachedTag) {
           // if the parent tags property is not yet an array
           // create it adding the first cached tag
-          if (!Array.isArray(cachedTag))
+          if (!isArray(cachedTag))
             ptag.tags[tagName] = [cachedTag]
           // add the new nested tag to the array
           ptag.tags[tagName].push(tag)
@@ -6114,10 +6039,8 @@ function parseNamedElements(root, parent, childTags) {
         childTags.push(tag)
       }
 
-      if(!dom.isLoop)
-        each(dom.attributes, function(attr) {
-          if (/^(name|id)$/.test(attr.name)) parent[attr.value] = dom
-        })
+      if (!dom.isLoop)
+        setNamed(dom, parent, [])
     }
 
   })
@@ -6144,6 +6067,7 @@ function parseExpressions(root, tag, expressions) {
 
     // loop
     var attr = dom.getAttribute('each')
+
     if (attr) { _each(dom, tag, attr); return false }
 
     // attribute expressions
@@ -6168,21 +6092,29 @@ function Tag(impl, conf, innerHTML) {
       opts = inherit(conf.opts) || {},
       dom = mkdom(impl.tmpl),
       parent = conf.parent,
+      isLoop = conf.isLoop,
+      hasImpl = conf.hasImpl,
+      item = cleanUpData(conf.item),
       expressions = [],
       childTags = [],
       root = conf.root,
-      item = conf.item,
       fn = impl.fn,
       tagName = root.tagName.toLowerCase(),
       attr = {},
+      propsInSyncWithParent = [],
       loopDom,
       TAG_ATTRIBUTES = /([\w\-]+)\s?=\s?['"]([^'"]+)["']/gim
+
 
   if (fn && root._tag) {
     root._tag.unmount(true)
   }
 
-  if(impl.attrs) {
+  // not yet mounted
+  this.isMounted = false
+  root.isLoop = isLoop
+
+  if (impl.attrs) {
     var attrs = impl.attrs.match(TAG_ATTRIBUTES)
 
     each(attrs, function(a) {
@@ -6191,6 +6123,7 @@ function Tag(impl, conf, innerHTML) {
     })
 
   }
+
   // keep a reference to the tag just created
   // so we will be able to mount this tag multiple times
   root._tag = this
@@ -6203,37 +6136,74 @@ function Tag(impl, conf, innerHTML) {
 
   // grab attributes
   each(root.attributes, function(el) {
-    attr[el.name] = el.value
+    var val = el.value
+    // remember attributes with expressions only
+    if (brackets(/\{.*\}/).test(val)) attr[el.name] = val
   })
 
-
-  if (dom.innerHTML && !/select/.test(tagName) && !/tbody/.test(tagName) && !/tr/.test(tagName))
+  if (dom.innerHTML && !/select|select|optgroup|tbody|tr/.test(tagName))
     // replace all the yield tags with the tag inner html
     dom.innerHTML = replaceYield(dom.innerHTML, innerHTML)
 
-
   // options
   function updateOpts() {
+    var ctx = hasImpl && isLoop ? self : parent || self
+    // update opts from current DOM attributes
+    each(root.attributes, function(el) {
+      opts[el.name] = tmpl(el.value, ctx)
+    })
+    // recover those with expressions
     each(Object.keys(attr), function(name) {
-      opts[name] = tmpl(attr[name], parent || self)
+      opts[name] = tmpl(attr[name], ctx)
     })
   }
 
-  this.update = function(data, init) {
-    extend(self, data, item)
+  function normalizeData(data) {
+    for (var key in item) {
+      if (typeof self[key] !== T_UNDEF)
+        self[key] = data[key]
+    }
+  }
+
+  function inheritFromParent () {
+    if (!self.parent || !isLoop) return
+    each(Object.keys(self.parent), function(k) {
+      // some properties must be always in sync with the parent tag
+      var mustSync = ~propsInSyncWithParent.indexOf(k)
+      if (typeof self[k] === T_UNDEF || mustSync) {
+        // track the property to keep in sync
+        // so we can keep it updated
+        if (!mustSync) propsInSyncWithParent.push(k)
+        self[k] = self.parent[k]
+      }
+    })
+  }
+
+  this.update = function(data) {
+    // make sure the data passed will not override
+    // the component core methods
+    data = cleanUpData(data)
+    // inherit properties from the parent
+    inheritFromParent()
+    // normalize the tag properties in case an item object was initially passed
+    if (typeof item === T_OBJECT || isArray(item)) {
+      normalizeData(data)
+      item = data
+    }
+    extend(self, data)
     updateOpts()
-    self.trigger('update', item)
-    update(expressions, self, item)
+    self.trigger('update', data)
+    update(expressions, self)
     self.trigger('updated')
   }
 
   this.mixin = function() {
     each(arguments, function(mix) {
-      mix = 'string' == typeof mix ? riot.mixin(mix) : mix
+      mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
       each(Object.keys(mix), function(key) {
         // bind methods to self
-        if ('init' != key)
-          self[key] = 'function' == typeof mix[key] ? mix[key].bind(self) : mix[key]
+        if (key != 'init')
+          self[key] = isFunction(mix[key]) ? mix[key].bind(self) : mix[key]
       })
       // init method will be called automatically
       if (mix.init) mix.init.bind(self)()
@@ -6249,52 +6219,61 @@ function Tag(impl, conf, innerHTML) {
 
     toggle(true)
 
+
     // parse layout after init. fn may calculate args for nested custom tags
     parseExpressions(dom, self, expressions)
+    if (!self.parent || hasImpl) parseExpressions(self.root, self, expressions) // top level before update, empty root
 
-    if (!self.parent) self.update()
+    if (!self.parent || isLoop) self.update(item)
 
     // internal use only, fixes #403
     self.trigger('premount')
 
-    if (fn) {
-      while (dom.firstChild) root.appendChild(dom.firstChild)
+    if (isLoop && !hasImpl) {
+      // update the root attribute for the looped elements
+      self.root = root = loopDom = dom.firstChild
 
     } else {
-      loopDom = dom.firstChild
-      root.insertBefore(loopDom, conf.before || null) // null needed for IE8
+      while (dom.firstChild) root.appendChild(dom.firstChild)
+      if (root.stub) self.root = root = parent.root
     }
-
-    if (root.stub) self.root = root = parent.root
-
     // if it's not a child tag we can trigger its mount event
-    if (!self.parent) self.trigger('mount')
+    if (!self.parent || self.parent.isMounted) {
+      self.isMounted = true
+      self.trigger('mount')
+    }
     // otherwise we need to wait that the parent event gets triggered
-    else self.parent.one('mount', function() { self.trigger('mount') })
+    else self.parent.one('mount', function() {
+      // avoid to trigger the `mount` event for the tags
+      // not visible included in an if statement
+      if (!isInStub(self.root)) {
+        self.parent.isMounted = self.isMounted = true
+        self.trigger('mount')
+      }
+    })
   }
 
 
   this.unmount = function(keepRootTag) {
-    var el = fn ? root : loopDom,
+    var el = loopDom || root,
         p = el.parentNode
 
     if (p) {
 
-      if (parent) {
+      if (parent)
         // remove this tag from the parent tags object
         // if there are multiple nested tags with same name..
         // remove this element form the array
-        if (Array.isArray(parent.tags[tagName])) {
+        if (isArray(parent.tags[tagName]))
           each(parent.tags[tagName], function(tag, i) {
             if (tag._id == self._id)
               parent.tags[tagName].splice(i, 1)
           })
-        } else
+        else
           // otherwise just delete the tag instance
           parent.tags[tagName] = undefined
-      } else {
+      else
         while (el.firstChild) el.removeChild(el.firstChild)
-      }
 
       if (!keepRootTag)
         p.removeChild(el)
@@ -6318,7 +6297,12 @@ function Tag(impl, conf, innerHTML) {
     // listen/unlisten parent (events flow one way from parent to children)
     if (parent) {
       var evt = isMount ? 'on' : 'off'
-      parent[evt]('update', self.update)[evt]('unmount', self.unmount)
+
+      // the loop tags will be always in sync with the parent automatically
+      if (isLoop)
+        parent[evt]('unmount', self.unmount)
+      else
+        parent[evt]('update', self.update)[evt]('unmount', self.unmount)
     }
   }
 
@@ -6328,15 +6312,29 @@ function Tag(impl, conf, innerHTML) {
 
 }
 
-function setEventHandler(name, handler, dom, tag, item) {
+function setEventHandler(name, handler, dom, tag) {
 
   dom[name] = function(e) {
 
+    var item = tag._item,
+        ptag = tag.parent
+
+    if (!item)
+      while (ptag) {
+        item = ptag._item
+        ptag = item ? false : ptag.parent
+      }
+
     // cross browser event fix
     e = e || window.event
-    e.which = e.which || e.charCode || e.keyCode
-    e.target = e.target || e.srcElement
-    e.currentTarget = dom
+
+    // ignore error on some browsers
+    try {
+      e.currentTarget = dom
+      if (!e.target) e.target = e.srcElement
+      if (!e.which) e.which = e.charCode || e.keyCode
+    } catch (ignored) { '' }
+
     e.item = item
 
     // prevent default behaviour (by default)
@@ -6362,8 +6360,7 @@ function insertTo(root, node, before) {
   }
 }
 
-// item = currently looped item
-function update(expressions, tag, item) {
+function update(expressions, tag) {
 
   each(expressions, function(expr, i) {
 
@@ -6388,8 +6385,8 @@ function update(expressions, tag, item) {
     remAttr(dom, attrName)
 
     // event handler
-    if (typeof value == 'function') {
-      setEventHandler(attrName, value, dom, tag, item)
+    if (isFunction(value)) {
+      setEventHandler(attrName, value, dom, tag)
 
     // if- conditional
     } else if (attrName == 'if') {
@@ -6397,14 +6394,23 @@ function update(expressions, tag, item) {
 
       // add to DOM
       if (value) {
-        stub && insertTo(stub.parentNode, stub, dom)
-
+        if (stub) {
+          insertTo(stub.parentNode, stub, dom)
+          dom.inStub = false
+          // avoid to trigger the mount event if the tags is not visible yet
+          // maybe we can optimize this avoiding to mount the tag at all
+          if (!isInStub(dom)) {
+            walk(dom, function(el) {
+              if (el._tag && !el._tag.isMounted) el._tag.isMounted = !!el._tag.trigger('mount')
+            })
+          }
+        }
       // remove from DOM
       } else {
         stub = expr.stub = stub || document.createTextNode('')
         insertTo(dom.parentNode, dom, stub)
+        dom.inStub = true
       }
-
     // show / hide
     } else if (/^(show|hide)$/.test(attrName)) {
       if (attrName == 'hide') value = !value
@@ -6415,7 +6421,7 @@ function update(expressions, tag, item) {
       dom.value = value
 
     // <img src="{ expr }">
-    } else if (attrName.slice(0, 5) == 'riot-') {
+    } else if (attrName.slice(0, 5) == 'riot-' && attrName != 'riot-tag') {
       attrName = attrName.slice(5)
       value ? dom.setAttribute(attrName, value) : remAttr(dom, attrName)
 
@@ -6426,7 +6432,7 @@ function update(expressions, tag, item) {
         value = attrName
       }
 
-      if (typeof value != 'object') dom.setAttribute(attrName, value)
+      if (typeof value !== T_OBJECT) dom.setAttribute(attrName, value)
 
     }
 
@@ -6443,6 +6449,10 @@ function each(els, fn) {
   return els
 }
 
+function isFunction(v) {
+  return typeof v === 'function' || false   // avoid IE problems
+}
+
 function remAttr(dom, name) {
   dom.removeAttribute(name)
 }
@@ -6451,71 +6461,65 @@ function fastAbs(nr) {
   return (nr ^ (nr >> 31)) - (nr >> 31)
 }
 
-// max 2 from objects allowed
-function extend(obj, from, from2) {
-  from && each(Object.keys(from), function(key) {
-    obj[key] = from[key]
-  })
-  return from2 ? extend(obj, from2) : obj
+function getTag(dom) {
+  var tagName = dom.tagName.toLowerCase()
+  return tagImpl[dom.getAttribute(RIOT_TAG) || tagName]
 }
 
-function checkIE() {
-  if (window) {
-    var ua = navigator.userAgent
-    var msie = ua.indexOf('MSIE ')
-    if (msie > 0) {
-      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
+function getTagName(dom) {
+  var child = getTag(dom),
+    namedTag = dom.getAttribute('name'),
+    tagName = namedTag && namedTag.indexOf(brackets(0)) < 0 ? namedTag : child ? child.name : dom.tagName.toLowerCase()
+
+  return tagName
+}
+
+function extend(src) {
+  var obj, args = arguments
+  for (var i = 1; i < args.length; ++i) {
+    if ((obj = args[i])) {
+      for (var key in obj) {      // eslint-disable-line guard-for-in
+        src[key] = obj[key]
+      }
     }
-    else {
-      return 0
-    }
   }
+  return src
 }
 
-function optionInnerHTML(el, html) {
-  var opt = document.createElement('option'),
-      valRegx = /value=[\"'](.+?)[\"']/,
-      selRegx = /selected=[\"'](.+?)[\"']/,
-      valuesMatch = html.match(valRegx),
-      selectedMatch = html.match(selRegx)
+// with this function we avoid that the current Tag methods get overridden
+function cleanUpData(data) {
+  if (!(data instanceof Tag)) return data
 
-  opt.innerHTML = html
-
-  if (valuesMatch) {
-    opt.value = valuesMatch[1]
+  var o = {},
+      blackList = ['update', 'root', 'mount', 'unmount', 'mixin', 'isMounted', 'isloop', 'tags', 'parent', 'opts']
+  for (var key in data) {
+    if (!~blackList.indexOf(key))
+      o[key] = data[key]
   }
-
-  if (selectedMatch) {
-    opt.setAttribute('riot-selected', selectedMatch[1])
-  }
-
-  el.appendChild(opt)
-}
-
-function tbodyInnerHTML(el, html, tagName) {
-  var div = document.createElement('div')
-  div.innerHTML = '<table>' + html + '</table>'
-
-  if (/td|th/.test(tagName)) {
-    el.appendChild(div.firstChild.firstChild.firstChild.firstChild)
-  } else {
-    el.appendChild(div.firstChild.firstChild.firstChild)
-  }
+  return o
 }
 
 function mkdom(template) {
-  var tagName = template.trim().slice(1, 3).toLowerCase(),
-      rootTag = /td|th/.test(tagName) ? 'tr' : tagName == 'tr' ? 'tbody' : 'div',
+  var checkie = ieVersion && ieVersion < 10,
+      matches = /^\s*<([\w-]+)/.exec(template),
+      tagName = matches ? matches[1].toLowerCase() : '',
+      rootTag = (tagName === 'th' || tagName === 'td') ? 'tr' :
+                (tagName === 'tr' ? 'tbody' : 'div'),
       el = mkEl(rootTag)
 
   el.stub = true
 
-  if (tagName === 'op' && ieVersion && ieVersion < 10) {
-    optionInnerHTML(el, template)
-  } else if ((rootTag === 'tbody' || rootTag === 'tr') && ieVersion && ieVersion < 10) {
-    tbodyInnerHTML(el, template, tagName)
-  } else
-    el.innerHTML = template
+  if (checkie) {
+    if (tagName === 'optgroup')
+      optgroupInnerHTML(el, template)
+    else if (tagName === 'option')
+      optionInnerHTML(el, template)
+    else if (rootTag !== 'div')
+      tbodyInnerHTML(el, template, tagName)
+    else
+      checkie = 0
+  }
+  if (!checkie) el.innerHTML = template
 
   return el
 }
@@ -6534,6 +6538,14 @@ function walk(dom, fn) {
   }
 }
 
+function isInStub(dom) {
+  while (dom) {
+    if (dom.inStub) return true
+    dom = dom.parentNode
+  }
+  return false
+}
+
 function mkEl(name) {
   return document.createElement(name)
 }
@@ -6543,20 +6555,11 @@ function replaceYield (tmpl, innerHTML) {
 }
 
 function $$(selector, ctx) {
-  ctx = ctx || document
-  return ctx.querySelectorAll(selector)
+  return (ctx || document).querySelectorAll(selector)
 }
 
-function arrDiff(arr1, arr2) {
-  return arr1.filter(function(el) {
-    return arr2.indexOf(el) < 0
-  })
-}
-
-function arrFindEquals(arr, el) {
-  return arr.filter(function (_el) {
-    return _el === el
-  })
+function $(selector, ctx) {
+  return (ctx || document).querySelector(selector)
 }
 
 function inherit(parent) {
@@ -6564,27 +6567,29 @@ function inherit(parent) {
   Child.prototype = parent
   return new Child()
 }
+
+function setNamed(dom, parent, keys) {
+  each(dom.attributes, function(attr) {
+    if (dom._visited) return
+    if (attr.name === 'id' || attr.name === 'name') {
+      dom._visited = true
+      var p, v = attr.value
+      if (~keys.indexOf(v)) return
+
+      p = parent[v]
+      if (!p)
+        parent[v] = dom
+      else
+        isArray(p) ? p.push(dom) : (parent[v] = [p, dom])
+    }
+  })
+}
 /**
  *
  * Hacks needed for the old internet explorer versions [lower than IE10]
  *
  */
-
-var ieVersion = checkIE()
-
-function checkIE() {
-  if (window) {
-    var ua = navigator.userAgent
-    var msie = ua.indexOf('MSIE ')
-    if (msie > 0) {
-      return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10)
-    }
-    else {
-      return 0
-    }
-  }
-}
-
+/* istanbul ignore next */
 function tbodyInnerHTML(el, html, tagName) {
   var div = mkEl('div'),
       loops = /td|th/.test(tagName) ? 3 : 2,
@@ -6593,29 +6598,59 @@ function tbodyInnerHTML(el, html, tagName) {
   div.innerHTML = '<table>' + html + '</table>'
   child = div.firstChild
 
-  while(loops--) {
-    child = child.firstChild
-  }
+  while (loops--) child = child.firstChild
 
   el.appendChild(child)
 
 }
-
+/* istanbul ignore next */
 function optionInnerHTML(el, html) {
   var opt = mkEl('option'),
       valRegx = /value=[\"'](.+?)[\"']/,
       selRegx = /selected=[\"'](.+?)[\"']/,
+      eachRegx = /each=[\"'](.+?)[\"']/,
+      ifRegx = /if=[\"'](.+?)[\"']/,
+      innerRegx = />([^<]*)</,
       valuesMatch = html.match(valRegx),
-      selectedMatch = html.match(selRegx)
+      selectedMatch = html.match(selRegx),
+      innerValue = html.match(innerRegx),
+      eachMatch = html.match(eachRegx),
+      ifMatch = html.match(ifRegx)
 
-  opt.innerHTML = html
+  if (innerValue) opt.innerHTML = innerValue[1]
+  else opt.innerHTML = html
 
-  if (valuesMatch) {
-    opt.value = valuesMatch[1]
+  if (valuesMatch) opt.value = valuesMatch[1]
+  if (selectedMatch) opt.setAttribute('riot-selected', selectedMatch[1])
+  if (eachMatch) opt.setAttribute('each', eachMatch[1])
+  if (ifMatch) opt.setAttribute('if', ifMatch[1])
+
+  el.appendChild(opt)
+}
+/* istanbul ignore next */
+function optgroupInnerHTML(el, html) {
+  var opt = mkEl('optgroup'),
+      labelRegx = /label=[\"'](.+?)[\"']/,
+      elementRegx = /^<([^>]*)>/,
+      tagRegx = /^<([^ \>]*)/,
+      labelMatch = html.match(labelRegx),
+      elementMatch = html.match(elementRegx),
+      tagMatch = html.match(tagRegx),
+      innerContent = html
+
+  if (elementMatch) {
+    var options = html.slice(elementMatch[1].length+2, -tagMatch[1].length-3).trim()
+    innerContent = options
   }
 
-  if (selectedMatch) {
-    opt.setAttribute('riot-selected', selectedMatch[1])
+  if (labelMatch) opt.setAttribute('riot-label', labelMatch[1])
+
+  if (innerContent) {
+    var innerOpt = mkEl('div')
+
+    optionInnerHTML(innerOpt, innerContent)
+
+    opt.appendChild(innerOpt.firstChild)
   }
 
   el.appendChild(opt)
@@ -6630,10 +6665,7 @@ var virtualDom = [],
     tagImpl = {},
     styleNode
 
-
-function getTag(dom) {
-  return tagImpl[dom.getAttribute('riot-tag') || dom.tagName.toLowerCase()]
-}
+var RIOT_TAG = 'riot-tag'
 
 function injectStyle(css) {
 
@@ -6641,16 +6673,22 @@ function injectStyle(css) {
 
   if (!document.head) return
 
-  if(styleNode.styleSheet)
+  if (styleNode.styleSheet)
     styleNode.styleSheet.cssText += css
   else
     styleNode.innerHTML += css
 
   if (!styleNode._rendered)
-    if (styleNode.styleSheet)
+    if (styleNode.styleSheet) {
       document.body.appendChild(styleNode)
-    else
-      document.head.appendChild(styleNode)
+    } else {
+      var rs = $('style[type=riot]')
+      if (rs) {
+        rs.parentNode.insertBefore(styleNode, rs)
+        rs.parentNode.removeChild(rs)
+      } else document.head.appendChild(styleNode)
+
+    }
 
   styleNode._rendered = true
 
@@ -6658,7 +6696,8 @@ function injectStyle(css) {
 
 function mountTo(root, tagName, opts) {
   var tag = tagImpl[tagName],
-      innerHTML = root.innerHTML
+      // cache the inner HTML to fix #855
+      innerHTML = root._innerHTML = root._innerHTML || root.innerHTML
 
   // clear the inner html
   root.innerHTML = ''
@@ -6676,88 +6715,105 @@ function mountTo(root, tagName, opts) {
 }
 
 riot.tag = function(name, html, css, attrs, fn) {
-  if (typeof attrs == 'function') {
+  if (isFunction(attrs)) {
     fn = attrs
-    if(/^[\w\-]+\s?=/.test(css)) {attrs = css; css = ''} else attrs = ''
+    if (/^[\w\-]+\s?=/.test(css)) {
+      attrs = css
+      css = ''
+    } else attrs = ''
   }
-  if (typeof css == 'function') fn = css
-  else if (css) injectStyle(css)
+  if (css) {
+    if (isFunction(css)) fn = css
+    else injectStyle(css)
+  }
   tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
   return name
 }
 
 riot.mount = function(selector, tagName, opts) {
 
-  var el,
-      selctAllTags = function() {
-        var keys = Object.keys(tagImpl)
-        var list = keys.join(', ')
-        each(keys, function(t) {
-          list += ', *[riot-tag="'+ t.trim() + '"]'
-        })
-        return list
-      },
+  var els,
       allTags,
       tags = []
 
-  if (typeof tagName == 'object') { opts = tagName; tagName = 0 }
+  // helper functions
+
+  function addRiotTags(arr) {
+    var list = ''
+    each(arr, function (e) {
+      list += ', *[riot-tag="'+ e.trim() + '"]'
+    })
+    return list
+  }
+
+  function selectAllTags() {
+    var keys = Object.keys(tagImpl)
+    return keys + addRiotTags(keys)
+  }
+
+  function pushTags(root) {
+    if (root.tagName) {
+      if (tagName && !root.getAttribute(RIOT_TAG))
+        root.setAttribute(RIOT_TAG, tagName)
+
+      var tag = mountTo(root,
+        tagName || root.getAttribute(RIOT_TAG) || root.tagName.toLowerCase(), opts)
+
+      if (tag) tags.push(tag)
+    }
+    else if (root.length) {
+      each(root, pushTags)   // assume nodeList
+    }
+  }
+
+  // ----- mount code -----
+
+  if (typeof tagName === T_OBJECT) {
+    opts = tagName
+    tagName = 0
+  }
 
   // crawl the DOM to find the tag
-  if(typeof selector == 'string') {
-    if (selector == '*') {
+  if (typeof selector === T_STRING) {
+    if (selector === '*')
       // select all the tags registered
       // and also the tags found with the riot-tag attribute set
-      selector = allTags = selctAllTags()
-    } else {
-      selector.split(',').map(function(t) {
-        selector += ', *[riot-tag="'+ t.trim() + '"]'
-      })
+      selector = allTags = selectAllTags()
+    else
+      // or just the ones named like the selector
+      selector += addRiotTags(selector.split(','))
 
-    }
-    // or just the ones named like the selector
-    el = $$(selector)
+    els = $$(selector)
   }
-  // probably you have passed already a tag or a NodeList
   else
-    el = selector
+    // probably you have passed already a tag or a NodeList
+    els = selector
 
   // select all the registered and mount them inside their root elements
-  if (tagName == '*') {
+  if (tagName === '*') {
     // get all custom tags
-    tagName = allTags || selctAllTags()
-    // if the root el it's just a single tag
-    if (el.tagName) {
-      el = $$(tagName, el)
-    } else {
-      var nodeList = []
+    tagName = allTags || selectAllTags()
+    // if the root els it's just a single tag
+    if (els.tagName)
+      els = $$(tagName, els)
+    else {
       // select all the children for all the different root elements
-      each(el, function(tag) {
-        nodeList = $$(tagName, tag)
+      var nodeList = []
+      each(els, function (_el) {
+        nodeList.push($$(tagName, _el))
       })
-      el = nodeList
+      els = nodeList
     }
     // get rid of the tagName
     tagName = 0
   }
 
-  function push(root) {
-    if(tagName && !root.getAttribute('riot-tag')) root.setAttribute('riot-tag', tagName)
-
-    var name = tagName || root.getAttribute('riot-tag') || root.tagName.toLowerCase(),
-        tag = mountTo(root, name, opts)
-
-    if (tag) tags.push(tag)
-  }
-
-  // DOM node
-  if (el.tagName)
-    push(selector)
-  // selector or NodeList
+  if (els.tagName)
+    pushTags(els)
   else
-    each(el, push)
+    each(els, pushTags)
 
   return tags
-
 }
 
 // update everything
@@ -6775,27 +6831,14 @@ riot.mountTo = riot.mount
   riot.util = { brackets: brackets, tmpl: tmpl }
 
   // support CommonJS, AMD & browser
-  if (typeof exports === 'object')
+  /* istanbul ignore next */
+  if (typeof exports === T_OBJECT)
     module.exports = riot
   else if (typeof define === 'function' && define.amd)
-    define(function() { return riot })
+    define(function() { return window.riot = riot })
   else
     window.riot = riot
 
 })(typeof window != 'undefined' ? window : undefined);
 
-},{}],57:[function(require,module,exports){
-var StateRouter = require('abstract-state-router')
-var riotRenderer = require('riot-state-renderer')
-var domready = require('domready')
-
-var stateRouter = StateRouter(riotRenderer(), 'body')
-
-require('./login/login')(stateRouter)
-require('./app/app')(stateRouter)
-
-domready(function() {
-	stateRouter.evaluateCurrentRoute('login')
-})
-
-},{"./app/app":4,"./login/login":11,"abstract-state-router":14,"domready":52,"riot-state-renderer":54}]},{},[57]);
+},{}]},{},[11]);
