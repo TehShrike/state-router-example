@@ -23,6 +23,7 @@
   "dependencies": {
     "abstract-state-router": "^5.3.0",
     "array.prototype.findindex": "^1.0.0",
+    "async-all": "1.0.0",
     "domready": "^1.0.8",
     "ractive-state-router": "^5.0.0",
     "random-uuid-v4": "0.0.4",

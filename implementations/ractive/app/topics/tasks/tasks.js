@@ -1,5 +1,6 @@
 var model = require('model.js')
 var fs = require('fs')
+var all = require('async-all')
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
 
@@ -9,10 +10,10 @@ module.exports = function(stateRouter) {
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
  		template: fs.readFileSync('implementations/ractive/app/topics/tasks/tasks.html', { encoding: 'utf8' }),
  		resolve: function(data, parameters, cb) {
- 			cb(null, {
- 				topic: model.getTopic(parameters.topicId),
- 				tasks: model.getTasks(parameters.topicId)
- 			})
+ 			all({
+ 				topic: model.getTopic.bind(null, parameters.topicId),
+ 				tasks: model.getTasks.bind(null, parameters.topicId)
+ 			}, cb)
  		},
  		activate: function(context) {
  			var ractive = context.domApi
@@ -20,7 +21,7 @@ module.exports = function(stateRouter) {
 
  			function setTaskDone(index, done) {
  				ractive.set('tasks.' + index + '.done', done)
- 				model.saveTasks(topicId)
+ 				model.saveTasks(topicId, ractive.get('tasks'))
  			}
 
   			ractive.complete = function complete(taskIndex) {
@@ -31,7 +32,7 @@ module.exports = function(stateRouter) {
  			}
  			ractive.remove = function remove(taskIndex) {
  				ractive.data.tasks.splice(taskIndex, 1)
- 				model.saveTasks(topicId)
+ 				model.saveTasks(topicId, ractive.get('tasks'))
  			}
 
  			ractive.on('newTaskKeyup', function(e) {
@@ -43,7 +44,8 @@ module.exports = function(stateRouter) {
  			})
 
  			function createNewTask(taskName) {
- 				model.saveTask(topicId, taskName)
+ 				var task = model.saveTask(topicId, taskName)
+ 				ractive.push('tasks', task)
  			}
 
  			ractive.find('.add-new-task').focus()

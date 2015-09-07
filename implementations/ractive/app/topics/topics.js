@@ -1,4 +1,5 @@
 var model = require('model.js')
+var all = require('async-all')
 
 module.exports = function(stateRouter) {
 	stateRouter.addState({
@@ -7,10 +8,10 @@ module.exports = function(stateRouter) {
 		defaultChild: 'no-task',
 		template: require('fs').readFileSync('implementations/ractive/app/topics/topics.html', { encoding: 'utf8' }),
 		resolve: function(data, parameters, cb) {
-			cb(null, {
-				topics: model.getTopics(),
-				tasks: model.getTasks()
-			})
+			all({
+				topics: model.getTopics,
+				tasks: model.getTasks
+			}, cb)
 		},
 		activate: function(context) {
 			var ractive = context.domApi
@@ -26,20 +27,23 @@ module.exports = function(stateRouter) {
 				})
 			}
 
-			function recalculateTasksLeftToDoInTopic(topicId) {
-				var tasks = model.getTasks(topicId)
+			function updateTopicsAndTasksLeftToDo(topicId) {
+				model.getTasks(topicId, function(err, tasks) {
+					var leftToDo =  tasks.reduce(function(toDo, task) {
+						return toDo + (task.done ? 0 : 1)
+					}, 0)
 
-				var leftToDo =  tasks.reduce(function(toDo, task) {
-					return toDo + (task.done ? 0 : 1)
-				}, 0)
-
-				ractive.set('tasksUndone.' + topicId, leftToDo)
+					ractive.set('tasksUndone.' + topicId, leftToDo)
+				})
+				model.getTopics(function(err, topics) {
+					ractive.set('topics', topics)
+				})
 			}
 
-			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
+			model.on('tasks saved', updateTopicsAndTasksLeftToDo)
 
 			context.content.topics.forEach(function(topic) {
-				recalculateTasksLeftToDoInTopic(topic.id)
+				updateTopicsAndTasksLeftToDo(topic.id)
 			})
 
 			ractive.on('add-topic', function() {
@@ -49,8 +53,7 @@ module.exports = function(stateRouter) {
 				if (addingTopic && newTopicName) {
 					var newTopic = model.addTopic(newTopicName)
 					ractive.set('newTopic', '')
-					model.saveTopics()
-					recalculateTasksLeftToDoInTopic(newTopic.id)
+					updateTopicsAndTasksLeftToDo(newTopic.id)
 					stateRouter.go('app.topics.tasks', {
 						topicId: newTopic.id
 					})
@@ -64,7 +67,7 @@ module.exports = function(stateRouter) {
 			})
 
 			context.on('destroy', function() {
-				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
+				model.removeListener('tasks saved', updateTopicsAndTasksLeftToDo)
 			})
 		}
 	})
