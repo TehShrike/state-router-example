@@ -27,7 +27,7 @@ module.exports = function(stateRouter) {
 				})
 			}
 
-			function updateTopicsAndTasksLeftToDo(topicId) {
+			function recalculateTasksLeftToDoInTopic(topicId) {
 				model.getTasks(topicId, function(err, tasks) {
 					var leftToDo =  tasks.reduce(function(toDo, task) {
 						return toDo + (task.done ? 0 : 1)
@@ -35,15 +35,12 @@ module.exports = function(stateRouter) {
 
 					ractive.set('tasksUndone.' + topicId, leftToDo)
 				})
-				model.getTopics(function(err, topics) {
-					ractive.set('topics', topics)
-				})
 			}
 
-			model.on('tasks saved', updateTopicsAndTasksLeftToDo)
+			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
 
 			context.content.topics.forEach(function(topic) {
-				updateTopicsAndTasksLeftToDo(topic.id)
+				recalculateTasksLeftToDoInTopic(topic.id)
 			})
 
 			ractive.on('add-topic', function() {
@@ -52,8 +49,9 @@ module.exports = function(stateRouter) {
 
 				if (addingTopic && newTopicName) {
 					var newTopic = model.addTopic(newTopicName)
+					ractive.push('topics', newTopic)
 					ractive.set('newTopic', '')
-					updateTopicsAndTasksLeftToDo(newTopic.id)
+					recalculateTasksLeftToDoInTopic(newTopic.id)
 					stateRouter.go('app.topics.tasks', {
 						topicId: newTopic.id
 					})
@@ -67,7 +65,7 @@ module.exports = function(stateRouter) {
 			})
 
 			context.on('destroy', function() {
-				model.removeListener('tasks saved', updateTopicsAndTasksLeftToDo)
+				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
 			})
 		}
 	})
