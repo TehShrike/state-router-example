@@ -28,7 +28,7 @@ module.exports = function(stateRouter) {
  				})
  			}
 
- 			function updateTopicsAndTasksLeftToDo(topicId) {
+ 			function recalculateTasksLeftToDoInTopic(topicId) {
  				model.getTasks(topicId, function(err, tasks) {
 	 				var leftToDo =  tasks.reduce(function(toDo, task) {
 	 					return toDo + (task.done ? 0 : 1)
@@ -39,23 +39,23 @@ module.exports = function(stateRouter) {
  				})
  			}
 
- 			model.on('tasks saved', updateTopicsAndTasksLeftToDo)
+ 			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
 
  			tag.opts.topics.forEach(function(topic) {
- 				updateTopicsAndTasksLeftToDo(topic.id)
+ 				recalculateTasksLeftToDoInTopic(topic.id)
  			})
 
  			tag.addTopic = function addTopic(newTopicName) {
 				var newTopic = model.addTopic(newTopicName)
 				tag.opts.topics.push(newTopic)
-				updateTopicsAndTasksLeftToDo(newTopic.id)
+				recalculateTasksLeftToDoInTopic(newTopic.id)
 				stateRouter.go('app.topics.tasks', {
 					topicId: newTopic.id
 				})
  			}
 
  			context.on('destroy', function() {
- 				model.removeListener('tasks saved', updateTopicsAndTasksLeftToDo)
+ 				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
  			})
  		}
 	})
