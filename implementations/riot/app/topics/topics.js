@@ -10,8 +10,10 @@ module.exports = function(stateRouter) {
 		defaultChild: 'no-task',
  		template: 'topics',
  		resolve: function(data, parameters, cb) {
- 			cb(null, {
- 				topics: model.getTopics()
+ 			model.getTopics(function(err, topics) {
+ 				cb(null, {
+	 				topics: topics
+	 			})
  			})
  		},
  		activate: function(context) {
@@ -26,34 +28,34 @@ module.exports = function(stateRouter) {
  				})
  			}
 
- 			function recalculateTasksLeftToDoInTopic(topicId) {
- 				var tasks = model.getTasks(topicId)
+ 			function updateTopicsAndTasksLeftToDo(topicId) {
+ 				model.getTasks(topicId, function(err, tasks) {
+	 				var leftToDo =  tasks.reduce(function(toDo, task) {
+	 					return toDo + (task.done ? 0 : 1)
+	 				}, 0)
 
- 				var leftToDo =  tasks.reduce(function(toDo, task) {
- 					return toDo + (task.done ? 0 : 1)
- 				}, 0)
-
- 				tag.opts.tasksUndone[topicId] = leftToDo
- 				tag.update()
+	 				tag.opts.tasksUndone[topicId] = leftToDo
+	 				tag.update()
+ 				})
  			}
 
- 			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
+ 			model.on('tasks saved', updateTopicsAndTasksLeftToDo)
 
  			tag.opts.topics.forEach(function(topic) {
- 				recalculateTasksLeftToDoInTopic(topic.id)
+ 				updateTopicsAndTasksLeftToDo(topic.id)
  			})
 
  			tag.addTopic = function addTopic(newTopicName) {
 				var newTopic = model.addTopic(newTopicName)
-				model.saveTopics()
-				recalculateTasksLeftToDoInTopic(newTopic.id)
+				tag.opts.topics.push(newTopic)
+				updateTopicsAndTasksLeftToDo(newTopic.id)
 				stateRouter.go('app.topics.tasks', {
 					topicId: newTopic.id
 				})
  			}
 
  			context.on('destroy', function() {
- 				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
+ 				model.removeListener('tasks saved', updateTopicsAndTasksLeftToDo)
  			})
  		}
 	})
