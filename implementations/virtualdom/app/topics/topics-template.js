@@ -34,7 +34,7 @@ module.exports = function (h, resolveContext, helpers) {
 								href: helpers.makePath('app.topics.tasks', { topicId: topic.id })
 							}, [
 								topic.name,
-								h('span.badge', undone ? undone.toString() : [] )
+								h('span.badge', undone ? undone.toString() : '0' )
 							]
 						)
 					})
