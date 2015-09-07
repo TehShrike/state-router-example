@@ -1,12 +1,12 @@
 var model = require('model.js')
+var each = require('async-each')
 
 function activate(stateRouter, context) {
 	var domApi = context.domApi
-	var topicId = context.parameters.topicId
 
 	domApi.emitter.on('new topic', function (newTopicName) {
 		var newTopicObject = model.addTopic(newTopicName)
-		model.saveTopics()
+		domApi.sharedState.topics.push(newTopicObject)
 		recalculateTasksLeftToDoInTopic(newTopicObject.id)
 		stateRouter.go('app.topics.tasks', {
 			topicId: newTopicObject.id
@@ -21,26 +21,34 @@ function activate(stateRouter, context) {
 		model.removeListener('tasks saved', recalculateAndUpdate)
 	})
 
-	function recalculateTasksLeftToDoInTopic(topicId) {
-		var tasks = model.getTasks(topicId)
+	function recalculateTasksLeftToDoInTopic(topicId, cb) {
+		model.getTasks(topicId, function(err, tasks) {
+			var sumOfNotDoneTasks = tasks.filter(function(task) {
+				return !task.done
+			}).length
 
-		var sumOfNotDoneTasks = tasks.reduce(function(sum, task) {
-			return sum + Number(!task.done)
-		}, 0)
-
-		var sharedState = domApi.sharedState
-		sharedState.tasksUndone = sharedState.tasksUndone || {}
-		sharedState.tasksUndone[topicId] = sumOfNotDoneTasks
+			var sharedState = domApi.sharedState
+			sharedState.tasksUndone = sharedState.tasksUndone || {}
+			sharedState.tasksUndone[topicId] = sumOfNotDoneTasks
+			cb && cb()
+		})
 	}
 
 	function recalculateAndUpdate(topicId) {
-		recalculateTasksLeftToDoInTopic(topicId)
-		model.saveTopics()
-		domApi.update(topicId)
+		recalculateTasksLeftToDoInTopic(topicId, function() {
+			domApi.update(topicId)
+		})
 	}
 
-	model.getTopics().forEach(function(topic) {
+	domApi.sharedState.topics.forEach(function(topic) {
 		recalculateTasksLeftToDoInTopic(topic.id)
+	})
+
+	var topicIds = domApi.sharedState.topics.map(function(topic) {
+		return topic.id
+	})
+	each(topicIds, recalculateTasksLeftToDoInTopic, function() {
+		domApi.update()
 	})
 }
 

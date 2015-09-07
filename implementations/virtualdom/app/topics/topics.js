@@ -10,8 +10,10 @@ module.exports = function(stateRouter) {
 		defaultChild: 'no-task',
 		template: template,
 		resolve: function resolve(data, parameters, cb) {
-			cb(null, {
-				topics: model.getTopics()
+			model.getTopics(function(err, topics) {
+				cb(err, {
+					topics: topics
+				})
 			})
 		},
 		activate: activate.bind(null, stateRouter)

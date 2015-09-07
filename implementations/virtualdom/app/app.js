@@ -21,7 +21,6 @@ module.exports = function(stateRouter) {
 		activate: function activate(context) {
 			context.domApi.emitter.on('save', function () {
 				model.saveCurrentUser(null)
-				console.log('saving')
 			})
 		}
 	})
