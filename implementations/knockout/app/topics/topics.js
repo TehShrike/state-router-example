@@ -1,5 +1,6 @@
 var model = require('model.js');
 var ko = require('knockout');
+var asyncAll = require('async-all');
 
 
 module.exports = function(stateRouter) {
@@ -7,15 +8,21 @@ module.exports = function(stateRouter) {
 		name: 'app.topics',
 		route: '/topics',
 		defaultChild: 'no-task',
-		template: require('fs').readFileSync('implementations/knockout/app/topics/topics.html', 'utf8'),
+		template: {
+			template: require('fs').readFileSync('implementations/knockout/app/topics/topics.html', 'utf8'),
+			viewModel: TopicsVM
+		},
 		resolve: function(data, parameters, cb) {
-			var viewModel = new TopicsVM(stateRouter);
-			cb(null, viewModel);
+			asyncAll({
+				topics: model.getTopics,
+				tasks: model.getTasks
+			}, cb);
 		},
 		activate: function(context) {
-			var viewModel = context.content;
-			viewModel.activate();
-			context.on('destroy', viewModel.dispose.bind(viewModel));
+			var viewModel = context.domApi.viewModel;
+			viewModel.goToState = stateRouter.go;
+			viewModel.activate(context.content.topics, context.content.tasks);
+			context.on('destroy', function() { viewModel.dispose(); });
 		}
 	});
 
@@ -23,9 +30,7 @@ module.exports = function(stateRouter) {
 };
 
 
-function TopicsVM(stateRouter) {
-	this._stateRouter = stateRouter;
-
+function TopicsVM() {
 	this.addingTopic = ko.observable(false);
 	this.newTopic = ko.observable('');
 	this.topics = ko.observableArray();
@@ -38,10 +43,10 @@ function TopicsVM(stateRouter) {
 }
 
 ko.utils.extend(TopicsVM.prototype, {
-	activate: function() {
+	activate: function(topics, tasks) {
 		this.addingTopic(false);
 		this.newTopic('');
-		this._init();
+		this._init(topics, tasks);
 	},
 
 	dispose: function() {
@@ -55,11 +60,11 @@ ko.utils.extend(TopicsVM.prototype, {
 		if (this.addingTopic()) {
 			if (newTopicName) {
 				var newTopic = model.addTopic(newTopicName);
-				model.saveTopics();
+
 				this.newTopic('');
 				this.addingTopic(false);
 
-				this._stateRouter.go('app.topics.tasks', {
+				this.goToState('app.topics.tasks', {
 					topicId: newTopic.id
 				});
 			}
@@ -74,37 +79,42 @@ ko.utils.extend(TopicsVM.prototype, {
 	},
 
 	onTopicsSaved: function() {
-		this._init();
+		var _this = this;
+		asyncAll({
+			topics: model.getTopics,
+			tasks: model.getTasks
+		}, function(err, data) {
+			_this._init(data.topics, data.tasks);
+		});
 	},
 
-	_init: function() {
-		this.topics(
-			model.getTopics().map(function(item) {
+	_init: function(topics, tasksByTopic) {
+		var _this = this;
+		_this.topics(
+			topics.map(function(item) {
 				return {
 					id: item.id,
 					name: item.name,
-					tasksLeft: ko.observable()
+					tasksLeft: ko.observable(_this._countTasksLeft(tasksByTopic[item.id]))
 				};
 			}));
-		this.topics().forEach(function(item) { this._recomputeTasksLeft(item.id); }, this);
+	},
+
+	_countTasksLeft: function(tasks) {
+		return tasks.reduce(function(toDo, task) {
+			return toDo + (task.done ? 0 : 1);
+		}, 0);
 	},
 
 	_recomputeTasksLeft: function(topicId) {
 		var topic = this.topics().find(function(item) {
 			return item.id === topicId;
 		});
-		var countTasksLeft = function(topicId) {
-			return model.getTasks(topicId)
-				.reduce(function(toDo, task) {
-					return toDo + (task.done ? 0 : 1);
-				}, 0);
-		};
-
 		if (topic) {
-			topic.tasksLeft(countTasksLeft(topic.id));
-		}
-		else {
-			this._init();
+			var _this = this;
+			model.getTasks(topicId, function(err, tasks) {
+				topic.tasksLeft(_this._countTasksLeft(tasks));
+			});
 		}
 	}
 });

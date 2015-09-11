@@ -4909,7 +4909,7 @@ module.exports = function all(o, cb) {
 	var results = {}
 	var errorResponse = null
 
-	if (typeof o !== 'object' || Array.isArray(o)) {
+	if (!o || typeof o !== 'object' || Array.isArray(o)) {
 		throw new Error('async-all requires you to pass in an object!')
 	}
 
@@ -5414,7 +5414,9 @@ function drainQueue() {
         currentQueue = queue;
         queue = [];
         while (++queueIndex < len) {
-            currentQueue[queueIndex].run();
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
         }
         queueIndex = -1;
         len = queue.length;
@@ -5466,7 +5468,6 @@ process.binding = function (name) {
     throw new Error('process.binding is not supported');
 };
 
-// TODO(shtylman)
 process.cwd = function () { return '/' };
 process.chdir = function (dir) {
     throw new Error('process.chdir is not supported');
@@ -5703,7 +5704,7 @@ module.exports = function() {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = (d + Math.random()*16)%16 | 0;
         d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
     });
 };
 

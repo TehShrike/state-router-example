@@ -2,21 +2,28 @@ var model = require('model.js');
 var fs = require('fs');
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}';
 var ko = require('knockout');
-
+var asyncAll = require('async-all');
 
 
 module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
- 		template: fs.readFileSync('implementations/knockout/app/topics/tasks/tasks.html', 'utf8'),
+		template: {
+			template: fs.readFileSync('implementations/knockout/app/topics/tasks/tasks.html', 'utf8'),
+			viewModel: TasksVM
+		},
+
  		resolve: function(data, parameters, cb) {
- 			cb(null, new TasksVM());
+ 			asyncAll({
+				topic: model.getTopic.bind(undefined, parameters.topicId),
+				tasks: model.getTasks.bind(undefined, parameters.topicId)
+			}, cb);
  		},
  		activate: function(context) {
-			var viewModel = context.content;
-			viewModel.activate(context.parameters.topicId);
-			context.on('destroy', viewModel.dispose.bind(viewModel));
+			var viewModel = context.domApi.viewModel;
+			viewModel.activate(context.content.topic, context.content.tasks);
+			context.on('destroy', function() { viewModel.dispose(); });
  		}
 	});
 
@@ -45,17 +52,16 @@ function TasksVM() {
 }
 
 ko.utils.extend(TasksVM.prototype, {
-	activate: function(topicId) {
-		this._init(topicId);
+	activate: function(topic, tasks) {
+		this._init(topic, tasks);
 	},
 
-	_init: function(topicId) {
-		var topic = model.getTopic(topicId);
-		this.topicId(topicId);
+	_init: function(topic, tasks) {
+		this.topicId(topic.id);
 		this.topicName(topic.name);
 
 		this.tasks(
-			model.getTasks(topicId).map(function(item) {
+			tasks.map(function(item) {
 				return {
 					name: ko.observable(item.name),
 					done: ko.observable(item.done),
@@ -72,25 +78,27 @@ ko.utils.extend(TasksVM.prototype, {
 	completeTask: function(task) {
 		task.done(true);
 		task.$data.done = true;
-		model.saveTasks(this.topicId());
+		model.saveTasks(this.topicId(), this.tasks().map(function(item) { return {name: item.name(), done: item.done() }}));
 	},
 
 	restoreTask: function(task) {
 		task.done(false);
 		task.$data.done = false;
-		model.saveTasks(this.topicId());
+		model.saveTasks(this.topicId(), this.tasks().map(function(item) { return {name: item.name(), done: item.done() }}));
 	},
 
 	removeTask: function(task) {
+		var _this = this;
 		this.tasks.remove(task);
 
-		var tasks = model.getTasks(this.topicId());
-		var index = tasks.indexOf(task.$data);
+		model.getTasks(this.topicId(), function(err, tasks) {
+			var index = tasks.indexOf(task.$data);
 
-		if (index > -1) {
-			tasks.splice(index, 1);
-			model.saveTasks(this.topicId());
-		}
+			if (index > -1) {
+				tasks.splice(index, 1);
+				model.saveTasks(_this.topicId(), _this.tasks().map(function(item) { return {name: item.name(), done: item.done() }}));
+			}
+		});
 	},
 
 	createTask: function() {
@@ -107,6 +115,12 @@ ko.utils.extend(TasksVM.prototype, {
 	},
 
 	onTasksSaved: function(topicId) {
-		this._init(topicId);
+		var _this = this;
+		asyncAll({
+			topic: model.getTopic.bind(undefined, topicId),
+			tasks: model.getTasks.bind(undefined, topicId)
+		}, function(err, data) {
+			_this._init(data.topic, data.tasks);
+		});
 	}
 });

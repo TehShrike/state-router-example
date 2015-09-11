@@ -24,20 +24,20 @@
   "dependencies": {
     "abstract-state-router": "^5.3.0",
     "array.prototype.findindex": "^1.0.0",
-    "async-all": "1.0.0",
+    "async-all": "1.0.1",
     "async-each": "0.1.6",
     "domready": "^1.0.8",
     "knockout": "^3.3.0",
-    "knockout-state-renderer": "^0.0.2",
+    "knockout-state-renderer": "^1.0.0",
     "ractive-state-router": "^5.0.0",
-    "random-uuid-v4": "0.0.4",
+    "random-uuid-v4": "0.0.5",
     "riot": "^2.1.0",
     "riot-state-renderer": "^4.0.1",
     "virtualdom-state-renderer": "1.0.0"
   },
   "devDependencies": {
     "brfs": "^1.4.0",
-    "browserify": "^10.2.1",
+    "browserify": "^11.1.0",
     "riotify": "^0.1.0",
     "watchify": "^3.2.1"
   }
