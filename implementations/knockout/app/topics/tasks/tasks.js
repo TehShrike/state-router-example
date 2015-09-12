@@ -13,7 +13,6 @@ module.exports = function(stateRouter) {
 			template: fs.readFileSync('implementations/knockout/app/topics/tasks/tasks.html', 'utf8'),
 			viewModel: TasksVM
 		},
-
  		resolve: function(data, parameters, cb) {
  			asyncAll({
 				topic: model.getTopic.bind(undefined, parameters.topicId),
@@ -23,7 +22,6 @@ module.exports = function(stateRouter) {
  		activate: function(context) {
 			var viewModel = context.domApi.viewModel;
 			viewModel.activate(context.content.topic, context.content.tasks);
-			context.on('destroy', function() { viewModel.dispose(); });
  		}
 	});
 
@@ -122,5 +120,9 @@ ko.utils.extend(TasksVM.prototype, {
 		}, function(err, data) {
 			_this._init(data.topic, data.tasks);
 		});
+	},
+
+	resetContext: function(data) {
+		this._init(data.topic, data.tasks);
 	}
 });

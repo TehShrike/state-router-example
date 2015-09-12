@@ -22,7 +22,6 @@ module.exports = function(stateRouter) {
 			var viewModel = context.domApi.viewModel;
 			viewModel.goToState = stateRouter.go;
 			viewModel.activate(context.content.topics, context.content.tasks);
-			context.on('destroy', function() { viewModel.dispose(); });
 		}
 	});
 
@@ -116,5 +115,9 @@ ko.utils.extend(TopicsVM.prototype, {
 				topic.tasksLeft(_this._countTasksLeft(tasks));
 			});
 		}
+	},
+
+	resetContext: function(data) {
+		this._init(data.topics, data.tasks);
 	}
 });
