@@ -1,12 +1,12 @@
 
 Information about the [abstract-state-router](https://github.com/TehShrike/abstract-state-router), and some example implementations.
 
-**[Check it out!](http://crissdev.github.io/state-router-example/implementations/knockout/)**
+**[Check it out!](http://tehshrike.github.io/state-router-example/implementations/knockout/)**
 
 To run it yourself locally, check it out into some directory being served up by a static http server, maybe Apache or something:
 
 ```sh
-git clone git@github.com:crissdev/state-router-example.git
+git clone git@github.com:tehshrike/state-router-example.git
 cd state-router-example
 npm install
 ```
