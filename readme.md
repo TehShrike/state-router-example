@@ -1,7 +1,7 @@
 
 Information about the [abstract-state-router](https://github.com/TehShrike/abstract-state-router), and some example implementations.
 
-**[Check it out!](http://tehshrike.github.io/state-router-example/implementations/knockout/)**
+**[Check it out!](https://tehshrike.github.io/state-router-example)**
 
 To run it yourself locally, check it out into some directory being served up by a static http server, maybe Apache or something:
 
