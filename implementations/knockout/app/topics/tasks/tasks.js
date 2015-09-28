@@ -86,17 +86,8 @@ ko.utils.extend(TasksVM.prototype, {
 	},
 
 	removeTask: function(task) {
-		var _this = this;
 		this.tasks.remove(task);
-
-		model.getTasks(this.topicId(), function(err, tasks) {
-			var index = tasks.indexOf(task.$data);
-
-			if (index > -1) {
-				tasks.splice(index, 1);
-				model.saveTasks(_this.topicId(), _this.tasks().map(function(item) { return {name: item.name(), done: item.done() }}));
-			}
-		});
+		model.saveTasks(this.topicId(), this.tasks().map(function(item) { return {name: item.name(), done: item.done() }}));
 	},
 
 	createTask: function() {
