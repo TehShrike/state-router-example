@@ -31,7 +31,7 @@ module.exports = function(stateRouter) {
  				setTaskDone(taskIndex, false)
  			}
  			ractive.remove = function remove(taskIndex) {
- 				ractive.data.tasks.splice(taskIndex, 1)
+ 				ractive.get('tasks').splice(taskIndex, 1)
  				model.saveTasks(topicId, ractive.get('tasks'))
  			}
 
