@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js && browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js && browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js && browserify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js",
-    "watchriot": "watchify -t riotify -d implementations/riot/index.js -o implementations/riot/bundle.js",
-    "watchractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js",
-    "watchvirtualdom": "watchify -d implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
-    "watchko": "watchify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js"
+    "build": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js && browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js && browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js && browserify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js && browserify -t brfs implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
+    "watch:riot": "watchify -t riotify -d implementations/riot/index.js -o implementations/riot/bundle.js",
+    "watch:ractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js",
+    "watch:ractive-redux": "watchify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs -d implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
+    "watch:virtualdom": "watchify -d implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
+    "watch:ko": "watchify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -26,18 +27,24 @@
     "array.prototype.findindex": "^1.0.0",
     "async-all": "1.0.1",
     "async-each": "0.1.6",
+    "dom-value": "0.0.0",
     "domready": "^1.0.8",
     "knockout": "^3.3.0",
     "knockout-state-renderer": "^1.0.0",
-    "ractive-state-router": "^5.0.0",
+    "ractive": "0.7.3",
+    "ractive-state-router": "~6.0.0",
     "random-uuid-v4": "0.0.5",
     "riot": "^2.1.0",
     "riot-state-renderer": "^4.0.1",
     "virtualdom-state-renderer": "1.0.0"
   },
   "devDependencies": {
+    "babel-plugin-transform-object-rest-spread": "6.3.13",
+    "babel-preset-es2015": "6.3.13",
+    "babelify": "7.2.0",
     "brfs": "^1.4.0",
-    "browserify": "^11.1.0",
+    "browserify": "11.2.0",
+    "redux": "3.0.6",
     "riotify": "^0.1.0",
     "watchify": "^3.2.1"
   }

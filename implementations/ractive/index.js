@@ -1,9 +1,9 @@
 var StateRouter = require('abstract-state-router')
+var Ractive = require('ractive')
 var ractiveRenderer = require('ractive-state-router')
 var domready = require('domready')
 
-var stateRouter = StateRouter(ractiveRenderer({
-}), 'body')
+var stateRouter = StateRouter(ractiveRenderer(Ractive, {}), 'body')
 
 require('./login/login')(stateRouter)
 require('./app/app')(stateRouter)
