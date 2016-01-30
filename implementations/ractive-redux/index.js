@@ -1,18 +1,14 @@
 var StateRouter = require('abstract-state-router')
 var ractiveRenderer = require('ractive-state-router')
 var domready = require('domready')
-var routerRedux = require('./router-redux')
+var createStore = require('redux').createStore
 
-var decorator = require('./decorator')
+var routerRedux = require('./router-redux')
 var Ractive = require('ractive')
 
-var stateRouter = StateRouter(ractiveRenderer(Ractive, {
-	decorators: {
-		setValue: decorator
-	}
-}), 'body')
+var stateRouter = StateRouter(ractiveRenderer(Ractive, {}), 'body')
 
-routerRedux(stateRouter)
+routerRedux(stateRouter, createStore)
 
 stateRouter.setMaxListeners(20)
 

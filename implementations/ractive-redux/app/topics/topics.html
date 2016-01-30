@@ -16,8 +16,7 @@
 						<div class="table-row">
 							<div class="table-cell">
 								<input type="text"
-								on-change="dispatchInput:SET_NEW_TOPIC"
-								decorator="setValue:{{newTopic}}"
+								on-change="fire('dispatchInput', 'SET_NEW_TOPIC', event.node)"
 								class="new-topic-name form-control {{^addingTopic}}hidden{{/addingTopic}}"
 								placeholder="Topic name">
 							</div>

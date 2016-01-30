@@ -1,23 +1,20 @@
-var createStore = require('redux').createStore
 var value = require('dom-value')
 
-module.exports = function(stateRouter) {
+module.exports = function(stateRouter, createStore) {
 	var unsubscribes = {}
 	var domApis = {}
 
-	function attachToState(state, domApi, initialState) {
+	function attachToState(state, ractive, initialState) {
 		if (state.data && state.data.reducer) {
 			var store = createStore(state.data.reducer, { ...initialState, ...state.data.initialState })
-			domApi.on('dispatch', actionType => store.dispatch({ type: actionType }))
-			domApi.on('dispatchInput', (event, actionType) => {
-				store.dispatch({ type: actionType, payload: value(event.node) })
+			ractive.on('dispatch', actionType => store.dispatch({ type: actionType }))
+			ractive.on('dispatchInput', (actionType, node) => {
+				store.dispatch({ type: actionType, payload: value(node) })
 			})
 
-			domApi.store = store
-			domApis[state.name] = domApi
-			unsubscribes[state.name] = store.subscribe(() => {
-				domApi.set(store.getState())
-			})
+			ractive.store = store
+			domApis[state.name] = ractive
+			unsubscribes[state.name] = store.subscribe(() => ractive.set(store.getState()))
 		}
 	}
 	function detatchFromState(stateName) {

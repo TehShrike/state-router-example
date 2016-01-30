@@ -30,7 +30,10 @@ module.exports = function(stateRouter) {
 		name: 'app.topics',
 		route: '/topics',
 		defaultChild: 'no-task',
-		template: require('fs').readFileSync('implementations/ractive-redux/app/topics/topics.html', { encoding: 'utf8' }),
+		template: {
+			template: require('fs').readFileSync('implementations/ractive-redux/app/topics/topics.html', { encoding: 'utf8' }),
+			toway: false
+		},
 		resolve: function(data, parameters, cb) {
 			all({
 				topics: model.getTopics,
@@ -49,7 +52,7 @@ module.exports = function(stateRouter) {
 						addingTopic: true
 					}
 				},
-				ADD_TOPIC: (state, action, dispatch) => {
+				ADD_TOPIC: (state, action) => {
 					var newTopicName = state.newTopic
 
 					if (newTopicName) {
@@ -96,11 +99,9 @@ module.exports = function(stateRouter) {
 			var ractive = context.domApi
 			var dispatch = ractive.store.dispatch
 
-			ractive.observe('addingTopic', function(newValue, oldValue, keypath) {
-				if (newValue) {
-					process.nextTick(function() {
-						ractive.find('.new-topic-name').focus()
-					})
+			ractive.on('dispatch', function(action) {
+				if (action === 'START_ADDING_TOPIC') {
+					ractive.find('.new-topic-name').focus()
 				}
 			})
 
