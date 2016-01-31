@@ -5,12 +5,17 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js && browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js && browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js && browserify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js && browserify -t brfs implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
+    "build": "npm run build:riot && npm run build:ractive && npm run build:ractive-redux && npm run build:virtualdom && npm run build:ko",
     "watch:riot": "watchify -t riotify -d implementations/riot/index.js -o implementations/riot/bundle.js",
+    "build:riot": "browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js",
     "watch:ractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js",
+    "build:ractive": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js",
     "watch:ractive-redux": "watchify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs -d implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
+    "build:ractive-redux": "browserify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
     "watch:virtualdom": "watchify -d implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
-    "watch:ko": "watchify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js"
+    "build:virtualdom": "browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
+    "watch:ko": "watchify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js",
+    "build:ko": "browserify -t brfs implementations/knockout/index.js -o implementations/knockout/bundle.js"
   },
   "repository": {
     "type": "git",
