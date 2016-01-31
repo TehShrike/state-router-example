@@ -1,20 +1,29 @@
 var value = require('dom-value')
 
-module.exports = function(stateRouter, createStore) {
+module.exports = function(stateRouter, redux) {
 	var unsubscribes = {}
 	var domApis = {}
 
-	function attachToState(state, ractive, initialState) {
-		if (state.data && state.data.reducer) {
-			var store = createStore(state.data.reducer, { ...initialState, ...state.data.initialState })
+	function attachToState(routerState, ractive, initialState) {
+		if (routerState.data && routerState.data.reducer) {
+			var causeDomEffects
+			if (routerState.data.afterAction) {
+				causeDomEffects = makeChangeListener(routerState, ractive)
+			}
+
+			var store = redux.createStore(routerState.data.reducer,
+					{ ...initialState, ...routerState.data.initialState },
+					redux.applyMiddleware(causeDomEffects))
+
 			ractive.on('dispatch', actionType => store.dispatch({ type: actionType }))
 			ractive.on('dispatchInput', (actionType, node) => {
 				store.dispatch({ type: actionType, payload: value(node) })
 			})
 
 			ractive.store = store
-			domApis[state.name] = ractive
-			unsubscribes[state.name] = store.subscribe(() => ractive.set(store.getState()))
+			domApis[routerState.name] = ractive
+			unsubscribes[routerState.name] = store.subscribe(() => ractive.set(store.getState()))
+
 		}
 	}
 	function detatchFromState(stateName) {
@@ -32,4 +41,21 @@ module.exports = function(stateRouter, createStore) {
 	stateRouter.on('afterResetState', context => attachToState(context.state, context.domApi, context.content))
 
 	stateRouter.on('beforeDestroyState', context => detatchFromState(context.state.name))
+}
+
+function makeChangeListener(routerState, ractive) {
+	return function causeDomEffects({ getState, dispatch }) {
+		return next => action => {
+			var finalAction = next(action)
+
+			routerState.data.afterAction({
+				state: getState(),
+				dispatch,
+				domApi: ractive,
+				action
+			})
+
+			return finalAction
+		}
+	}
 }

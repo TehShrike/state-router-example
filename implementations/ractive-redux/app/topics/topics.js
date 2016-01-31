@@ -1,10 +1,19 @@
 var model = require('model.js')
 var all = require('async-all')
 
-function makeReducer(reducerFunctions) {
+function switchForNamedArgs(mapOfFunctions) {
+	return function(argumentMap) {
+		var type = argumentMap.action.type
+
+		if (mapOfFunctions[type]) {
+			mapOfFunctions[type](argumentMap)
+		}
+	}
+}
+function makeReducer(mapOfFunctions) {
 	return function(state, action) {
-		if (reducerFunctions[action.type]) {
-			return reducerFunctions[action.type](state, action)
+		if (mapOfFunctions[action.type]) {
+			return mapOfFunctions[action.type](state, action)
 		} else {
 			return state
 		}
@@ -46,13 +55,13 @@ module.exports = function(stateRouter) {
 				addingTopic: false
 			},
 			reducer: makeReducer({
-				START_ADDING_TOPIC: (state, action) => {
+				START_ADDING_TOPIC: (state) => {
 					return {
 						...state,
 						addingTopic: true
 					}
 				},
-				ADD_TOPIC: (state, action) => {
+				ADD_TOPIC: (state) => {
 					var newTopicName = state.newTopic
 
 					if (newTopicName) {
@@ -93,35 +102,23 @@ module.exports = function(stateRouter) {
 						}
 					}
 				}
+			}),
+			afterAction: switchForNamedArgs({
+				START_ADDING_TOPIC: ({ domApi: ractive }) => ractive.find('.new-topic-name').focus(),
+				ADD_TOPIC: ({ state, dispatch }) => state.topics.forEach(
+						topicId => recalculateTasksLeftToDoInTopic(topicId, dispatch))
 			})
 		},
 		activate: function(context) {
 			var ractive = context.domApi
 			var dispatch = ractive.store.dispatch
 
-			ractive.on('dispatch', function(action) {
-				if (action === 'START_ADDING_TOPIC') {
-					ractive.find('.new-topic-name').focus()
-				}
-			})
-
 			var recalculateTasks = topicId => recalculateTasksLeftToDoInTopic(topicId, dispatch)
 
-			ractive.observe('topics', (newValue, oldValue) => {
-				if (newValue !== oldValue) {
-					newValue.forEach(recalculateTasks)
-				}
-			})
+			context.content.topics.forEach(topic => recalculateTasks(topic.id))
 
 			model.on('tasks saved', recalculateTasks)
-
-			context.content.topics.forEach(function(topic) {
-				recalculateTasks(topic.id)
-			})
-
-			context.on('destroy', function() {
-				model.removeListener('tasks saved', recalculateTasks)
-			})
+			context.on('destroy', () => model.removeListener('tasks saved', recalculateTasks))
 		}
 	})
 
