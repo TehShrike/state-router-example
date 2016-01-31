@@ -5,6 +5,8 @@ var domready = require('domready')
 
 var stateRouter = StateRouter(ractiveRenderer(Ractive, {}), 'body')
 
+stateRouter.setMaxListeners(20)
+
 require('./login/login')(stateRouter)
 require('./app/app')(stateRouter)
 

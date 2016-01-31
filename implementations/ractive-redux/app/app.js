@@ -8,16 +8,18 @@ module.exports = function(stateRouter) {
 		defaultChild: 'topics',
 		template: fs.readFileSync('implementations/ractive-redux/app/app.html').toString(),
 		resolve: function resolve(data, parameters, cb) {
-			if (!model.getCurrentUser().name) {
-				cb.redirect('login')
+			var currentUser = model.getCurrentUser()
+
+			if (currentUser.name) {
+				cb(null, {
+					currentUser
+				})
 			} else {
-				cb(null, {})
+				cb.redirect('login')
 			}
 		},
 		activate: function(context) {
 			var ractive = context.domApi
-
-			ractive.set('currentUser', model.getCurrentUser())
 
 			ractive.on('logout', function() {
 				model.saveCurrentUser(null)

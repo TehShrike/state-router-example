@@ -1,24 +1,6 @@
 var model = require('model.js')
 var all = require('async-all')
-
-function switchForNamedArgs(mapOfFunctions) {
-	return function(argumentMap) {
-		var type = argumentMap.action.type
-
-		if (mapOfFunctions[type]) {
-			mapOfFunctions[type](argumentMap)
-		}
-	}
-}
-function makeReducer(mapOfFunctions) {
-	return function(state, action) {
-		if (mapOfFunctions[action.type]) {
-			return mapOfFunctions[action.type](state, action)
-		} else {
-			return state
-		}
-	}
-}
+import { switchForNamedArgs, makeReducer } from 'action-helpers.js'
 
 function recalculateTasksLeftToDoInTopic(topicId, dispatch) {
 	model.getTasks(topicId, function(err, tasks) {
@@ -35,6 +17,56 @@ function recalculateTasksLeftToDoInTopic(topicId, dispatch) {
 }
 
 module.exports = function(stateRouter) {
+	var reducer = makeReducer({
+		START_ADDING_TOPIC: (state) => {
+			return {
+				...state,
+				addingTopic: true
+			}
+		},
+		ADD_TOPIC: (state) => {
+			var newTopicName = state.newTopic
+
+			if (newTopicName) {
+				var newTopic = model.addTopic(newTopicName)
+
+				stateRouter.go('app.topics.tasks', {
+					topicId: newTopic.id
+				})
+
+				return {
+					...state,
+					newTopic: '',
+					addingTopic: false,
+					topics: [
+						...state.topics,
+						newTopic
+					]
+				}
+			} else {
+				return {
+					...state,
+					addingTopic: false
+				}
+			}
+		},
+		SET_NEW_TOPIC: (state, action) => {
+			return {
+				...state,
+				newTopic: action.payload
+			}
+		},
+		UPDATE_UNDONE_TASKS: (state, action) => {
+			return {
+				...state,
+				tasksUndone: {
+					...state.tasksUndone,
+					[action.topicId]: action.leftToDo
+				}
+			}
+		}
+	})
+
 	stateRouter.addState({
 		name: 'app.topics',
 		route: '/topics',
@@ -54,55 +86,7 @@ module.exports = function(stateRouter) {
 				tasksUndone: {},
 				addingTopic: false
 			},
-			reducer: makeReducer({
-				START_ADDING_TOPIC: (state) => {
-					return {
-						...state,
-						addingTopic: true
-					}
-				},
-				ADD_TOPIC: (state) => {
-					var newTopicName = state.newTopic
-
-					if (newTopicName) {
-						var newTopic = model.addTopic(newTopicName)
-
-						stateRouter.go('app.topics.tasks', {
-							topicId: newTopic.id
-						})
-
-						return {
-							...state,
-							newTopic: '',
-							addingTopic: false,
-							topics: [
-								...state.topics,
-								newTopic
-							]
-						}
-					} else {
-						return {
-							...state,
-							addingTopic: false
-						}
-					}
-				},
-				SET_NEW_TOPIC: (state, action) => {
-					return {
-						...state,
-						newTopic: action.payload
-					}
-				},
-				UPDATE_UNDONE_TASKS: (state, action) => {
-					return {
-						...state,
-						tasksUndone: {
-							...state.tasksUndone,
-							[action.topicId]: action.leftToDo
-						}
-					}
-				}
-			}),
+			reducer: reducer,
 			afterAction: switchForNamedArgs({
 				START_ADDING_TOPIC: ({ domApi: ractive }) => ractive.find('.new-topic-name').focus(),
 				ADD_TOPIC: ({ state, dispatch }) => state.topics.forEach(
@@ -110,8 +94,7 @@ module.exports = function(stateRouter) {
 			})
 		},
 		activate: function(context) {
-			var ractive = context.domApi
-			var dispatch = ractive.store.dispatch
+			var dispatch = context.domApi.store.dispatch
 
 			var recalculateTasks = topicId => recalculateTasksLeftToDoInTopic(topicId, dispatch)
 

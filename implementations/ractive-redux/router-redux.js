@@ -15,7 +15,15 @@ module.exports = function(stateRouter, redux) {
 					{ ...initialState, ...routerState.data.initialState },
 					redux.applyMiddleware(causeDomEffects))
 
-			ractive.on('dispatch', actionType => store.dispatch({ type: actionType }))
+			ractive.on('dispatch', (actionType, payload) => {
+				var action = {}
+				if (payload && typeof payload === 'object') {
+					action = payload
+				}
+				action.type = actionType
+
+				store.dispatch(action)
+			})
 			ractive.on('dispatchInput', (actionType, node) => {
 				store.dispatch({ type: actionType, payload: value(node) })
 			})

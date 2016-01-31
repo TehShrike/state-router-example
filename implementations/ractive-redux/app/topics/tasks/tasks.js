@@ -1,54 +1,81 @@
 var model = require('model.js')
 var fs = require('fs')
 var all = require('async-all')
+import { switchForNamedArgs, makeReducer } from 'action-helpers.js'
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+
+var reducer = makeReducer({
+	SET_NEW_TASK: (state, action) => {
+		return {
+			...state,
+			newTaskName: action.payload
+		}
+	},
+	ADD_NEW_TASK: (state, action) => {
+		 var task = model.saveTask(state.topicId, state.newTaskName)
+
+		return {
+			...state,
+			newTaskName: '',
+			tasks: [
+				...state.tasks,
+				task
+			]
+		}
+	},
+	REMOVE_TASK: (state, action) => {
+		return {
+			...state,
+			tasks: [
+				...state.tasks.slice(0, action.index),
+				...state.tasks.slice(action.index + 1)
+			]
+		}
+	},
+	SET_TASK_DONE: (state, action) => {
+		var task = state.tasks[action.index]
+		return {
+			...state,
+			tasks: [
+				...state.tasks.slice(0, action.index), {
+					...task,
+					done: action.done
+				},
+				...state.tasks.slice(action.index + 1)
+			]
+		}
+	}
+})
 
 module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
- 		template: fs.readFileSync('implementations/ractive-redux/app/topics/tasks/tasks.html', { encoding: 'utf8' }),
+ 		template: {
+ 			template: fs.readFileSync('implementations/ractive-redux/app/topics/tasks/tasks.html', { encoding: 'utf8' }),
+ 			twoway: false
+ 		},
+ 		data: {
+ 			reducer: reducer,
+ 			afterAction: function({ state, action }) {
+ 				switch (action.type) {
+ 					case 'ADD_NEW_TASK':
+ 					case 'REMOVE_TASK':
+ 					case 'SET_TASK_DONE':
+ 					model.saveTasks(state.topicId, state.tasks)
+ 				}
+ 			}
+ 		},
  		resolve: function(data, parameters, cb) {
  			all({
  				topic: model.getTopic.bind(null, parameters.topicId),
- 				tasks: model.getTasks.bind(null, parameters.topicId)
+ 				tasks: model.getTasks.bind(null, parameters.topicId),
+ 				topicId: parameters.topicId
  			}, cb)
  		},
  		activate: function(context) {
- 			var ractive = context.domApi
- 			var topicId = context.parameters.topicId
-
- 			function setTaskDone(index, done) {
- 				ractive.set('tasks.' + index + '.done', done)
- 				model.saveTasks(topicId, ractive.get('tasks'))
- 			}
-
-  			ractive.complete = function complete(taskIndex) {
-  				setTaskDone(taskIndex, true)
- 			}
- 			ractive.restore = function restore(taskIndex) {
- 				setTaskDone(taskIndex, false)
- 			}
- 			ractive.remove = function remove(taskIndex) {
- 				ractive.get('tasks').splice(taskIndex, 1)
- 				model.saveTasks(topicId, ractive.get('tasks'))
- 			}
-
- 			ractive.on('newTaskKeyup', function(e) {
- 				var newTaskName = ractive.get('newTaskName')
- 				if (e.original.keyCode === 13 && newTaskName) {
- 					createNewTask(newTaskName)
- 					ractive.set('newTaskName', '')
- 				}
- 			})
-
- 			function createNewTask(taskName) {
- 				var task = model.saveTask(topicId, taskName)
- 				ractive.push('tasks', task)
- 			}
-
- 			ractive.find('.add-new-task').focus()
+ 			context.domApi.find('.add-new-task').focus()
  		}
 	})
 

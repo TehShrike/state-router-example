@@ -25,13 +25,23 @@
 				</td>
 				<td>
 					{{#if done}}
-						<button class="btn btn-primary full-width" on-click="restore(i)">Restore</button>
+						<button
+						class="btn btn-primary full-width"
+						on-click="fire('dispatch', 'SET_TASK_DONE', { index: i, done: false })">
+							Restore
+						</button>
 					{{else}}
-						<button class="btn btn-success full-width" on-click="complete(i)">Complete</button>
+						<button
+						class="btn btn-success full-width"
+						on-click="fire('dispatch', 'SET_TASK_DONE', { index: i, done: true })">
+							Complete
+						</button>
 					{{/if}}
 				</td>
 				<td>
-					<button class="btn btn-danger full-width" on-click="remove(i)">
+					<button
+					class="btn btn-danger full-width"
+					on-click="fire('dispatch', 'REMOVE_TASK', { index: i })">
 						Remove
 					</button>
 				</td>
@@ -39,7 +49,13 @@
 		{{/tasks}}
 		<tr>
 			<td>
-				<input type="text" class="form-control add-new-task" placeholder="New task" value="{{newTaskName}}" on-keyup="newTaskKeyup">
+				<form action="" onsubmit="return false" on-submit="fire('dispatch', 'ADD_NEW_TASK')">
+					<input type="text"
+					class="form-control add-new-task"
+					placeholder="New task"
+					value="{{newTaskName}}"
+					on-change="fire('dispatchInput', 'SET_NEW_TASK', event.node)">
+				</form>
 			</td>
 		</tr>
 	</tbody>
