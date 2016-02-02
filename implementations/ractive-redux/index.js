@@ -1,14 +1,13 @@
 var StateRouter = require('abstract-state-router')
 var ractiveRenderer = require('ractive-state-router')
 var domready = require('domready')
-var redux = require('redux')
 
-var routerRedux = require('./router-redux')
+var routerRedux = require('state-router-redux-ractive')
 var Ractive = require('ractive')
 
 var stateRouter = StateRouter(ractiveRenderer(Ractive, {}), 'body')
 
-routerRedux(stateRouter, redux)
+routerRedux(stateRouter)
 
 stateRouter.setMaxListeners(20)
 
