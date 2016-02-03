@@ -41,7 +41,7 @@
     "random-uuid-v4": "0.0.5",
     "riot": "^2.1.0",
     "riot-state-renderer": "^4.0.1",
-    "state-router-redux-ractive": "~1.0.0",
+    "state-router-redux-ractive": "~2.0.0",
     "virtualdom-state-renderer": "1.0.0"
   },
   "devDependencies": {
