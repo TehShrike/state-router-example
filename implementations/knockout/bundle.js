@@ -52,7 +52,7 @@ module.exports = function(stateRouter) {
 	require('./topics/topics')(stateRouter);
 };
 
-},{"./about/about":1,"./topics/topics":4,"array.prototype.findindex":28,"knockout":34,"model.js":7}],3:[function(require,module,exports){
+},{"./about/about":1,"./topics/topics":4,"array.prototype.findindex":18,"knockout":28,"model.js":7}],3:[function(require,module,exports){
 var model = require('model.js');
 
 var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}';
@@ -173,7 +173,7 @@ ko.utils.extend(TasksVM.prototype, {
 	}
 });
 
-},{"async-all":29,"knockout":34,"model.js":7}],4:[function(require,module,exports){
+},{"async-all":19,"knockout":28,"model.js":7}],4:[function(require,module,exports){
 var model = require('model.js');
 var ko = require('knockout');
 var asyncAll = require('async-all');
@@ -298,7 +298,7 @@ ko.utils.extend(TopicsVM.prototype, {
 	}
 });
 
-},{"./tasks/tasks":3,"async-all":29,"knockout":34,"model.js":7}],5:[function(require,module,exports){
+},{"./tasks/tasks":3,"async-all":19,"knockout":28,"model.js":7}],5:[function(require,module,exports){
 var StateRouter = require('abstract-state-router')
 var makeRenderer = require('knockout-state-renderer')
 var domready = require('domready')
@@ -312,7 +312,7 @@ domready(function() {
 	stateRouter.evaluateCurrentRoute('login')
 })
 
-},{"./app/app":2,"./login/login":6,"abstract-state-router":9,"domready":31,"knockout-state-renderer":33}],6:[function(require,module,exports){
+},{"./app/app":2,"./login/login":6,"abstract-state-router":9,"domready":22,"knockout-state-renderer":27}],6:[function(require,module,exports){
 
 var model = require('model.js');
 var ko = require('knockout');
@@ -340,7 +340,7 @@ module.exports = function(stateRouter) {
 	});
 };
 
-},{"knockout":34,"model.js":7}],7:[function(require,module,exports){
+},{"knockout":28,"model.js":7}],7:[function(require,module,exports){
 (function (process){
 var uuid4 = require('random-uuid-v4')
 var EventEmitter = require('events').EventEmitter
@@ -522,8 +522,8 @@ function initializeDummyData() {
 
 
 }).call(this,require('_process'))
-},{"_process":30,"events":32,"random-uuid-v4":38}],8:[function(require,module,exports){
-module.exports={ "reverse": false }
+},{"_process":20,"events":23,"random-uuid-v4":36}],8:[function(require,module,exports){
+module.exports = { reverse: false }
 },{}],9:[function(require,module,exports){
 (function (process){
 var StateState = require('./lib/state-state')
@@ -532,7 +532,7 @@ var CurrentState = require('./lib/current-state')
 var stateChangeLogic = require('./lib/state-change-logic')
 var parse = require('./lib/state-string-parser')
 var StateTransitionManager = require('./lib/state-transition-manager')
-var defaultRouterOptions = require('./default-router-options.json')
+var defaultRouterOptions = require('./default-router-options.js')
 
 var series = require('./lib/promise-map-series')
 var denodeify = require('then-denodeify')
@@ -545,11 +545,12 @@ var buildPath = require('page-path-builder')
 
 require('native-promise-only/npo')
 
-var expectedPropertiesOfAddState = ['name', 'route', 'defaultChild', 'data', 'template', 'resolve', 'activate', 'querystringParameters', 'defaultQuerystringParameters']
+var expectedPropertiesOfAddState = ['name', 'route', 'defaultChild', 'data', 'template', 'resolve', 'activate', 'querystringParameters', 'defaultQuerystringParameters', 'defaultParameters']
 
 module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOptions) {
 	var prototypalStateHolder = StateState()
-	var current = CurrentState()
+	var lastCompletelyLoadedState = CurrentState()
+	var lastStateStartedActivating = CurrentState()
 	var stateProviderEmitter = new EventEmitter()
 	StateTransitionManager(stateProviderEmitter)
 	stateRouterOptions = extend({
@@ -564,8 +565,6 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 	stateRouterOptions.router.setDefault(function(route, parameters) {
 		stateProviderEmitter.emit('routeNotFound', route, parameters)
 	})
-
-	current.set('', {})
 
 	var destroyDom = null
 	var getDomChild = null
@@ -753,9 +752,9 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 		return promiseMe(prototypalStateHolder.guaranteeAllStatesExist, newStateName)
 		.then(function applyDefaultParameters() {
 			var state = prototypalStateHolder.get(newStateName)
-			var defaultParams = state.defaultQuerystringParameters || {}
+			var defaultParams = state.defaultParameters || state.defaultQuerystringParameters || {}
 			var needToApplyDefaults = Object.keys(defaultParams).some(function missingParameterValue(param) {
-				return !parameters[param]
+				return typeof parameters[param] === 'undefined'
 			})
 
 			if (needToApplyDefaults) {
@@ -764,9 +763,9 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 			return state
 		}).then(ifNotCancelled(function(state) {
 			stateProviderEmitter.emit('stateChangeStart', state, parameters)
+			lastStateStartedActivating.set(state.name, parameters)
 		})).then(function getStateChanges() {
-
-			var stateComparisonResults = StateComparison(prototypalStateHolder)(current.get().name, current.get().parameters, newStateName, parameters)
+			var stateComparisonResults = StateComparison(prototypalStateHolder)(lastCompletelyLoadedState.get().name, lastCompletelyLoadedState.get().parameters, newStateName, parameters)
 			return stateChangeLogic(stateComparisonResults) // { destroy, change, create }
 		}).then(ifNotCancelled(function resolveDestroyAndActivateStates(stateChanges) {
 			return resolveStates(getStatesToResolve(stateChanges), extend(parameters)).catch(function onResolveError(e) {
@@ -810,7 +809,7 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 				})
 			}
 		})).then(function stateChangeComplete() {
-			current.set(newStateName, parameters)
+			lastCompletelyLoadedState.set(newStateName, parameters)
 			try {
 				stateProviderEmitter.emit('stateChangeEnd', prototypalStateHolder.get(newStateName), parameters)
 			} catch (e) {
@@ -833,12 +832,25 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 	}
 
 	function makePath(stateName, parameters, options) {
+		function getGuaranteedPreviousState() {
+			if (!lastStateStartedActivating.get().name) {
+				throw new Error('makePath required a previous state to exist, and none was found')
+			}
+			return lastStateStartedActivating.get()
+		}
 		if (options && options.inherit) {
-			parameters = extend(current.get().parameters, parameters)
+			parameters = extend(getGuaranteedPreviousState().parameters, parameters)
 		}
 
-		prototypalStateHolder.guaranteeAllStatesExist(stateName)
-		var route = prototypalStateHolder.buildFullStateRoute(stateName)
+		var destinationStateName = stateName === null ? getGuaranteedPreviousState().name : stateName
+
+		var destinationState = prototypalStateHolder.get(destinationStateName) || {}
+		var defaultParams = destinationState.defaultParameters || destinationState.defaultQuerystringParameters
+
+		parameters = extend(defaultParams, parameters)
+
+		prototypalStateHolder.guaranteeAllStatesExist(destinationStateName)
+		var route = prototypalStateHolder.buildFullStateRoute(destinationStateName)
 		return buildPath(route, parameters || {})
 	}
 
@@ -864,8 +876,8 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 		return stateRouterOptions.pathPrefix + makePath(stateName, parameters, options)
 	}
 	stateProviderEmitter.stateIsActive = function stateIsActive(stateName, opts) {
-		var currentState = current.get()
-		return currentState.name.indexOf(stateName) === 0 && (typeof opts === 'undefined' || Object.keys(opts).every(function matches(key) {
+		var currentState = lastCompletelyLoadedState.get()
+		return (currentState.name === stateName || currentState.name.indexOf(stateName + '.') === 0) && (typeof opts === 'undefined' || Object.keys(opts).every(function matches(key) {
 			return opts[key] === currentState.parameters[key]
 		}))
 	}
@@ -956,9 +968,12 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./default-router-options.json":8,"./lib/current-state":10,"./lib/promise-map-series":11,"./lib/state-change-logic":12,"./lib/state-comparison":13,"./lib/state-state":14,"./lib/state-string-parser":15,"./lib/state-transition-manager":16,"_process":30,"combine-arrays":18,"events":32,"hash-brown-router":20,"native-promise-only/npo":22,"page-path-builder":23,"then-denodeify":26,"xtend":27}],10:[function(require,module,exports){
+},{"./default-router-options.js":8,"./lib/current-state":10,"./lib/promise-map-series":11,"./lib/state-change-logic":12,"./lib/state-comparison":13,"./lib/state-state":14,"./lib/state-string-parser":15,"./lib/state-transition-manager":16,"_process":20,"combine-arrays":21,"events":23,"hash-brown-router":25,"native-promise-only/npo":29,"page-path-builder":30,"then-denodeify":37,"xtend":38}],10:[function(require,module,exports){
 module.exports = function CurrentState() {
-	var current = null
+	var current = {
+		name: '',
+		parameters: {}
+	}
 
 	return {
 		get: function() {
@@ -991,7 +1006,7 @@ module.exports = function sequence(array, iterator, thisArg) {
 	return Promise.all(results)
 }
 
-},{"native-promise-only/npo":22}],12:[function(require,module,exports){
+},{"native-promise-only/npo":29}],12:[function(require,module,exports){
 module.exports = function stateChangeLogic(stateComparisonResults) {
 	var hitChangingState = false
 	var hitDestroyedState = false
@@ -1079,7 +1094,7 @@ function stateComparison(parametersChanged, originalState, originalParameters, n
 	})
 }
 
-},{"./state-string-parser":15,"combine-arrays":18,"path-to-regexp-with-reversible-keys":25}],14:[function(require,module,exports){
+},{"./state-string-parser":15,"combine-arrays":21,"path-to-regexp-with-reversible-keys":32}],14:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var parse = require('./state-string-parser')
 
@@ -1271,560 +1286,6 @@ module.exports = function (emitter) {
 })(this);
 
 },{}],18:[function(require,module,exports){
-module.exports = function(obj) {
-	var keys = Object.keys(obj)
-
-	keys.forEach(function(key) {
-		if (!Array.isArray(obj[key])) {
-			throw new Error(key + ' is not an array')
-		}
-	})
-
-	var maxIndex = keys.reduce(function(maxSoFar, key) {
-		var len = obj[key].length
-		return maxSoFar > len ? maxSoFar : len
-	}, 0)
-
-	var output = []
-
-	function getObject(index) {
-		var o = {}
-		keys.forEach(function(key) {
-			o[key] = obj[key][index]
-		})
-		return o
-	}
-
-	for (var i = 0; i < maxIndex; ++i) {
-		output.push(getObject(i))
-	}
-
-	return output
-}
-
-},{}],19:[function(require,module,exports){
-var EventEmitter = require('events').EventEmitter
-
-module.exports = function HashLocation(window) {
-	var emitter = new EventEmitter()
-	var last = ''
-
-	window.addEventListener('hashchange', function() {
-		if (last !== emitter.get()) {
-			last = emitter.get()
-			emitter.emit('hashchange')
-		}
-	})
-
-	emitter.go = go.bind(null, window)
-	emitter.replace = replace.bind(null, window)
-	emitter.get = get.bind(null, window)
-
-	return emitter
-}
-
-function replace(window, newPath) {
-	window.location.replace(everythingBeforeTheSlash(window.location.href) + '#' + newPath)
-}
-
-function everythingBeforeTheSlash(url) {
-	var hashIndex = url.indexOf('#')
-	return hashIndex === -1 ? url : url.substring(0, hashIndex)
-}
-
-function go(window, newPath) {
-	window.location.hash = newPath
-}
-
-function get(window) {
-	return removeHashFromPath(window.location.hash)
-}
-
-function removeHashFromPath(path) {
-	return (path && path[0] === '#') ? path.substr(1) : path
-}
-
-},{"events":32}],20:[function(require,module,exports){
-var pathToRegexp = require('path-to-regexp-with-reversible-keys')
-var qs = require('querystring')
-var xtend = require('xtend')
-var browserHashLocation = require('./hash-location.js')
-require('array.prototype.find')
-
-module.exports = function Router(opts, hashLocation) {
-	if (isHashLocation(opts)) {
-		hashLocation = opts
-		opts = null
-	}
-
-	opts = opts || {}
-
-	if (!hashLocation) {
-		hashLocation = browserHashLocation(window)
-	}
-
-	var routes = []
-
-	var onHashChange = evaluateCurrentPath.bind(null, routes, hashLocation, !!opts.reverse)
-
-	hashLocation.on('hashchange', onHashChange)
-
-	function stop() {
-		hashLocation.removeListener('hashchange', onHashChange)
-	}
-
-	return {
-		add: add.bind(null, routes),
-		stop: stop,
-		evaluateCurrent: evaluateCurrentPathOrGoToDefault.bind(null, routes, hashLocation),
-		setDefault: setDefault.bind(null, routes),
-		replace: hashLocation.replace,
-		go: hashLocation.go,
-		location: hashLocation
-	}
-}
-
-function evaluateCurrentPath(routes, hashLocation, reverse) {
-	evaluatePath(routes, hashLocation.get(), reverse)
-}
-
-function getPathParts(path) {
-	var chunks = path.split('?')
-	return {
-		path: chunks.shift(),
-		queryString: qs.parse(chunks.join(''))
-	}
-}
-
-function evaluatePath(routes, path, reverse) {
-	var pathParts = getPathParts(path)
-	path = pathParts.path
-	var queryStringParameters = pathParts.queryString
-
-	var matchingRoute = (reverse ? reverseArray(routes) : routes).find("".match, path)
-
-	if (matchingRoute) {
-		var regexResult = matchingRoute.exec(path)
-		var routeParameters = makeParametersObjectFromRegexResult(matchingRoute.keys, regexResult)
-		var params = xtend(queryStringParameters, routeParameters)
-		matchingRoute.fn(params)
-	} else if (routes.defaultFn) {
-		routes.defaultFn(path, queryStringParameters)
-	}
-}
-
-function reverseArray(ary) {
-	return ary.slice().reverse()
-}
-
-function makeParametersObjectFromRegexResult(keys, regexResult) {
-	return keys.reduce(function(memo, urlKey, index) {
-		memo[urlKey.name] = regexResult[index + 1]
-		return memo
-	}, {})
-}
-
-function add(routes, routeString, routeFunction) {
-	if (typeof routeFunction !== 'function') {
-		throw new Error('The router add function must be passed a callback function')
-	}
-	var newRoute = pathToRegexp(routeString)
-	newRoute.fn = routeFunction
-	routes.push(newRoute)
-}
-
-function evaluateCurrentPathOrGoToDefault(routes, hashLocation, defaultPath) {
-	if (hashLocation.get()) {
-		var routesCopy = routes.slice()
-		routesCopy.defaultFn = function() {
-			hashLocation.go(defaultPath)
-		}
-		evaluateCurrentPath(routesCopy, hashLocation)
-	} else {
-		hashLocation.go(defaultPath)
-	}
-}
-
-function setDefault(routes, defaultFn) {
-	routes.defaultFn = defaultFn
-}
-
-function isHashLocation(hashLocation) {
-	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
-}
-},{"./hash-location.js":19,"array.prototype.find":17,"path-to-regexp-with-reversible-keys":25,"querystring":37,"xtend":27}],21:[function(require,module,exports){
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
-};
-
-},{}],22:[function(require,module,exports){
-(function (global){
-/*! Native Promise Only
-    v0.8.1 (c) Kyle Simpson
-    MIT License: http://getify.mit-license.org
-*/
-!function(t,n,e){n[t]=n[t]||e(),"undefined"!=typeof module&&module.exports?module.exports=n[t]:"function"==typeof define&&define.amd&&define(function(){return n[t]})}("Promise","undefined"!=typeof global?global:this,function(){"use strict";function t(t,n){l.add(t,n),h||(h=y(l.drain))}function n(t){var n,e=typeof t;return null==t||"object"!=e&&"function"!=e||(n=t.then),"function"==typeof n?n:!1}function e(){for(var t=0;t<this.chain.length;t++)o(this,1===this.state?this.chain[t].success:this.chain[t].failure,this.chain[t]);this.chain.length=0}function o(t,e,o){var r,i;try{e===!1?o.reject(t.msg):(r=e===!0?t.msg:e.call(void 0,t.msg),r===o.promise?o.reject(TypeError("Promise-chain cycle")):(i=n(r))?i.call(r,o.resolve,o.reject):o.resolve(r))}catch(c){o.reject(c)}}function r(o){var c,u=this;if(!u.triggered){u.triggered=!0,u.def&&(u=u.def);try{(c=n(o))?t(function(){var t=new f(u);try{c.call(o,function(){r.apply(t,arguments)},function(){i.apply(t,arguments)})}catch(n){i.call(t,n)}}):(u.msg=o,u.state=1,u.chain.length>0&&t(e,u))}catch(a){i.call(new f(u),a)}}}function i(n){var o=this;o.triggered||(o.triggered=!0,o.def&&(o=o.def),o.msg=n,o.state=2,o.chain.length>0&&t(e,o))}function c(t,n,e,o){for(var r=0;r<n.length;r++)!function(r){t.resolve(n[r]).then(function(t){e(r,t)},o)}(r)}function f(t){this.def=t,this.triggered=!1}function u(t){this.promise=t,this.state=0,this.triggered=!1,this.chain=[],this.msg=void 0}function a(n){if("function"!=typeof n)throw TypeError("Not a function");if(0!==this.__NPO__)throw TypeError("Not a promise");this.__NPO__=1;var o=new u(this);this.then=function(n,r){var i={success:"function"==typeof n?n:!0,failure:"function"==typeof r?r:!1};return i.promise=new this.constructor(function(t,n){if("function"!=typeof t||"function"!=typeof n)throw TypeError("Not a function");i.resolve=t,i.reject=n}),o.chain.push(i),0!==o.state&&t(e,o),i.promise},this["catch"]=function(t){return this.then(void 0,t)};try{n.call(void 0,function(t){r.call(o,t)},function(t){i.call(o,t)})}catch(c){i.call(o,c)}}var s,h,l,p=Object.prototype.toString,y="undefined"!=typeof setImmediate?function(t){return setImmediate(t)}:setTimeout;try{Object.defineProperty({},"x",{}),s=function(t,n,e,o){return Object.defineProperty(t,n,{value:e,writable:!0,configurable:o!==!1})}}catch(d){s=function(t,n,e){return t[n]=e,t}}l=function(){function t(t,n){this.fn=t,this.self=n,this.next=void 0}var n,e,o;return{add:function(r,i){o=new t(r,i),e?e.next=o:n=o,e=o,o=void 0},drain:function(){var t=n;for(n=e=h=void 0;t;)t.fn.call(t.self),t=t.next}}}();var g=s({},"constructor",a,!1);return a.prototype=g,s(g,"__NPO__",0,!1),s(a,"resolve",function(t){var n=this;return t&&"object"==typeof t&&1===t.__NPO__?t:new n(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");n(t)})}),s(a,"reject",function(t){return new this(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");e(t)})}),s(a,"all",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):0===t.length?n.resolve([]):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");var r=t.length,i=Array(r),f=0;c(n,t,function(t,n){i[t]=n,++f===r&&e(i)},o)})}),s(a,"race",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");c(n,t,function(t,n){e(n)},o)})}),a});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],23:[function(require,module,exports){
-var parser = require('./path-parser')
-var stringifyQuerystring = require('querystring').stringify
-
-module.exports = function(pathStr, parameters) {
-
-	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
-	var allTokens = parsed.allTokens
-	var regex = parsed.regex
-
-	if (parameters) {
-		var path = allTokens.map(function(bit) {
-			if (bit.string) {
-				return bit.string
-			}
-
-			if (!bit.optional && !parameters[bit.name]) {
-				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
-			}
-
-			return parameters[bit.name] ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
-		}).join('')
-
-		if (!regex.test(path)) {
-			throw new Error('Provided arguments do not match the original arguments')
-		}
-
-		return buildPathWithQuerystring(path, parameters, allTokens)
-	} else {
-		return parsed
-	}
-}
-
-function buildPathWithQuerystring(path, parameters, tokenArray) {
-	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
-
-	if (Object.keys(parametersInQuerystring).length === 0) {
-		return path
-	}
-
-	return path + '?' + stringifyQuerystring(parametersInQuerystring)
-}
-
-function getParametersWithoutMatchingToken(parameters, tokenArray) {
-	var tokenHash = tokenArray.reduce(function(memo, bit) {
-		if (!bit.string) {
-			memo[bit.name] = bit
-		}
-		return memo
-	}, {})
-
-	return Object.keys(parameters).filter(function(param) {
-		return !tokenHash[param]
-	}).reduce(function(newParameters, param) {
-		newParameters[param] = parameters[param]
-		return newParameters
-	}, {})
-}
-
-},{"./path-parser":24,"querystring":37}],24:[function(require,module,exports){
-// This file to be replaced with an official implementation maintained by
-// the page.js crew if and when that becomes an option
-
-var pathToRegexp = require('path-to-regexp-with-reversible-keys')
-
-module.exports = function(pathString) {
-	var parseResults = pathToRegexp(pathString)
-
-	// The only reason I'm returning a new object instead of the results of the pathToRegexp
-	// function is so that if the official implementation ends up returning an
-	// allTokens-style array via some other mechanism, I may be able to change this file
-	// without having to change the rest of the module in index.js
-	return {
-		regex: parseResults,
-		allTokens: parseResults.allTokens
-	}
-}
-
-},{"path-to-regexp-with-reversible-keys":25}],25:[function(require,module,exports){
-var isArray = require('isarray');
-
-/**
- * Expose `pathToRegexp`.
- */
-module.exports = pathToRegexp;
-
-/**
- * The main path matching regexp utility.
- *
- * @type {RegExp}
- */
-var PATH_REGEXP = new RegExp([
-  // Match escaped characters that would otherwise appear in future matches.
-  // This allows the user to escape special characters that won't transform.
-  '(\\\\.)',
-  // Match Express-style parameters and un-named parameters with a prefix
-  // and optional suffixes. Matches appear as:
-  //
-  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
-  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
-  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
-  // Match regexp special characters that are always escaped.
-  '([.+*?=^!:${}()[\\]|\\/])'
-].join('|'), 'g');
-
-/**
- * Escape the capturing group by escaping special characters and meaning.
- *
- * @param  {String} group
- * @return {String}
- */
-function escapeGroup (group) {
-  return group.replace(/([=!:$\/()])/g, '\\$1');
-}
-
-/**
- * Attach the keys as a property of the regexp.
- *
- * @param  {RegExp} re
- * @param  {Array}  keys
- * @return {RegExp}
- */
-function attachKeys (re, keys, allTokens) {
-  re.keys = keys;
-  re.allTokens = allTokens;
-  return re;
-}
-
-/**
- * Get the flags for a regexp from the options.
- *
- * @param  {Object} options
- * @return {String}
- */
-function flags (options) {
-  return options.sensitive ? '' : 'i';
-}
-
-/**
- * Pull out keys from a regexp.
- *
- * @param  {RegExp} path
- * @param  {Array}  keys
- * @return {RegExp}
- */
-function regexpToRegexp (path, keys, allTokens) {
-  // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g);
-
-  if (groups) {
-    for (var i = 0; i < groups.length; i++) {
-      keys.push({
-        name:      i,
-        delimiter: null,
-        optional:  false,
-        repeat:    false
-      });
-    }
-  }
-
-  return attachKeys(path, keys, allTokens);
-}
-
-/**
- * Transform an array into a regexp.
- *
- * @param  {Array}  path
- * @param  {Array}  keys
- * @param  {Object} options
- * @return {RegExp}
- */
-function arrayToRegexp (path, keys, options, allTokens) {
-  var parts = [];
-
-  for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options, allTokens).source);
-  }
-
-  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
-  return attachKeys(regexp, keys, allTokens);
-}
-
-/**
- * Replace the specific tags with regexp strings.
- *
- * @param  {String} path
- * @param  {Array}  keys
- * @return {String}
- */
-function replacePath (path, keys, allTokens) {
-  var index = 0;
-  var lastEndIndex = 0
-
-  function addLastToken(lastToken) {
-    if (lastEndIndex === 0 && lastToken[0] !== '/') {
-      lastToken = '/' + lastToken
-    }
-    allTokens.push({
-      string: lastToken
-    });
-  }
-
-
-  function replace (match, escaped, prefix, key, capture, group, suffix, escape, offset) {
-    if (escaped) {
-      return escaped;
-    }
-
-    if (escape) {
-      return '\\' + escape;
-    }
-
-    var repeat   = suffix === '+' || suffix === '*';
-    var optional = suffix === '?' || suffix === '*';
-
-    if (offset > lastEndIndex) {
-      addLastToken(path.substring(lastEndIndex, offset));
-    }
-
-    lastEndIndex = offset + match.length;
-
-    var newKey = {
-      name:      key || index++,
-      delimiter: prefix || '/',
-      optional:  optional,
-      repeat:    repeat
-    }
-
-    keys.push(newKey);
-    allTokens.push(newKey);
-
-    prefix = prefix ? ('\\' + prefix) : '';
-    capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
-
-    if (repeat) {
-      capture = capture + '(?:' + prefix + capture + ')*';
-    }
-
-    if (optional) {
-      return '(?:' + prefix + '(' + capture + '))?';
-    }
-
-    // Basic parameter support.
-    return prefix + '(' + capture + ')';
-  }
-
-  var newPath = path.replace(PATH_REGEXP, replace);
-
-  if (lastEndIndex < path.length) {
-    addLastToken(path.substring(lastEndIndex))
-  }
-
-  return newPath;
-}
-
-/**
- * Normalize the given path string, returning a regular expression.
- *
- * An empty array can be passed in for the keys, which will hold the
- * placeholder key descriptions. For example, using `/user/:id`, `keys` will
- * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
- *
- * @param  {(String|RegExp|Array)} path
- * @param  {Array}                 [keys]
- * @param  {Object}                [options]
- * @return {RegExp}
- */
-function pathToRegexp (path, keys, options, allTokens) {
-  keys = keys || [];
-  allTokens = allTokens || [];
-
-  if (!isArray(keys)) {
-    options = keys;
-    keys = [];
-  } else if (!options) {
-    options = {};
-  }
-
-  if (path instanceof RegExp) {
-    return regexpToRegexp(path, keys, options, allTokens);
-  }
-
-  if (isArray(path)) {
-    return arrayToRegexp(path, keys, options, allTokens);
-  }
-
-  var strict = options.strict;
-  var end = options.end !== false;
-  var route = replacePath(path, keys, allTokens);
-  var endsWithSlash = path.charAt(path.length - 1) === '/';
-
-  // In non-strict mode we allow a slash at the end of match. If the path to
-  // match already ends with a slash, we remove it for consistency. The slash
-  // is valid at the end of a path match, not in the middle. This is important
-  // in non-ending mode, where "/test/" shouldn't match "/test//route".
-  if (!strict) {
-    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
-  }
-
-  if (end) {
-    route += '$';
-  } else {
-    // In non-ending mode, we need the capturing groups to match as much as
-    // possible by using a positive lookahead to the end or next path segment.
-    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
-  }
-
-  return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
-}
-
-},{"isarray":21}],26:[function(require,module,exports){
-module.exports = function denodeify(fn) {
-	return function() {
-		var self = this
-		var args = Array.prototype.slice.call(arguments)
-		return new Promise(function(resolve, reject) {
-			args.push(function(err, res) {
-				if (err) {
-					reject(err)
-				} else {
-					resolve(res)
-				}
-			})
-
-			var res = fn.apply(self, args)
-
-			var isPromise = res
-				&& (typeof res === 'object' || typeof res === 'function')
-				&& typeof res.then === 'function'
-
-			if (isPromise) {
-				resolve(res)
-			}
-		})
-	}
-}
-
-},{}],27:[function(require,module,exports){
-module.exports = extend
-
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        for (var key in source) {
-            if (hasOwnProperty.call(source, key)) {
-                target[key] = source[key]
-            }
-        }
-    }
-
-    return target
-}
-
-},{}],28:[function(require,module,exports){
 // Array.prototype.findIndex - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: <https://github.com/paulmillr/Array.prototype.findIndex>
 (function (globals) {
@@ -1857,7 +1318,7 @@ function extend() {
   }
 }(this));
 
-},{}],29:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (process){
 module.exports = function all(o, cb) {
 	var responded = false
@@ -1923,16 +1384,105 @@ module.exports = function all(o, cb) {
 }
 
 }).call(this,require('_process'))
-},{"_process":30}],30:[function(require,module,exports){
+},{"_process":20}],20:[function(require,module,exports){
 // shim for using process in browser
-
 var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
 var queue = [];
 var draining = false;
 var currentQueue;
 var queueIndex = -1;
 
 function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
     draining = false;
     if (currentQueue.length) {
         queue = currentQueue.concat(queue);
@@ -1948,7 +1498,7 @@ function drainQueue() {
     if (draining) {
         return;
     }
-    var timeout = setTimeout(cleanUpNextTick);
+    var timeout = runTimeout(cleanUpNextTick);
     draining = true;
 
     var len = queue.length;
@@ -1965,7 +1515,7 @@ function drainQueue() {
     }
     currentQueue = null;
     draining = false;
-    clearTimeout(timeout);
+    runClearTimeout(timeout);
 }
 
 process.nextTick = function (fun) {
@@ -1977,7 +1527,7 @@ process.nextTick = function (fun) {
     }
     queue.push(new Item(fun, args));
     if (queue.length === 1 && !draining) {
-        setTimeout(drainQueue, 0);
+        runTimeout(drainQueue);
     }
 };
 
@@ -2016,7 +1566,39 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],31:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
+module.exports = function(obj) {
+	var keys = Object.keys(obj)
+
+	keys.forEach(function(key) {
+		if (!Array.isArray(obj[key])) {
+			throw new Error(key + ' is not an array')
+		}
+	})
+
+	var maxIndex = keys.reduce(function(maxSoFar, key) {
+		var len = obj[key].length
+		return maxSoFar > len ? maxSoFar : len
+	}, 0)
+
+	var output = []
+
+	function getObject(index) {
+		var o = {}
+		keys.forEach(function(key) {
+			o[key] = obj[key][index]
+		})
+		return o
+	}
+
+	for (var i = 0; i < maxIndex; ++i) {
+		output.push(getObject(i))
+	}
+
+	return output
+}
+
+},{}],22:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -2048,7 +1630,7 @@ process.umask = function() { return 0; };
 
 });
 
-},{}],32:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2351,7 +1933,170 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],33:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
+var EventEmitter = require('events').EventEmitter
+
+module.exports = function HashLocation(window) {
+	var emitter = new EventEmitter()
+	var last = ''
+	var needToDecode = getNeedToDecode()
+
+	window.addEventListener('hashchange', function() {
+		if (last !== emitter.get()) {
+			last = emitter.get()
+			emitter.emit('hashchange')
+		}
+	})
+
+	emitter.go = go.bind(null, window)
+	emitter.replace = replace.bind(null, window)
+	emitter.get = get.bind(null, window, needToDecode)
+
+	return emitter
+}
+
+function replace(window, newPath) {
+	window.location.replace(everythingBeforeTheSlash(window.location.href) + '#' + newPath)
+}
+
+function everythingBeforeTheSlash(url) {
+	var hashIndex = url.indexOf('#')
+	return hashIndex === -1 ? url : url.substring(0, hashIndex)
+}
+
+function go(window, newPath) {
+	window.location.hash = newPath
+}
+
+function get(window, needToDecode) {
+	var hash = removeHashFromPath(window.location.hash)
+	return needToDecode ? decodeURI(hash) : hash
+}
+
+function removeHashFromPath(path) {
+	return (path && path[0] === '#') ? path.substr(1) : path
+}
+
+function getNeedToDecode() {
+	var a = document.createElement('a')
+	a.href = '#x x'
+	return !/x x/.test(a.hash)
+}
+
+},{"events":23}],25:[function(require,module,exports){
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+var qs = require('querystring')
+var xtend = require('xtend')
+var browserHashLocation = require('./hash-location.js')
+require('array.prototype.find')
+
+module.exports = function Router(opts, hashLocation) {
+	if (isHashLocation(opts)) {
+		hashLocation = opts
+		opts = null
+	}
+
+	opts = opts || {}
+
+	if (!hashLocation) {
+		hashLocation = browserHashLocation(window)
+	}
+
+	var routes = []
+
+	var onHashChange = evaluateCurrentPath.bind(null, routes, hashLocation, !!opts.reverse)
+
+	hashLocation.on('hashchange', onHashChange)
+
+	function stop() {
+		hashLocation.removeListener('hashchange', onHashChange)
+	}
+
+	return {
+		add: add.bind(null, routes),
+		stop: stop,
+		evaluateCurrent: evaluateCurrentPathOrGoToDefault.bind(null, routes, hashLocation, !!opts.reverse),
+		setDefault: setDefault.bind(null, routes),
+		replace: hashLocation.replace,
+		go: hashLocation.go,
+		location: hashLocation
+	}
+}
+
+function evaluateCurrentPath(routes, hashLocation, reverse) {
+	evaluatePath(routes, hashLocation.get(), reverse)
+}
+
+function getPathParts(path) {
+	var chunks = path.split('?')
+	return {
+		path: chunks.shift(),
+		queryString: qs.parse(chunks.join(''))
+	}
+}
+
+function evaluatePath(routes, path, reverse) {
+	var pathParts = getPathParts(path)
+	path = pathParts.path
+	var queryStringParameters = pathParts.queryString
+
+	var matchingRoute = (reverse ? reverseArray(routes) : routes).find("".match, path)
+
+	if (matchingRoute) {
+		var regexResult = matchingRoute.exec(path)
+		var routeParameters = makeParametersObjectFromRegexResult(matchingRoute.keys, regexResult)
+		var params = xtend(queryStringParameters, routeParameters)
+		matchingRoute.fn(params)
+	} else if (routes.defaultFn) {
+		routes.defaultFn(path, queryStringParameters)
+	}
+}
+
+function reverseArray(ary) {
+	return ary.slice().reverse()
+}
+
+function makeParametersObjectFromRegexResult(keys, regexResult) {
+	return keys.reduce(function(memo, urlKey, index) {
+		memo[urlKey.name] = regexResult[index + 1]
+		return memo
+	}, {})
+}
+
+function add(routes, routeString, routeFunction) {
+	if (typeof routeFunction !== 'function') {
+		throw new Error('The router add function must be passed a callback function')
+	}
+	var newRoute = pathToRegexp(routeString)
+	newRoute.fn = routeFunction
+	routes.push(newRoute)
+}
+
+function evaluateCurrentPathOrGoToDefault(routes, hashLocation, reverse, defaultPath) {
+	if (hashLocation.get()) {
+		var routesCopy = routes.slice()
+		routesCopy.defaultFn = function() {
+			hashLocation.go(defaultPath)
+		}
+		evaluateCurrentPath(routesCopy, hashLocation, reverse)
+	} else {
+		hashLocation.go(defaultPath)
+	}
+}
+
+function setDefault(routes, defaultFn) {
+	routes.defaultFn = defaultFn
+}
+
+function isHashLocation(hashLocation) {
+	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
+}
+},{"./hash-location.js":24,"array.prototype.find":17,"path-to-regexp-with-reversible-keys":32,"querystring":35,"xtend":38}],26:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],27:[function(require,module,exports){
 'use strict';
 var ko = require('knockout');
 
@@ -2535,10 +2280,10 @@ module.exports = function KnockoutStateRenderer(options) {
   };
 };
 
-},{"knockout":34}],34:[function(require,module,exports){
+},{"knockout":28}],28:[function(require,module,exports){
 /*!
- * Knockout JavaScript library v3.4.0
- * (c) Steven Sanderson - http://knockoutjs.com/
+ * Knockout JavaScript library v3.4.1
+ * (c) The Knockout.js team - http://knockoutjs.com/
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
@@ -2583,7 +2328,7 @@ ko.exportSymbol = function(koPath, object) {
 ko.exportProperty = function(owner, publicName, object) {
     owner[publicName] = object;
 };
-ko.version = "3.4.0";
+ko.version = "3.4.1";
 
 ko.exportSymbol('version', ko.version);
 // For any options that may affect various areas of Knockout and aren't directly associated with data binding.
@@ -4245,6 +3990,7 @@ ko.extenders['trackArrayChanges'] = function(target, options) {
         cachedDiff = null,
         arrayChangeSubscription,
         pendingNotifications = 0,
+        underlyingNotifySubscribersFunction,
         underlyingBeforeSubscriptionAddFunction = target.beforeSubscriptionAdd,
         underlyingAfterSubscriptionRemoveFunction = target.afterSubscriptionRemove;
 
@@ -4261,6 +4007,10 @@ ko.extenders['trackArrayChanges'] = function(target, options) {
         if (underlyingAfterSubscriptionRemoveFunction)
             underlyingAfterSubscriptionRemoveFunction.call(target, event);
         if (event === arrayChangeEventName && !target.hasSubscriptionsForEvent(arrayChangeEventName)) {
+            if (underlyingNotifySubscribersFunction) {
+                target['notifySubscribers'] = underlyingNotifySubscribersFunction;
+                underlyingNotifySubscribersFunction = undefined;
+            }
             arrayChangeSubscription.dispose();
             trackingChanges = false;
         }
@@ -4275,7 +4025,7 @@ ko.extenders['trackArrayChanges'] = function(target, options) {
         trackingChanges = true;
 
         // Intercept "notifySubscribers" to track how many times it was called.
-        var underlyingNotifySubscribersFunction = target['notifySubscribers'];
+        underlyingNotifySubscribersFunction = target['notifySubscribers'];
         target['notifySubscribers'] = function(valueToNotify, event) {
             if (!event || event === defaultEvent) {
                 ++pendingNotifications;
@@ -4585,7 +4335,8 @@ var computedFn = {
     evaluateImmediate: function (notifyChange) {
         var computedObservable = this,
             state = computedObservable[computedState],
-            disposeWhen = state.disposeWhen;
+            disposeWhen = state.disposeWhen,
+            changed = false;
 
         if (state.isBeingEvaluated) {
             // If the evaluation of a ko.computed causes side effects, it's possible that it will trigger its own re-evaluation.
@@ -4613,7 +4364,7 @@ var computedFn = {
 
         state.isBeingEvaluated = true;
         try {
-            this.evaluateImmediate_CallReadWithDependencyDetection(notifyChange);
+            changed = this.evaluateImmediate_CallReadWithDependencyDetection(notifyChange);
         } finally {
             state.isBeingEvaluated = false;
         }
@@ -4621,6 +4372,8 @@ var computedFn = {
         if (!state.dependenciesCount) {
             computedObservable.dispose();
         }
+
+        return changed;
     },
     evaluateImmediate_CallReadWithDependencyDetection: function (notifyChange) {
         // This function is really just part of the evaluateImmediate logic. You would never call it from anywhere else.
@@ -4628,7 +4381,8 @@ var computedFn = {
         // which contributes to saving about 40% off the CPU overhead of computed evaluation (on V8 at least).
 
         var computedObservable = this,
-            state = computedObservable[computedState];
+            state = computedObservable[computedState],
+            changed = false;
 
         // Initially, we assume that none of the subscriptions are still being used (i.e., all are candidates for disposal).
         // Then, during evaluation, we cross off any that are in fact still being used.
@@ -4657,17 +4411,22 @@ var computedFn = {
             }
 
             state.latestValue = newValue;
+            if (DEBUG) computedObservable._latestValue = newValue;
 
             if (state.isSleeping) {
                 computedObservable.updateVersion();
             } else if (notifyChange) {
                 computedObservable["notifySubscribers"](state.latestValue);
             }
+
+            changed = true;
         }
 
         if (isInitial) {
             computedObservable["notifySubscribers"](state.latestValue, "awake");
         }
+
+        return changed;
     },
     evaluateImmediate_CallReadThenEndDependencyDetection: function (state, dependencyDetectionContext) {
         // This function is really part of the evaluateImmediate_CallReadWithDependencyDetection logic.
@@ -4741,7 +4500,9 @@ var pureComputedOverrides = {
                 state.dependencyTracking = null;
                 state.dependenciesCount = 0;
                 state.isStale = true;
-                computedObservable.evaluateImmediate();
+                if (computedObservable.evaluateImmediate()) {
+                    computedObservable.updateVersion();
+                }
             } else {
                 // First put the dependencies in order
                 var dependeciesOrder = [];
@@ -5498,7 +5259,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
 
     // The ko.bindingContext constructor is only called directly to create the root context. For child
     // contexts, use bindingContext.createChildContext or bindingContext.extend.
-    ko.bindingContext = function(dataItemOrAccessor, parentContext, dataItemAlias, extendCallback) {
+    ko.bindingContext = function(dataItemOrAccessor, parentContext, dataItemAlias, extendCallback, options) {
 
         // The binding context object includes static properties for the current, parent, and root view models.
         // If a view model is actually stored in an observable, the corresponding binding context object, and
@@ -5521,10 +5282,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
                 ko.utils.extend(self, parentContext);
 
                 // Because the above copy overwrites our own properties, we need to reset them.
-                // During the first execution, "subscribable" isn't set, so don't bother doing the update then.
-                if (subscribable) {
-                    self._subscribable = subscribable;
-                }
+                self._subscribable = subscribable;
             } else {
                 self['$parents'] = [];
                 self['$root'] = dataItem;
@@ -5554,35 +5312,43 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
         var self = this,
             isFunc = typeof(dataItemOrAccessor) == "function" && !ko.isObservable(dataItemOrAccessor),
             nodes,
+            subscribable;
+
+        if (options && options['exportDependencies']) {
+            // The "exportDependencies" option means that the calling code will track any dependencies and re-create
+            // the binding context when they change.
+            updateContext();
+        } else {
             subscribable = ko.dependentObservable(updateContext, null, { disposeWhen: disposeWhen, disposeWhenNodeIsRemoved: true });
 
-        // At this point, the binding context has been initialized, and the "subscribable" computed observable is
-        // subscribed to any observables that were accessed in the process. If there is nothing to track, the
-        // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
-        // the context object.
-        if (subscribable.isActive()) {
-            self._subscribable = subscribable;
+            // At this point, the binding context has been initialized, and the "subscribable" computed observable is
+            // subscribed to any observables that were accessed in the process. If there is nothing to track, the
+            // computed will be inactive, and we can safely throw it away. If it's active, the computed is stored in
+            // the context object.
+            if (subscribable.isActive()) {
+                self._subscribable = subscribable;
 
-            // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
-            subscribable['equalityComparer'] = null;
+                // Always notify because even if the model ($data) hasn't changed, other context properties might have changed
+                subscribable['equalityComparer'] = null;
 
-            // We need to be able to dispose of this computed observable when it's no longer needed. This would be
-            // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
-            // we cannot assume that those nodes have any relation to each other. So instead we track any node that
-            // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
+                // We need to be able to dispose of this computed observable when it's no longer needed. This would be
+                // easy if we had a single node to watch, but binding contexts can be used by many different nodes, and
+                // we cannot assume that those nodes have any relation to each other. So instead we track any node that
+                // the context is attached to, and dispose the computed when all of those nodes have been cleaned.
 
-            // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
-            nodes = [];
-            subscribable._addNode = function(node) {
-                nodes.push(node);
-                ko.utils.domNodeDisposal.addDisposeCallback(node, function(node) {
-                    ko.utils.arrayRemoveItem(nodes, node);
-                    if (!nodes.length) {
-                        subscribable.dispose();
-                        self._subscribable = subscribable = undefined;
-                    }
-                });
-            };
+                // Add properties to *subscribable* instead of *self* because any properties added to *self* may be overwritten on updates
+                nodes = [];
+                subscribable._addNode = function(node) {
+                    nodes.push(node);
+                    ko.utils.domNodeDisposal.addDisposeCallback(node, function(node) {
+                        ko.utils.arrayRemoveItem(nodes, node);
+                        if (!nodes.length) {
+                            subscribable.dispose();
+                            self._subscribable = subscribable = undefined;
+                        }
+                    });
+                };
+            }
         }
     }
 
@@ -5591,7 +5357,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
     // But this does not mean that the $data value of the child context will also get updated. If the child
     // view model also depends on the parent view model, you must provide a function that returns the correct
     // view model on each update.
-    ko.bindingContext.prototype['createChildContext'] = function (dataItemOrAccessor, dataItemAlias, extendCallback) {
+    ko.bindingContext.prototype['createChildContext'] = function (dataItemOrAccessor, dataItemAlias, extendCallback, options) {
         return new ko.bindingContext(dataItemOrAccessor, this, dataItemAlias, function(self, parentContext) {
             // Extend the context hierarchy by setting the appropriate pointers
             self['$parentContext'] = parentContext;
@@ -5600,7 +5366,7 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
             self['$parents'].unshift(self['$parent']);
             if (extendCallback)
                 extendCallback(self);
-        });
+        }, options);
     };
 
     // Extend the binding context with new custom properties. This doesn't change the context hierarchy.
@@ -5615,6 +5381,10 @@ ko.exportSymbol('bindingProvider', ko.bindingProvider);
             self['$rawData'] = parentContext['$rawData'];
             ko.utils.extend(self, typeof(properties) == "function" ? properties() : properties);
         });
+    };
+
+    ko.bindingContext.prototype.createStaticChildContext = function (dataItemOrAccessor, dataItemAlias) {
+        return this['createChildContext'](dataItemOrAccessor, dataItemAlias, null, { "exportDependencies": true });
     };
 
     // Returns the valueAccesor function for a binding value
@@ -6861,7 +6631,8 @@ function makeWithIfBinding(bindingKey, isWith, isNot, makeContextCallback) {
             var didDisplayOnLastUpdate,
                 savedNodes;
             ko.computed(function() {
-                var dataValue = ko.utils.unwrapObservable(valueAccessor()),
+                var rawValue = valueAccessor(),
+                    dataValue = ko.utils.unwrapObservable(rawValue),
                     shouldDisplay = !isNot !== !dataValue, // equivalent to isNot ? !dataValue : !!dataValue
                     isFirstRender = !savedNodes,
                     needsRefresh = isFirstRender || isWith || (shouldDisplay !== didDisplayOnLastUpdate);
@@ -6876,7 +6647,7 @@ function makeWithIfBinding(bindingKey, isWith, isNot, makeContextCallback) {
                         if (!isFirstRender) {
                             ko.virtualElements.setDomNodeChildren(element, ko.utils.cloneNodes(savedNodes));
                         }
-                        ko.applyBindingsToDescendants(makeContextCallback ? makeContextCallback(bindingContext, dataValue) : bindingContext, element);
+                        ko.applyBindingsToDescendants(makeContextCallback ? makeContextCallback(bindingContext, rawValue) : bindingContext, element);
                     } else {
                         ko.virtualElements.emptyNode(element);
                     }
@@ -6896,7 +6667,7 @@ makeWithIfBinding('if');
 makeWithIfBinding('ifnot', false /* isWith */, true /* isNot */);
 makeWithIfBinding('with', true /* isWith */, false /* isNot */,
     function(bindingContext, dataValue) {
-        return bindingContext['createChildContext'](dataValue);
+        return bindingContext.createStaticChildContext(dataValue);
     }
 );
 var captionPlaceholder = {};
@@ -7857,7 +7628,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
                     // Ensure we've got a proper binding context to work with
                     var bindingContext = (dataOrBindingContext && (dataOrBindingContext instanceof ko.bindingContext))
                         ? dataOrBindingContext
-                        : new ko.bindingContext(ko.utils.unwrapObservable(dataOrBindingContext));
+                        : new ko.bindingContext(dataOrBindingContext, null, null, null, { "exportDependencies": true });
 
                     var templateName = resolveTemplateName(template, bindingContext['$data'], bindingContext),
                         renderedNodesArray = executeTemplate(targetNodeOrNodeArray, renderMode, templateName, bindingContext, options);
@@ -7958,7 +7729,6 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
         },
         'update': function (element, valueAccessor, allBindings, viewModel, bindingContext) {
             var value = valueAccessor(),
-                dataValue,
                 options = ko.utils.unwrapObservable(value),
                 shouldDisplay = true,
                 templateComputed = null,
@@ -7975,8 +7745,6 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
                     shouldDisplay = ko.utils.unwrapObservable(options['if']);
                 if (shouldDisplay && 'ifnot' in options)
                     shouldDisplay = !ko.utils.unwrapObservable(options['ifnot']);
-
-                dataValue = ko.utils.unwrapObservable(options['data']);
             }
 
             if ('foreach' in options) {
@@ -7988,7 +7756,7 @@ ko.exportSymbol('__tr_ambtns', ko.templateRewriting.applyMemoizedBindingsToNextS
             } else {
                 // Render once for this single data point (or use the viewModel if no data was provided)
                 var innerBindingContext = ('data' in options) ?
-                    bindingContext['createChildContext'](dataValue, options['as']) :  // Given an explitit 'data' value, we create a child binding context for it
+                    bindingContext.createStaticChildContext(options['data'], options['as']) :  // Given an explitit 'data' value, we create a child binding context for it
                     bindingContext;                                                        // Given no explicit 'data' value, we retain the same binding context
                 templateComputed = ko.renderTemplate(templateName || element, innerBindingContext, options, element);
             }
@@ -8408,7 +8176,327 @@ ko.exportSymbol('nativeTemplateEngine', ko.nativeTemplateEngine);
 }());
 })();
 
-},{}],35:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
+(function (global){
+/*! Native Promise Only
+    v0.8.1 (c) Kyle Simpson
+    MIT License: http://getify.mit-license.org
+*/
+!function(t,n,e){n[t]=n[t]||e(),"undefined"!=typeof module&&module.exports?module.exports=n[t]:"function"==typeof define&&define.amd&&define(function(){return n[t]})}("Promise","undefined"!=typeof global?global:this,function(){"use strict";function t(t,n){l.add(t,n),h||(h=y(l.drain))}function n(t){var n,e=typeof t;return null==t||"object"!=e&&"function"!=e||(n=t.then),"function"==typeof n?n:!1}function e(){for(var t=0;t<this.chain.length;t++)o(this,1===this.state?this.chain[t].success:this.chain[t].failure,this.chain[t]);this.chain.length=0}function o(t,e,o){var r,i;try{e===!1?o.reject(t.msg):(r=e===!0?t.msg:e.call(void 0,t.msg),r===o.promise?o.reject(TypeError("Promise-chain cycle")):(i=n(r))?i.call(r,o.resolve,o.reject):o.resolve(r))}catch(c){o.reject(c)}}function r(o){var c,u=this;if(!u.triggered){u.triggered=!0,u.def&&(u=u.def);try{(c=n(o))?t(function(){var t=new f(u);try{c.call(o,function(){r.apply(t,arguments)},function(){i.apply(t,arguments)})}catch(n){i.call(t,n)}}):(u.msg=o,u.state=1,u.chain.length>0&&t(e,u))}catch(a){i.call(new f(u),a)}}}function i(n){var o=this;o.triggered||(o.triggered=!0,o.def&&(o=o.def),o.msg=n,o.state=2,o.chain.length>0&&t(e,o))}function c(t,n,e,o){for(var r=0;r<n.length;r++)!function(r){t.resolve(n[r]).then(function(t){e(r,t)},o)}(r)}function f(t){this.def=t,this.triggered=!1}function u(t){this.promise=t,this.state=0,this.triggered=!1,this.chain=[],this.msg=void 0}function a(n){if("function"!=typeof n)throw TypeError("Not a function");if(0!==this.__NPO__)throw TypeError("Not a promise");this.__NPO__=1;var o=new u(this);this.then=function(n,r){var i={success:"function"==typeof n?n:!0,failure:"function"==typeof r?r:!1};return i.promise=new this.constructor(function(t,n){if("function"!=typeof t||"function"!=typeof n)throw TypeError("Not a function");i.resolve=t,i.reject=n}),o.chain.push(i),0!==o.state&&t(e,o),i.promise},this["catch"]=function(t){return this.then(void 0,t)};try{n.call(void 0,function(t){r.call(o,t)},function(t){i.call(o,t)})}catch(c){i.call(o,c)}}var s,h,l,p=Object.prototype.toString,y="undefined"!=typeof setImmediate?function(t){return setImmediate(t)}:setTimeout;try{Object.defineProperty({},"x",{}),s=function(t,n,e,o){return Object.defineProperty(t,n,{value:e,writable:!0,configurable:o!==!1})}}catch(d){s=function(t,n,e){return t[n]=e,t}}l=function(){function t(t,n){this.fn=t,this.self=n,this.next=void 0}var n,e,o;return{add:function(r,i){o=new t(r,i),e?e.next=o:n=o,e=o,o=void 0},drain:function(){var t=n;for(n=e=h=void 0;t;)t.fn.call(t.self),t=t.next}}}();var g=s({},"constructor",a,!1);return a.prototype=g,s(g,"__NPO__",0,!1),s(a,"resolve",function(t){var n=this;return t&&"object"==typeof t&&1===t.__NPO__?t:new n(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");n(t)})}),s(a,"reject",function(t){return new this(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");e(t)})}),s(a,"all",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):0===t.length?n.resolve([]):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");var r=t.length,i=Array(r),f=0;c(n,t,function(t,n){i[t]=n,++f===r&&e(i)},o)})}),s(a,"race",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");c(n,t,function(t,n){e(n)},o)})}),a});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],30:[function(require,module,exports){
+var parser = require('./path-parser')
+var stringifyQuerystring = require('querystring').stringify
+
+module.exports = function(pathStr, parameters) {
+
+	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
+	var allTokens = parsed.allTokens
+	var regex = parsed.regex
+
+	if (parameters) {
+		var path = allTokens.map(function(bit) {
+			if (bit.string) {
+				return bit.string
+			}
+
+			var defined = typeof parameters[bit.name] !== 'undefined'
+			if (!bit.optional && !defined) {
+				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
+			}
+
+			return defined ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
+		}).join('')
+
+		if (!regex.test(path)) {
+			throw new Error('Provided arguments do not match the original arguments')
+		}
+
+		return buildPathWithQuerystring(path, parameters, allTokens)
+	} else {
+		return parsed
+	}
+}
+
+function buildPathWithQuerystring(path, parameters, tokenArray) {
+	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
+
+	if (Object.keys(parametersInQuerystring).length === 0) {
+		return path
+	}
+
+	return path + '?' + stringifyQuerystring(parametersInQuerystring)
+}
+
+function getParametersWithoutMatchingToken(parameters, tokenArray) {
+	var tokenHash = tokenArray.reduce(function(memo, bit) {
+		if (!bit.string) {
+			memo[bit.name] = bit
+		}
+		return memo
+	}, {})
+
+	return Object.keys(parameters).filter(function(param) {
+		return !tokenHash[param]
+	}).reduce(function(newParameters, param) {
+		newParameters[param] = parameters[param]
+		return newParameters
+	}, {})
+}
+
+},{"./path-parser":31,"querystring":35}],31:[function(require,module,exports){
+// This file to be replaced with an official implementation maintained by
+// the page.js crew if and when that becomes an option
+
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+
+module.exports = function(pathString) {
+	var parseResults = pathToRegexp(pathString)
+
+	// The only reason I'm returning a new object instead of the results of the pathToRegexp
+	// function is so that if the official implementation ends up returning an
+	// allTokens-style array via some other mechanism, I may be able to change this file
+	// without having to change the rest of the module in index.js
+	return {
+		regex: parseResults,
+		allTokens: parseResults.allTokens
+	}
+}
+
+},{"path-to-regexp-with-reversible-keys":32}],32:[function(require,module,exports){
+var isArray = require('isarray');
+
+/**
+ * Expose `pathToRegexp`.
+ */
+module.exports = pathToRegexp;
+
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
+  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
+  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
+  // Match regexp special characters that are always escaped.
+  '([.+*?=^!:${}()[\\]|\\/])'
+].join('|'), 'g');
+
+/**
+ * Escape the capturing group by escaping special characters and meaning.
+ *
+ * @param  {String} group
+ * @return {String}
+ */
+function escapeGroup (group) {
+  return group.replace(/([=!:$\/()])/g, '\\$1');
+}
+
+/**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {RegExp} re
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function attachKeys (re, keys, allTokens) {
+  re.keys = keys;
+  re.allTokens = allTokens;
+  return re;
+}
+
+/**
+ * Get the flags for a regexp from the options.
+ *
+ * @param  {Object} options
+ * @return {String}
+ */
+function flags (options) {
+  return options.sensitive ? '' : 'i';
+}
+
+/**
+ * Pull out keys from a regexp.
+ *
+ * @param  {RegExp} path
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function regexpToRegexp (path, keys, allTokens) {
+  // Use a negative lookahead to match only capturing groups.
+  var groups = path.source.match(/\((?!\?)/g);
+
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      keys.push({
+        name:      i,
+        delimiter: null,
+        optional:  false,
+        repeat:    false
+      });
+    }
+  }
+
+  return attachKeys(path, keys, allTokens);
+}
+
+/**
+ * Transform an array into a regexp.
+ *
+ * @param  {Array}  path
+ * @param  {Array}  keys
+ * @param  {Object} options
+ * @return {RegExp}
+ */
+function arrayToRegexp (path, keys, options, allTokens) {
+  var parts = [];
+
+  for (var i = 0; i < path.length; i++) {
+    parts.push(pathToRegexp(path[i], keys, options, allTokens).source);
+  }
+
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
+  return attachKeys(regexp, keys, allTokens);
+}
+
+/**
+ * Replace the specific tags with regexp strings.
+ *
+ * @param  {String} path
+ * @param  {Array}  keys
+ * @return {String}
+ */
+function replacePath (path, keys, allTokens) {
+  var index = 0;
+  var lastEndIndex = 0
+
+  function addLastToken(lastToken) {
+    if (lastEndIndex === 0 && lastToken[0] !== '/') {
+      lastToken = '/' + lastToken
+    }
+    allTokens.push({
+      string: lastToken
+    });
+  }
+
+
+  function replace (match, escaped, prefix, key, capture, group, suffix, escape, offset) {
+    if (escaped) {
+      return escaped;
+    }
+
+    if (escape) {
+      return '\\' + escape;
+    }
+
+    var repeat   = suffix === '+' || suffix === '*';
+    var optional = suffix === '?' || suffix === '*';
+
+    if (offset > lastEndIndex) {
+      addLastToken(path.substring(lastEndIndex, offset));
+    }
+
+    lastEndIndex = offset + match.length;
+
+    var newKey = {
+      name:      key || index++,
+      delimiter: prefix || '/',
+      optional:  optional,
+      repeat:    repeat
+    }
+
+    keys.push(newKey);
+    allTokens.push(newKey);
+
+    prefix = prefix ? ('\\' + prefix) : '';
+    capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
+
+    if (repeat) {
+      capture = capture + '(?:' + prefix + capture + ')*';
+    }
+
+    if (optional) {
+      return '(?:' + prefix + '(' + capture + '))?';
+    }
+
+    // Basic parameter support.
+    return prefix + '(' + capture + ')';
+  }
+
+  var newPath = path.replace(PATH_REGEXP, replace);
+
+  if (lastEndIndex < path.length) {
+    addLastToken(path.substring(lastEndIndex))
+  }
+
+  return newPath;
+}
+
+/**
+ * Normalize the given path string, returning a regular expression.
+ *
+ * An empty array can be passed in for the keys, which will hold the
+ * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+ * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+ *
+ * @param  {(String|RegExp|Array)} path
+ * @param  {Array}                 [keys]
+ * @param  {Object}                [options]
+ * @return {RegExp}
+ */
+function pathToRegexp (path, keys, options, allTokens) {
+  keys = keys || [];
+  allTokens = allTokens || [];
+
+  if (!isArray(keys)) {
+    options = keys;
+    keys = [];
+  } else if (!options) {
+    options = {};
+  }
+
+  if (path instanceof RegExp) {
+    return regexpToRegexp(path, keys, options, allTokens);
+  }
+
+  if (isArray(path)) {
+    return arrayToRegexp(path, keys, options, allTokens);
+  }
+
+  var strict = options.strict;
+  var end = options.end !== false;
+  var route = replacePath(path, keys, allTokens);
+  var endsWithSlash = path.charAt(path.length - 1) === '/';
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
+  }
+
+  if (end) {
+    route += '$';
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
+  }
+
+  return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
+}
+
+},{"isarray":26}],33:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8494,7 +8582,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],36:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -8581,13 +8669,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],37:[function(require,module,exports){
+},{}],35:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":35,"./encode":36}],38:[function(require,module,exports){
+},{"./decode":33,"./encode":34}],36:[function(require,module,exports){
 /**
  *
  * This function was taken from a stackoverflow answer:
@@ -8609,5 +8697,53 @@ module.exports = function() {
         return (c=='x' ? r : (r&0x3|0x8)).toString(16);
     });
 };
+
+},{}],37:[function(require,module,exports){
+module.exports = function denodeify(fn) {
+	return function() {
+		var self = this
+		var args = Array.prototype.slice.call(arguments)
+		return new Promise(function(resolve, reject) {
+			args.push(function(err, res) {
+				if (err) {
+					reject(err)
+				} else {
+					resolve(res)
+				}
+			})
+
+			var res = fn.apply(self, args)
+
+			var isPromise = res
+				&& (typeof res === 'object' || typeof res === 'function')
+				&& typeof res.then === 'function'
+
+			if (isPromise) {
+				resolve(res)
+			}
+		})
+	}
+}
+
+},{}],38:[function(require,module,exports){
+module.exports = extend
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (hasOwnProperty.call(source, key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
 
 },{}]},{},[5]);
