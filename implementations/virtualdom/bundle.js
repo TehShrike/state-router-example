@@ -180,7 +180,7 @@ function initializeDummyData() {
 
 
 }).call(this,require('_process'))
-},{"_process":30,"events":34,"random-uuid-v4":49}],2:[function(require,module,exports){
+},{"_process":41,"events":44,"random-uuid-v4":52}],2:[function(require,module,exports){
 module.exports = function (h, context) {
 	return h("div.container", [
 		h("div.row", [
@@ -279,7 +279,7 @@ module.exports = function(stateRouter) {
 	topicsState(stateRouter)
 }
 
-},{"./about/about":3,"./app-template.js":4,"./topics/topics":11,"array.prototype.findindex":24,"model.js":1}],6:[function(require,module,exports){
+},{"./about/about":3,"./app-template.js":4,"./topics/topics":11,"array.prototype.findindex":35,"model.js":1}],6:[function(require,module,exports){
 module.exports = function (h) {
 	return h('div',
 		h("p", "This is a very basic todo app\tto show off route states."),
@@ -421,7 +421,7 @@ module.exports = function(stateRouter) {
 	})
 }
 
-},{"./no-task-selected-template":6,"./tasks-template":7,"async-all":25,"model.js":1}],9:[function(require,module,exports){
+},{"./no-task-selected-template":6,"./tasks-template":7,"async-all":36,"model.js":1}],9:[function(require,module,exports){
 var model = require('model.js')
 var each = require('async-each')
 
@@ -478,7 +478,7 @@ function activate(stateRouter, context) {
 
 module.exports = activate
 
-},{"async-each":26,"model.js":1}],10:[function(require,module,exports){
+},{"async-each":37,"model.js":1}],10:[function(require,module,exports){
 var addingTopic = false
 
 module.exports = function (h, resolveContext, helpers) {
@@ -589,7 +589,7 @@ domready(function() {
 	stateRouter.evaluateCurrentRoute('login')
 })
 
-},{"./app/app":5,"./login/login":14,"abstract-state-router":15,"domready":32,"virtualdom-state-renderer":77}],13:[function(require,module,exports){
+},{"./app/app":5,"./login/login":14,"abstract-state-router":16,"domready":42,"virtualdom-state-renderer":79}],13:[function(require,module,exports){
 module.exports = function (h, context, helpers) {
 	var model = context.model
 	var stateRouter = context.stateRouter
@@ -669,7 +669,9 @@ module.exports = function(stateRouter) {
 	})
 }
 
-},{"./login-template":13,"fs":29,"model.js":1}],15:[function(require,module,exports){
+},{"./login-template":13,"fs":40,"model.js":1}],15:[function(require,module,exports){
+module.exports={ "reverse": false }
+},{}],16:[function(require,module,exports){
 (function (process){
 var StateState = require('./lib/state-state')
 var StateComparison = require('./lib/state-comparison')
@@ -677,6 +679,7 @@ var CurrentState = require('./lib/current-state')
 var stateChangeLogic = require('./lib/state-change-logic')
 var parse = require('./lib/state-string-parser')
 var StateTransitionManager = require('./lib/state-transition-manager')
+var defaultRouterOptions = require('./default-router-options.json')
 
 var series = require('./lib/promise-map-series')
 var denodeify = require('then-denodeify')
@@ -684,9 +687,10 @@ var denodeify = require('then-denodeify')
 var EventEmitter = require('events').EventEmitter
 var extend = require('xtend')
 var newHashBrownRouter = require('hash-brown-router')
-var Promise = require('native-promise-only/npo')
 var combine = require('combine-arrays')
 var buildPath = require('page-path-builder')
+
+require('native-promise-only/npo')
 
 var expectedPropertiesOfAddState = ['name', 'route', 'defaultChild', 'data', 'template', 'resolve', 'activate', 'querystringParameters', 'defaultQuerystringParameters']
 
@@ -701,8 +705,12 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 	}, stateRouterOptions)
 
 	if (!stateRouterOptions.router) {
-		stateRouterOptions.router = newHashBrownRouter({ reverse: true })
+		stateRouterOptions.router = newHashBrownRouter(defaultRouterOptions)
 	}
+
+	stateRouterOptions.router.setDefault(function(route, parameters) {
+		stateProviderEmitter.emit('routeNotFound', route, parameters)
+	})
 
 	current.set('', {})
 
@@ -726,15 +734,16 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 	}
 
 	function destroyStateName(stateName) {
-		activeEmitters[stateName].emit('destroy')
-		activeEmitters[stateName].removeAllListeners()
-		delete activeEmitters[stateName]
-		delete activeStateResolveContent[stateName]
 		var state = prototypalStateHolder.get(stateName)
 		stateProviderEmitter.emit('beforeDestroyState', {
 			state: state,
 			domApi: activeDomApis[stateName]
 		})
+
+		activeEmitters[stateName].emit('destroy')
+		activeEmitters[stateName].removeAllListeners()
+		delete activeEmitters[stateName]
+		delete activeStateResolveContent[stateName]
 
 		return destroyDom(activeDomApis[stateName]).then(function() {
 			delete activeDomApis[stateName]
@@ -745,9 +754,6 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 	}
 
 	function resetStateName(parameters, stateName) {
-		activeEmitters[stateName].emit('destroy')
-		delete activeEmitters[stateName]
-
 		var domApi = activeDomApis[stateName]
 		var content = getContentObject(activeStateResolveContent, stateName)
 		var state = prototypalStateHolder.get(stateName)
@@ -755,8 +761,12 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 		stateProviderEmitter.emit('beforeResetState', {
 			domApi: domApi,
 			content: content,
-			state: state
+			state: state,
+			parameters: parameters
 		})
+
+		activeEmitters[stateName].emit('destroy')
+		delete activeEmitters[stateName]
 
 		return resetDom({
 			domApi: domApi,
@@ -767,7 +777,8 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 			stateProviderEmitter.emit('afterResetState', {
 				domApi: domApi,
 				content: content,
-				state: state
+				state: state,
+				parameters: parameters
 			})
 		})
 	}
@@ -791,7 +802,8 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 
 			stateProviderEmitter.emit('beforeCreateState', {
 				state: state,
-				content: content
+				content: content,
+				parameters: parameters
 			})
 
 			return renderDom({
@@ -804,7 +816,8 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 				stateProviderEmitter.emit('afterCreateState', {
 					state: state,
 					domApi: domApi,
-					content: content
+					content: content,
+					parameters: parameters
 				})
 				return domApi
 			})
@@ -966,7 +979,11 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 		})
 	}
 
-	function makePath(stateName, parameters) {
+	function makePath(stateName, parameters, options) {
+		if (options && options.inherit) {
+			parameters = extend(current.get().parameters, parameters)
+		}
+
 		prototypalStateHolder.guaranteeAllStatesExist(stateName)
 		var route = prototypalStateHolder.buildFullStateRoute(stateName)
 		return buildPath(route, parameters || {})
@@ -981,7 +998,7 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 		options = extend(defaultOptions, options)
 		var goFunction = options.replace ? stateRouterOptions.router.replace : stateRouterOptions.router.go
 
-		return promiseMe(makePath, newStateName, parameters).then(goFunction, handleError.bind(null, 'stateChangeError'))
+		return promiseMe(makePath, newStateName, parameters, options).then(goFunction, handleError.bind(null, 'stateChangeError'))
 	}
 	stateProviderEmitter.evaluateCurrentRoute = function evaluateCurrentRoute(defaultState, defaultParams) {
 		return promiseMe(makePath, defaultState, defaultParams).then(function(defaultPath) {
@@ -990,8 +1007,8 @@ module.exports = function StateProvider(makeRenderer, rootElement, stateRouterOp
 			handleError('stateError', err)
 		})
 	}
-	stateProviderEmitter.makePath = function makePathAndPrependHash(stateName, parameters) {
-		return stateRouterOptions.pathPrefix + makePath(stateName, parameters)
+	stateProviderEmitter.makePath = function makePathAndPrependHash(stateName, parameters, options) {
+		return stateRouterOptions.pathPrefix + makePath(stateName, parameters, options)
 	}
 	stateProviderEmitter.stateIsActive = function stateIsActive(stateName, opts) {
 		var currentState = current.get()
@@ -1086,7 +1103,7 @@ function promiseMe() {
 }
 
 }).call(this,require('_process'))
-},{"./lib/current-state":16,"./lib/promise-map-series":17,"./lib/state-change-logic":18,"./lib/state-comparison":19,"./lib/state-state":20,"./lib/state-string-parser":21,"./lib/state-transition-manager":22,"_process":30,"combine-arrays":31,"events":34,"hash-brown-router":37,"native-promise-only/npo":42,"page-path-builder":43,"then-denodeify":50,"xtend":79}],16:[function(require,module,exports){
+},{"./default-router-options.json":15,"./lib/current-state":17,"./lib/promise-map-series":18,"./lib/state-change-logic":19,"./lib/state-comparison":20,"./lib/state-state":21,"./lib/state-string-parser":22,"./lib/state-transition-manager":23,"_process":41,"combine-arrays":25,"events":44,"hash-brown-router":27,"native-promise-only/npo":29,"page-path-builder":30,"then-denodeify":33,"xtend":34}],17:[function(require,module,exports){
 module.exports = function CurrentState() {
 	var current = null
 
@@ -1103,7 +1120,7 @@ module.exports = function CurrentState() {
 	}
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // Pulled from https://github.com/joliss/promise-map-series and prettied up a bit
 
 var Promise = require('native-promise-only/npo')
@@ -1121,7 +1138,7 @@ module.exports = function sequence(array, iterator, thisArg) {
 	return Promise.all(results)
 }
 
-},{"native-promise-only/npo":42}],18:[function(require,module,exports){
+},{"native-promise-only/npo":29}],19:[function(require,module,exports){
 module.exports = function stateChangeLogic(stateComparisonResults) {
 	var hitChangingState = false
 	var hitDestroyedState = false
@@ -1152,7 +1169,7 @@ module.exports = function stateChangeLogic(stateComparisonResults) {
 	return output
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var combine = require('combine-arrays')
 var pathToRegexp = require('path-to-regexp-with-reversible-keys')
@@ -1209,7 +1226,7 @@ function stateComparison(parametersChanged, originalState, originalParameters, n
 	})
 }
 
-},{"./state-string-parser":21,"combine-arrays":31,"path-to-regexp-with-reversible-keys":45}],20:[function(require,module,exports){
+},{"./state-string-parser":22,"combine-arrays":25,"path-to-regexp-with-reversible-keys":32}],21:[function(require,module,exports){
 var stateStringParser = require('./state-string-parser')
 var parse = require('./state-string-parser')
 
@@ -1299,7 +1316,7 @@ module.exports = function StateState() {
 	}
 }
 
-},{"./state-string-parser":21}],21:[function(require,module,exports){
+},{"./state-string-parser":22}],22:[function(require,module,exports){
 module.exports = function(stateString) {
 	return stateString.split('.').reduce(function(stateNames, latestNameChunk) {
 		if (stateNames.length) {
@@ -1310,7 +1327,7 @@ module.exports = function(stateString) {
 	}, [])
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 module.exports = function (emitter) {
 	var currentTransitionAttempt = null
 	var nextTransition = null
@@ -1365,7 +1382,7 @@ module.exports = function (emitter) {
 	}
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // Array.prototype.find - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: https://github.com/paulmillr/array.prototype.find
 // Fixes and tests supplied by Duncan Hall <http://duncanhall.net> 
@@ -1400,7 +1417,561 @@ module.exports = function (emitter) {
   }
 })(this);
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
+module.exports = function(obj) {
+	var keys = Object.keys(obj)
+
+	keys.forEach(function(key) {
+		if (!Array.isArray(obj[key])) {
+			throw new Error(key + ' is not an array')
+		}
+	})
+
+	var maxIndex = keys.reduce(function(maxSoFar, key) {
+		var len = obj[key].length
+		return maxSoFar > len ? maxSoFar : len
+	}, 0)
+
+	var output = []
+
+	function getObject(index) {
+		var o = {}
+		keys.forEach(function(key) {
+			o[key] = obj[key][index]
+		})
+		return o
+	}
+
+	for (var i = 0; i < maxIndex; ++i) {
+		output.push(getObject(i))
+	}
+
+	return output
+}
+
+},{}],26:[function(require,module,exports){
+var EventEmitter = require('events').EventEmitter
+
+module.exports = function HashLocation(window) {
+	var emitter = new EventEmitter()
+	var last = ''
+
+	window.addEventListener('hashchange', function() {
+		if (last !== emitter.get()) {
+			last = emitter.get()
+			emitter.emit('hashchange')
+		}
+	})
+
+	emitter.go = go.bind(null, window)
+	emitter.replace = replace.bind(null, window)
+	emitter.get = get.bind(null, window)
+
+	return emitter
+}
+
+function replace(window, newPath) {
+	window.location.replace(everythingBeforeTheSlash(window.location.href) + '#' + newPath)
+}
+
+function everythingBeforeTheSlash(url) {
+	var hashIndex = url.indexOf('#')
+	return hashIndex === -1 ? url : url.substring(0, hashIndex)
+}
+
+function go(window, newPath) {
+	window.location.hash = newPath
+}
+
+function get(window) {
+	return removeHashFromPath(window.location.hash)
+}
+
+function removeHashFromPath(path) {
+	return (path && path[0] === '#') ? path.substr(1) : path
+}
+
+},{"events":44}],27:[function(require,module,exports){
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+var qs = require('querystring')
+var xtend = require('xtend')
+var browserHashLocation = require('./hash-location.js')
+require('array.prototype.find')
+
+module.exports = function Router(opts, hashLocation) {
+	if (isHashLocation(opts)) {
+		hashLocation = opts
+		opts = null
+	}
+
+	opts = opts || {}
+
+	if (!hashLocation) {
+		hashLocation = browserHashLocation(window)
+	}
+
+	var routes = []
+
+	var onHashChange = evaluateCurrentPath.bind(null, routes, hashLocation, !!opts.reverse)
+
+	hashLocation.on('hashchange', onHashChange)
+
+	function stop() {
+		hashLocation.removeListener('hashchange', onHashChange)
+	}
+
+	return {
+		add: add.bind(null, routes),
+		stop: stop,
+		evaluateCurrent: evaluateCurrentPathOrGoToDefault.bind(null, routes, hashLocation),
+		setDefault: setDefault.bind(null, routes),
+		replace: hashLocation.replace,
+		go: hashLocation.go,
+		location: hashLocation
+	}
+}
+
+function evaluateCurrentPath(routes, hashLocation, reverse) {
+	evaluatePath(routes, hashLocation.get(), reverse)
+}
+
+function getPathParts(path) {
+	var chunks = path.split('?')
+	return {
+		path: chunks.shift(),
+		queryString: qs.parse(chunks.join(''))
+	}
+}
+
+function evaluatePath(routes, path, reverse) {
+	var pathParts = getPathParts(path)
+	path = pathParts.path
+	var queryStringParameters = pathParts.queryString
+
+	var matchingRoute = (reverse ? reverseArray(routes) : routes).find("".match, path)
+
+	if (matchingRoute) {
+		var regexResult = matchingRoute.exec(path)
+		var routeParameters = makeParametersObjectFromRegexResult(matchingRoute.keys, regexResult)
+		var params = xtend(queryStringParameters, routeParameters)
+		matchingRoute.fn(params)
+	} else if (routes.defaultFn) {
+		routes.defaultFn(path, queryStringParameters)
+	}
+}
+
+function reverseArray(ary) {
+	return ary.slice().reverse()
+}
+
+function makeParametersObjectFromRegexResult(keys, regexResult) {
+	return keys.reduce(function(memo, urlKey, index) {
+		memo[urlKey.name] = regexResult[index + 1]
+		return memo
+	}, {})
+}
+
+function add(routes, routeString, routeFunction) {
+	if (typeof routeFunction !== 'function') {
+		throw new Error('The router add function must be passed a callback function')
+	}
+	var newRoute = pathToRegexp(routeString)
+	newRoute.fn = routeFunction
+	routes.push(newRoute)
+}
+
+function evaluateCurrentPathOrGoToDefault(routes, hashLocation, defaultPath) {
+	if (hashLocation.get()) {
+		var routesCopy = routes.slice()
+		routesCopy.defaultFn = function() {
+			hashLocation.go(defaultPath)
+		}
+		evaluateCurrentPath(routesCopy, hashLocation)
+	} else {
+		hashLocation.go(defaultPath)
+	}
+}
+
+function setDefault(routes, defaultFn) {
+	routes.defaultFn = defaultFn
+}
+
+function isHashLocation(hashLocation) {
+	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
+}
+},{"./hash-location.js":26,"array.prototype.find":24,"path-to-regexp-with-reversible-keys":32,"querystring":51,"xtend":34}],28:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],29:[function(require,module,exports){
+(function (global){
+/*! Native Promise Only
+    v0.8.1 (c) Kyle Simpson
+    MIT License: http://getify.mit-license.org
+*/
+!function(t,n,e){n[t]=n[t]||e(),"undefined"!=typeof module&&module.exports?module.exports=n[t]:"function"==typeof define&&define.amd&&define(function(){return n[t]})}("Promise","undefined"!=typeof global?global:this,function(){"use strict";function t(t,n){l.add(t,n),h||(h=y(l.drain))}function n(t){var n,e=typeof t;return null==t||"object"!=e&&"function"!=e||(n=t.then),"function"==typeof n?n:!1}function e(){for(var t=0;t<this.chain.length;t++)o(this,1===this.state?this.chain[t].success:this.chain[t].failure,this.chain[t]);this.chain.length=0}function o(t,e,o){var r,i;try{e===!1?o.reject(t.msg):(r=e===!0?t.msg:e.call(void 0,t.msg),r===o.promise?o.reject(TypeError("Promise-chain cycle")):(i=n(r))?i.call(r,o.resolve,o.reject):o.resolve(r))}catch(c){o.reject(c)}}function r(o){var c,u=this;if(!u.triggered){u.triggered=!0,u.def&&(u=u.def);try{(c=n(o))?t(function(){var t=new f(u);try{c.call(o,function(){r.apply(t,arguments)},function(){i.apply(t,arguments)})}catch(n){i.call(t,n)}}):(u.msg=o,u.state=1,u.chain.length>0&&t(e,u))}catch(a){i.call(new f(u),a)}}}function i(n){var o=this;o.triggered||(o.triggered=!0,o.def&&(o=o.def),o.msg=n,o.state=2,o.chain.length>0&&t(e,o))}function c(t,n,e,o){for(var r=0;r<n.length;r++)!function(r){t.resolve(n[r]).then(function(t){e(r,t)},o)}(r)}function f(t){this.def=t,this.triggered=!1}function u(t){this.promise=t,this.state=0,this.triggered=!1,this.chain=[],this.msg=void 0}function a(n){if("function"!=typeof n)throw TypeError("Not a function");if(0!==this.__NPO__)throw TypeError("Not a promise");this.__NPO__=1;var o=new u(this);this.then=function(n,r){var i={success:"function"==typeof n?n:!0,failure:"function"==typeof r?r:!1};return i.promise=new this.constructor(function(t,n){if("function"!=typeof t||"function"!=typeof n)throw TypeError("Not a function");i.resolve=t,i.reject=n}),o.chain.push(i),0!==o.state&&t(e,o),i.promise},this["catch"]=function(t){return this.then(void 0,t)};try{n.call(void 0,function(t){r.call(o,t)},function(t){i.call(o,t)})}catch(c){i.call(o,c)}}var s,h,l,p=Object.prototype.toString,y="undefined"!=typeof setImmediate?function(t){return setImmediate(t)}:setTimeout;try{Object.defineProperty({},"x",{}),s=function(t,n,e,o){return Object.defineProperty(t,n,{value:e,writable:!0,configurable:o!==!1})}}catch(d){s=function(t,n,e){return t[n]=e,t}}l=function(){function t(t,n){this.fn=t,this.self=n,this.next=void 0}var n,e,o;return{add:function(r,i){o=new t(r,i),e?e.next=o:n=o,e=o,o=void 0},drain:function(){var t=n;for(n=e=h=void 0;t;)t.fn.call(t.self),t=t.next}}}();var g=s({},"constructor",a,!1);return a.prototype=g,s(g,"__NPO__",0,!1),s(a,"resolve",function(t){var n=this;return t&&"object"==typeof t&&1===t.__NPO__?t:new n(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");n(t)})}),s(a,"reject",function(t){return new this(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");e(t)})}),s(a,"all",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):0===t.length?n.resolve([]):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");var r=t.length,i=Array(r),f=0;c(n,t,function(t,n){i[t]=n,++f===r&&e(i)},o)})}),s(a,"race",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");c(n,t,function(t,n){e(n)},o)})}),a});
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],30:[function(require,module,exports){
+var parser = require('./path-parser')
+var stringifyQuerystring = require('querystring').stringify
+
+module.exports = function(pathStr, parameters) {
+
+	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
+	var allTokens = parsed.allTokens
+	var regex = parsed.regex
+
+	if (parameters) {
+		var path = allTokens.map(function(bit) {
+			if (bit.string) {
+				return bit.string
+			}
+
+			if (!bit.optional && !parameters[bit.name]) {
+				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
+			}
+
+			return parameters[bit.name] ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
+		}).join('')
+
+		if (!regex.test(path)) {
+			throw new Error('Provided arguments do not match the original arguments')
+		}
+
+		return buildPathWithQuerystring(path, parameters, allTokens)
+	} else {
+		return parsed
+	}
+}
+
+function buildPathWithQuerystring(path, parameters, tokenArray) {
+	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
+
+	if (Object.keys(parametersInQuerystring).length === 0) {
+		return path
+	}
+
+	return path + '?' + stringifyQuerystring(parametersInQuerystring)
+}
+
+function getParametersWithoutMatchingToken(parameters, tokenArray) {
+	var tokenHash = tokenArray.reduce(function(memo, bit) {
+		if (!bit.string) {
+			memo[bit.name] = bit
+		}
+		return memo
+	}, {})
+
+	return Object.keys(parameters).filter(function(param) {
+		return !tokenHash[param]
+	}).reduce(function(newParameters, param) {
+		newParameters[param] = parameters[param]
+		return newParameters
+	}, {})
+}
+
+},{"./path-parser":31,"querystring":51}],31:[function(require,module,exports){
+// This file to be replaced with an official implementation maintained by
+// the page.js crew if and when that becomes an option
+
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+
+module.exports = function(pathString) {
+	var parseResults = pathToRegexp(pathString)
+
+	// The only reason I'm returning a new object instead of the results of the pathToRegexp
+	// function is so that if the official implementation ends up returning an
+	// allTokens-style array via some other mechanism, I may be able to change this file
+	// without having to change the rest of the module in index.js
+	return {
+		regex: parseResults,
+		allTokens: parseResults.allTokens
+	}
+}
+
+},{"path-to-regexp-with-reversible-keys":32}],32:[function(require,module,exports){
+var isArray = require('isarray');
+
+/**
+ * Expose `pathToRegexp`.
+ */
+module.exports = pathToRegexp;
+
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
+  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
+  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
+  // Match regexp special characters that are always escaped.
+  '([.+*?=^!:${}()[\\]|\\/])'
+].join('|'), 'g');
+
+/**
+ * Escape the capturing group by escaping special characters and meaning.
+ *
+ * @param  {String} group
+ * @return {String}
+ */
+function escapeGroup (group) {
+  return group.replace(/([=!:$\/()])/g, '\\$1');
+}
+
+/**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {RegExp} re
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function attachKeys (re, keys, allTokens) {
+  re.keys = keys;
+  re.allTokens = allTokens;
+  return re;
+}
+
+/**
+ * Get the flags for a regexp from the options.
+ *
+ * @param  {Object} options
+ * @return {String}
+ */
+function flags (options) {
+  return options.sensitive ? '' : 'i';
+}
+
+/**
+ * Pull out keys from a regexp.
+ *
+ * @param  {RegExp} path
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function regexpToRegexp (path, keys, allTokens) {
+  // Use a negative lookahead to match only capturing groups.
+  var groups = path.source.match(/\((?!\?)/g);
+
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      keys.push({
+        name:      i,
+        delimiter: null,
+        optional:  false,
+        repeat:    false
+      });
+    }
+  }
+
+  return attachKeys(path, keys, allTokens);
+}
+
+/**
+ * Transform an array into a regexp.
+ *
+ * @param  {Array}  path
+ * @param  {Array}  keys
+ * @param  {Object} options
+ * @return {RegExp}
+ */
+function arrayToRegexp (path, keys, options, allTokens) {
+  var parts = [];
+
+  for (var i = 0; i < path.length; i++) {
+    parts.push(pathToRegexp(path[i], keys, options, allTokens).source);
+  }
+
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
+  return attachKeys(regexp, keys, allTokens);
+}
+
+/**
+ * Replace the specific tags with regexp strings.
+ *
+ * @param  {String} path
+ * @param  {Array}  keys
+ * @return {String}
+ */
+function replacePath (path, keys, allTokens) {
+  var index = 0;
+  var lastEndIndex = 0
+
+  function addLastToken(lastToken) {
+    if (lastEndIndex === 0 && lastToken[0] !== '/') {
+      lastToken = '/' + lastToken
+    }
+    allTokens.push({
+      string: lastToken
+    });
+  }
+
+
+  function replace (match, escaped, prefix, key, capture, group, suffix, escape, offset) {
+    if (escaped) {
+      return escaped;
+    }
+
+    if (escape) {
+      return '\\' + escape;
+    }
+
+    var repeat   = suffix === '+' || suffix === '*';
+    var optional = suffix === '?' || suffix === '*';
+
+    if (offset > lastEndIndex) {
+      addLastToken(path.substring(lastEndIndex, offset));
+    }
+
+    lastEndIndex = offset + match.length;
+
+    var newKey = {
+      name:      key || index++,
+      delimiter: prefix || '/',
+      optional:  optional,
+      repeat:    repeat
+    }
+
+    keys.push(newKey);
+    allTokens.push(newKey);
+
+    prefix = prefix ? ('\\' + prefix) : '';
+    capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
+
+    if (repeat) {
+      capture = capture + '(?:' + prefix + capture + ')*';
+    }
+
+    if (optional) {
+      return '(?:' + prefix + '(' + capture + '))?';
+    }
+
+    // Basic parameter support.
+    return prefix + '(' + capture + ')';
+  }
+
+  var newPath = path.replace(PATH_REGEXP, replace);
+
+  if (lastEndIndex < path.length) {
+    addLastToken(path.substring(lastEndIndex))
+  }
+
+  return newPath;
+}
+
+/**
+ * Normalize the given path string, returning a regular expression.
+ *
+ * An empty array can be passed in for the keys, which will hold the
+ * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+ * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+ *
+ * @param  {(String|RegExp|Array)} path
+ * @param  {Array}                 [keys]
+ * @param  {Object}                [options]
+ * @return {RegExp}
+ */
+function pathToRegexp (path, keys, options, allTokens) {
+  keys = keys || [];
+  allTokens = allTokens || [];
+
+  if (!isArray(keys)) {
+    options = keys;
+    keys = [];
+  } else if (!options) {
+    options = {};
+  }
+
+  if (path instanceof RegExp) {
+    return regexpToRegexp(path, keys, options, allTokens);
+  }
+
+  if (isArray(path)) {
+    return arrayToRegexp(path, keys, options, allTokens);
+  }
+
+  var strict = options.strict;
+  var end = options.end !== false;
+  var route = replacePath(path, keys, allTokens);
+  var endsWithSlash = path.charAt(path.length - 1) === '/';
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
+  }
+
+  if (end) {
+    route += '$';
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
+  }
+
+  return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
+}
+
+},{"isarray":28}],33:[function(require,module,exports){
+module.exports = function denodeify(fn) {
+	return function() {
+		var self = this
+		var args = Array.prototype.slice.call(arguments)
+		return new Promise(function(resolve, reject) {
+			args.push(function(err, res) {
+				if (err) {
+					reject(err)
+				} else {
+					resolve(res)
+				}
+			})
+
+			var res = fn.apply(self, args)
+
+			var isPromise = res
+				&& (typeof res === 'object' || typeof res === 'function')
+				&& typeof res.then === 'function'
+
+			if (isPromise) {
+				resolve(res)
+			}
+		})
+	}
+}
+
+},{}],34:[function(require,module,exports){
+module.exports = extend
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (hasOwnProperty.call(source, key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
+
+},{}],35:[function(require,module,exports){
 // Array.prototype.findIndex - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
 // For all details and docs: <https://github.com/paulmillr/Array.prototype.findIndex>
 (function (globals) {
@@ -1433,7 +2004,7 @@ module.exports = function (emitter) {
   }
 }(this));
 
-},{}],25:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 (function (process){
 module.exports = function all(o, cb) {
 	var responded = false
@@ -1499,7 +2070,7 @@ module.exports = function all(o, cb) {
 }
 
 }).call(this,require('_process'))
-},{"_process":30}],26:[function(require,module,exports){
+},{"_process":41}],37:[function(require,module,exports){
 // async-each MIT license (by Paul Miller from http://paulmillr.com).
 (function(globals) {
   'use strict';
@@ -1539,9 +2110,9 @@ module.exports = function all(o, cb) {
   }
 })(this);
 
-},{}],27:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 
-},{}],28:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 /*!
  * Cross-Browser Split 1.1.1
  * Copyright 2007-2012 Steven Levithan <stevenlevithan.com>
@@ -1649,9 +2220,9 @@ module.exports = (function split(undef) {
   return self;
 })();
 
-},{}],29:[function(require,module,exports){
-arguments[4][27][0].apply(exports,arguments)
-},{"dup":27}],30:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
+arguments[4][38][0].apply(exports,arguments)
+},{"dup":38}],41:[function(require,module,exports){
 // shim for using process in browser
 
 var process = module.exports = {};
@@ -1744,39 +2315,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],31:[function(require,module,exports){
-module.exports = function(obj) {
-	var keys = Object.keys(obj)
-
-	keys.forEach(function(key) {
-		if (!Array.isArray(obj[key])) {
-			throw new Error(key + ' is not an array')
-		}
-	})
-
-	var maxIndex = keys.reduce(function(maxSoFar, key) {
-		var len = obj[key].length
-		return maxSoFar > len ? maxSoFar : len
-	}, 0)
-
-	var output = []
-
-	function getObject(index) {
-		var o = {}
-		keys.forEach(function(key) {
-			o[key] = obj[key][index]
-		})
-		return o
-	}
-
-	for (var i = 0; i < maxIndex; ++i) {
-		output.push(getObject(i))
-	}
-
-	return output
-}
-
-},{}],32:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 /*!
   * domready (c) Dustin Diaz 2014 - License MIT
   */
@@ -1808,7 +2347,7 @@ module.exports = function(obj) {
 
 });
 
-},{}],33:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 'use strict';
 
 var OneVersionConstraint = require('individual/one-version');
@@ -1830,7 +2369,7 @@ function EvStore(elem) {
     return hash;
 }
 
-},{"individual/one-version":39}],34:[function(require,module,exports){
+},{"individual/one-version":47}],44:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2133,7 +2672,7 @@ function isUndefined(arg) {
   return arg === void 0;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 (function (global){
 var topLevel = typeof global !== 'undefined' ? global :
     typeof window !== 'undefined' ? window : {}
@@ -2152,157 +2691,7 @@ if (typeof document !== 'undefined') {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"min-document":27}],36:[function(require,module,exports){
-var EventEmitter = require('events').EventEmitter
-
-module.exports = function HashLocation(window) {
-	var emitter = new EventEmitter()
-	var last = ''
-
-	window.addEventListener('hashchange', function() {
-		if (last !== emitter.get()) {
-			last = emitter.get()
-			emitter.emit('hashchange')
-		}
-	})
-
-	emitter.go = go.bind(null, window)
-	emitter.replace = replace.bind(null, window)
-	emitter.get = get.bind(null, window)
-
-	return emitter
-}
-
-function replace(window, newPath) {
-	window.location.replace(everythingBeforeTheSlash(window.location.href) + '#' + newPath)
-}
-
-function everythingBeforeTheSlash(url) {
-	var hashIndex = url.indexOf('#')
-	return hashIndex === -1 ? url : url.substring(0, hashIndex)
-}
-
-function go(window, newPath) {
-	window.location.hash = newPath
-}
-
-function get(window) {
-	return removeHashFromPath(window.location.hash)
-}
-
-function removeHashFromPath(path) {
-	return (path && path[0] === '#') ? path.substr(1) : path
-}
-
-},{"events":34}],37:[function(require,module,exports){
-var pathToRegexp = require('path-to-regexp-with-reversible-keys')
-var qs = require('querystring')
-var xtend = require('xtend')
-var browserHashLocation = require('./hash-location.js')
-require('array.prototype.find')
-
-module.exports = function Router(opts, hashLocation) {
-	if (isHashLocation(opts)) {
-		hashLocation = opts
-		opts = null
-	}
-
-	opts = opts || {}
-
-	if (!hashLocation) {
-		hashLocation = browserHashLocation(window)
-	}
-
-	var routes = []
-
-	var onHashChange = evaluateCurrentPath.bind(null, routes, hashLocation, !!opts.reverse)
-
-	hashLocation.on('hashchange', onHashChange)
-
-	function stop() {
-		hashLocation.removeListener('hashchange', onHashChange)
-	}
-
-	return {
-		add: add.bind(null, routes),
-		stop: stop,
-		evaluateCurrent: evaluateCurrentPathOrGoToDefault.bind(null, routes, hashLocation),
-		setDefault: setDefault.bind(null, routes),
-		replace: hashLocation.replace,
-		go: hashLocation.go,
-		location: hashLocation
-	}
-}
-
-function evaluateCurrentPath(routes, hashLocation, reverse) {
-	evaluatePath(routes, hashLocation.get(), reverse)
-}
-
-function getPathParts(path) {
-	var chunks = path.split('?')
-	return {
-		path: chunks.shift(),
-		queryString: qs.parse(chunks.join(''))
-	}
-}
-
-function evaluatePath(routes, path, reverse) {
-	var pathParts = getPathParts(path)
-	path = pathParts.path
-	var queryStringParameters = pathParts.queryString
-
-	var matchingRoute = (reverse ? reverseArray(routes) : routes).find("".match, path)
-
-	if (matchingRoute) {
-		var regexResult = matchingRoute.exec(path)
-		var routeParameters = makeParametersObjectFromRegexResult(matchingRoute.keys, regexResult)
-		var params = xtend(queryStringParameters, routeParameters)
-		matchingRoute.fn(params)
-	} else if (routes.defaultFn) {
-		routes.defaultFn(path, queryStringParameters)
-	}
-}
-
-function reverseArray(ary) {
-	return ary.slice().reverse()
-}
-
-function makeParametersObjectFromRegexResult(keys, regexResult) {
-	return keys.reduce(function(memo, urlKey, index) {
-		memo[urlKey.name] = regexResult[index + 1]
-		return memo
-	}, {})
-}
-
-function add(routes, routeString, routeFunction) {
-	if (typeof routeFunction !== 'function') {
-		throw new Error('The router add function must be passed a callback function')
-	}
-	var newRoute = pathToRegexp(routeString)
-	newRoute.fn = routeFunction
-	routes.push(newRoute)
-}
-
-function evaluateCurrentPathOrGoToDefault(routes, hashLocation, defaultPath) {
-	if (hashLocation.get()) {
-		var routesCopy = routes.slice()
-		routesCopy.defaultFn = function() {
-			hashLocation.go(defaultPath)
-		}
-		evaluateCurrentPath(routesCopy, hashLocation)
-	} else {
-		hashLocation.go(defaultPath)
-	}
-}
-
-function setDefault(routes, defaultFn) {
-	routes.defaultFn = defaultFn
-}
-
-function isHashLocation(hashLocation) {
-	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
-}
-},{"./hash-location.js":36,"array.prototype.find":23,"path-to-regexp-with-reversible-keys":45,"querystring":48,"xtend":79}],38:[function(require,module,exports){
+},{"min-document":38}],46:[function(require,module,exports){
 (function (global){
 'use strict';
 
@@ -2325,7 +2714,7 @@ function Individual(key, value) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 'use strict';
 
 var Individual = require('./index.js');
@@ -2349,338 +2738,14 @@ function OneVersion(moduleName, version, defaultValue) {
     return Individual(key, defaultValue);
 }
 
-},{"./index.js":38}],40:[function(require,module,exports){
+},{"./index.js":46}],48:[function(require,module,exports){
 "use strict";
 
 module.exports = function isObject(x) {
 	return typeof x === "object" && x !== null;
 };
 
-},{}],41:[function(require,module,exports){
-module.exports = Array.isArray || function (arr) {
-  return Object.prototype.toString.call(arr) == '[object Array]';
-};
-
-},{}],42:[function(require,module,exports){
-(function (global){
-/*! Native Promise Only
-    v0.8.1 (c) Kyle Simpson
-    MIT License: http://getify.mit-license.org
-*/
-!function(t,n,e){n[t]=n[t]||e(),"undefined"!=typeof module&&module.exports?module.exports=n[t]:"function"==typeof define&&define.amd&&define(function(){return n[t]})}("Promise","undefined"!=typeof global?global:this,function(){"use strict";function t(t,n){l.add(t,n),h||(h=y(l.drain))}function n(t){var n,e=typeof t;return null==t||"object"!=e&&"function"!=e||(n=t.then),"function"==typeof n?n:!1}function e(){for(var t=0;t<this.chain.length;t++)o(this,1===this.state?this.chain[t].success:this.chain[t].failure,this.chain[t]);this.chain.length=0}function o(t,e,o){var r,i;try{e===!1?o.reject(t.msg):(r=e===!0?t.msg:e.call(void 0,t.msg),r===o.promise?o.reject(TypeError("Promise-chain cycle")):(i=n(r))?i.call(r,o.resolve,o.reject):o.resolve(r))}catch(c){o.reject(c)}}function r(o){var c,u=this;if(!u.triggered){u.triggered=!0,u.def&&(u=u.def);try{(c=n(o))?t(function(){var t=new f(u);try{c.call(o,function(){r.apply(t,arguments)},function(){i.apply(t,arguments)})}catch(n){i.call(t,n)}}):(u.msg=o,u.state=1,u.chain.length>0&&t(e,u))}catch(a){i.call(new f(u),a)}}}function i(n){var o=this;o.triggered||(o.triggered=!0,o.def&&(o=o.def),o.msg=n,o.state=2,o.chain.length>0&&t(e,o))}function c(t,n,e,o){for(var r=0;r<n.length;r++)!function(r){t.resolve(n[r]).then(function(t){e(r,t)},o)}(r)}function f(t){this.def=t,this.triggered=!1}function u(t){this.promise=t,this.state=0,this.triggered=!1,this.chain=[],this.msg=void 0}function a(n){if("function"!=typeof n)throw TypeError("Not a function");if(0!==this.__NPO__)throw TypeError("Not a promise");this.__NPO__=1;var o=new u(this);this.then=function(n,r){var i={success:"function"==typeof n?n:!0,failure:"function"==typeof r?r:!1};return i.promise=new this.constructor(function(t,n){if("function"!=typeof t||"function"!=typeof n)throw TypeError("Not a function");i.resolve=t,i.reject=n}),o.chain.push(i),0!==o.state&&t(e,o),i.promise},this["catch"]=function(t){return this.then(void 0,t)};try{n.call(void 0,function(t){r.call(o,t)},function(t){i.call(o,t)})}catch(c){i.call(o,c)}}var s,h,l,p=Object.prototype.toString,y="undefined"!=typeof setImmediate?function(t){return setImmediate(t)}:setTimeout;try{Object.defineProperty({},"x",{}),s=function(t,n,e,o){return Object.defineProperty(t,n,{value:e,writable:!0,configurable:o!==!1})}}catch(d){s=function(t,n,e){return t[n]=e,t}}l=function(){function t(t,n){this.fn=t,this.self=n,this.next=void 0}var n,e,o;return{add:function(r,i){o=new t(r,i),e?e.next=o:n=o,e=o,o=void 0},drain:function(){var t=n;for(n=e=h=void 0;t;)t.fn.call(t.self),t=t.next}}}();var g=s({},"constructor",a,!1);return a.prototype=g,s(g,"__NPO__",0,!1),s(a,"resolve",function(t){var n=this;return t&&"object"==typeof t&&1===t.__NPO__?t:new n(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");n(t)})}),s(a,"reject",function(t){return new this(function(n,e){if("function"!=typeof n||"function"!=typeof e)throw TypeError("Not a function");e(t)})}),s(a,"all",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):0===t.length?n.resolve([]):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");var r=t.length,i=Array(r),f=0;c(n,t,function(t,n){i[t]=n,++f===r&&e(i)},o)})}),s(a,"race",function(t){var n=this;return"[object Array]"!=p.call(t)?n.reject(TypeError("Not an array")):new n(function(e,o){if("function"!=typeof e||"function"!=typeof o)throw TypeError("Not a function");c(n,t,function(t,n){e(n)},o)})}),a});
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],43:[function(require,module,exports){
-var parser = require('./path-parser')
-var stringifyQuerystring = require('querystring').stringify
-
-module.exports = function(pathStr, parameters) {
-
-	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
-	var allTokens = parsed.allTokens
-	var regex = parsed.regex
-
-	if (parameters) {
-		var path = allTokens.map(function(bit) {
-			if (bit.string) {
-				return bit.string
-			}
-
-			if (!bit.optional && !parameters[bit.name]) {
-				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
-			}
-
-			return parameters[bit.name] ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
-		}).join('')
-
-		if (!regex.test(path)) {
-			throw new Error('Provided arguments do not match the original arguments')
-		}
-
-		return buildPathWithQuerystring(path, parameters, allTokens)
-	} else {
-		return parsed
-	}
-}
-
-function buildPathWithQuerystring(path, parameters, tokenArray) {
-	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
-
-	if (Object.keys(parametersInQuerystring).length === 0) {
-		return path
-	}
-
-	return path + '?' + stringifyQuerystring(parametersInQuerystring)
-}
-
-function getParametersWithoutMatchingToken(parameters, tokenArray) {
-	var tokenHash = tokenArray.reduce(function(memo, bit) {
-		if (!bit.string) {
-			memo[bit.name] = bit
-		}
-		return memo
-	}, {})
-
-	return Object.keys(parameters).filter(function(param) {
-		return !tokenHash[param]
-	}).reduce(function(newParameters, param) {
-		newParameters[param] = parameters[param]
-		return newParameters
-	}, {})
-}
-
-},{"./path-parser":44,"querystring":48}],44:[function(require,module,exports){
-// This file to be replaced with an official implementation maintained by
-// the page.js crew if and when that becomes an option
-
-var pathToRegexp = require('path-to-regexp-with-reversible-keys')
-
-module.exports = function(pathString) {
-	var parseResults = pathToRegexp(pathString)
-
-	// The only reason I'm returning a new object instead of the results of the pathToRegexp
-	// function is so that if the official implementation ends up returning an
-	// allTokens-style array via some other mechanism, I may be able to change this file
-	// without having to change the rest of the module in index.js
-	return {
-		regex: parseResults,
-		allTokens: parseResults.allTokens
-	}
-}
-
-},{"path-to-regexp-with-reversible-keys":45}],45:[function(require,module,exports){
-var isArray = require('isarray');
-
-/**
- * Expose `pathToRegexp`.
- */
-module.exports = pathToRegexp;
-
-/**
- * The main path matching regexp utility.
- *
- * @type {RegExp}
- */
-var PATH_REGEXP = new RegExp([
-  // Match escaped characters that would otherwise appear in future matches.
-  // This allows the user to escape special characters that won't transform.
-  '(\\\\.)',
-  // Match Express-style parameters and un-named parameters with a prefix
-  // and optional suffixes. Matches appear as:
-  //
-  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
-  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
-  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
-  // Match regexp special characters that are always escaped.
-  '([.+*?=^!:${}()[\\]|\\/])'
-].join('|'), 'g');
-
-/**
- * Escape the capturing group by escaping special characters and meaning.
- *
- * @param  {String} group
- * @return {String}
- */
-function escapeGroup (group) {
-  return group.replace(/([=!:$\/()])/g, '\\$1');
-}
-
-/**
- * Attach the keys as a property of the regexp.
- *
- * @param  {RegExp} re
- * @param  {Array}  keys
- * @return {RegExp}
- */
-function attachKeys (re, keys, allTokens) {
-  re.keys = keys;
-  re.allTokens = allTokens;
-  return re;
-}
-
-/**
- * Get the flags for a regexp from the options.
- *
- * @param  {Object} options
- * @return {String}
- */
-function flags (options) {
-  return options.sensitive ? '' : 'i';
-}
-
-/**
- * Pull out keys from a regexp.
- *
- * @param  {RegExp} path
- * @param  {Array}  keys
- * @return {RegExp}
- */
-function regexpToRegexp (path, keys, allTokens) {
-  // Use a negative lookahead to match only capturing groups.
-  var groups = path.source.match(/\((?!\?)/g);
-
-  if (groups) {
-    for (var i = 0; i < groups.length; i++) {
-      keys.push({
-        name:      i,
-        delimiter: null,
-        optional:  false,
-        repeat:    false
-      });
-    }
-  }
-
-  return attachKeys(path, keys, allTokens);
-}
-
-/**
- * Transform an array into a regexp.
- *
- * @param  {Array}  path
- * @param  {Array}  keys
- * @param  {Object} options
- * @return {RegExp}
- */
-function arrayToRegexp (path, keys, options, allTokens) {
-  var parts = [];
-
-  for (var i = 0; i < path.length; i++) {
-    parts.push(pathToRegexp(path[i], keys, options, allTokens).source);
-  }
-
-  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
-  return attachKeys(regexp, keys, allTokens);
-}
-
-/**
- * Replace the specific tags with regexp strings.
- *
- * @param  {String} path
- * @param  {Array}  keys
- * @return {String}
- */
-function replacePath (path, keys, allTokens) {
-  var index = 0;
-  var lastEndIndex = 0
-
-  function addLastToken(lastToken) {
-    if (lastEndIndex === 0 && lastToken[0] !== '/') {
-      lastToken = '/' + lastToken
-    }
-    allTokens.push({
-      string: lastToken
-    });
-  }
-
-
-  function replace (match, escaped, prefix, key, capture, group, suffix, escape, offset) {
-    if (escaped) {
-      return escaped;
-    }
-
-    if (escape) {
-      return '\\' + escape;
-    }
-
-    var repeat   = suffix === '+' || suffix === '*';
-    var optional = suffix === '?' || suffix === '*';
-
-    if (offset > lastEndIndex) {
-      addLastToken(path.substring(lastEndIndex, offset));
-    }
-
-    lastEndIndex = offset + match.length;
-
-    var newKey = {
-      name:      key || index++,
-      delimiter: prefix || '/',
-      optional:  optional,
-      repeat:    repeat
-    }
-
-    keys.push(newKey);
-    allTokens.push(newKey);
-
-    prefix = prefix ? ('\\' + prefix) : '';
-    capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
-
-    if (repeat) {
-      capture = capture + '(?:' + prefix + capture + ')*';
-    }
-
-    if (optional) {
-      return '(?:' + prefix + '(' + capture + '))?';
-    }
-
-    // Basic parameter support.
-    return prefix + '(' + capture + ')';
-  }
-
-  var newPath = path.replace(PATH_REGEXP, replace);
-
-  if (lastEndIndex < path.length) {
-    addLastToken(path.substring(lastEndIndex))
-  }
-
-  return newPath;
-}
-
-/**
- * Normalize the given path string, returning a regular expression.
- *
- * An empty array can be passed in for the keys, which will hold the
- * placeholder key descriptions. For example, using `/user/:id`, `keys` will
- * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
- *
- * @param  {(String|RegExp|Array)} path
- * @param  {Array}                 [keys]
- * @param  {Object}                [options]
- * @return {RegExp}
- */
-function pathToRegexp (path, keys, options, allTokens) {
-  keys = keys || [];
-  allTokens = allTokens || [];
-
-  if (!isArray(keys)) {
-    options = keys;
-    keys = [];
-  } else if (!options) {
-    options = {};
-  }
-
-  if (path instanceof RegExp) {
-    return regexpToRegexp(path, keys, options, allTokens);
-  }
-
-  if (isArray(path)) {
-    return arrayToRegexp(path, keys, options, allTokens);
-  }
-
-  var strict = options.strict;
-  var end = options.end !== false;
-  var route = replacePath(path, keys, allTokens);
-  var endsWithSlash = path.charAt(path.length - 1) === '/';
-
-  // In non-strict mode we allow a slash at the end of match. If the path to
-  // match already ends with a slash, we remove it for consistency. The slash
-  // is valid at the end of a path match, not in the middle. This is important
-  // in non-ending mode, where "/test/" shouldn't match "/test//route".
-  if (!strict) {
-    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
-  }
-
-  if (end) {
-    route += '$';
-  } else {
-    // In non-ending mode, we need the capturing groups to match as much as
-    // possible by using a positive lookahead to the end or next path segment.
-    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
-  }
-
-  return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
-}
-
-},{"isarray":41}],46:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2766,7 +2831,7 @@ var isArray = Array.isArray || function (xs) {
   return Object.prototype.toString.call(xs) === '[object Array]';
 };
 
-},{}],47:[function(require,module,exports){
+},{}],50:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2853,13 +2918,13 @@ var objectKeys = Object.keys || function (obj) {
   return res;
 };
 
-},{}],48:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 'use strict';
 
 exports.decode = exports.parse = require('./decode');
 exports.encode = exports.stringify = require('./encode');
 
-},{"./decode":46,"./encode":47}],49:[function(require,module,exports){
+},{"./decode":49,"./encode":50}],52:[function(require,module,exports){
 /**
  *
  * This function was taken from a stackoverflow answer:
@@ -2882,54 +2947,27 @@ module.exports = function() {
     });
 };
 
-},{}],50:[function(require,module,exports){
-module.exports = function denodeify(fn) {
-	return function() {
-		var self = this
-		var args = Array.prototype.slice.call(arguments)
-		return new Promise(function(resolve, reject) {
-			args.push(function(err, res) {
-				if (err) {
-					reject(err)
-				} else {
-					resolve(res)
-				}
-			})
-
-			var res = fn.apply(self, args)
-
-			var isPromise = res
-				&& (typeof res === 'object' || typeof res === 'function')
-				&& typeof res.then === 'function'
-
-			if (isPromise) {
-				resolve(res)
-			}
-		})
-	}
-}
-
-},{}],51:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 var createElement = require("./vdom/create-element.js")
 
 module.exports = createElement
 
-},{"./vdom/create-element.js":56}],52:[function(require,module,exports){
+},{"./vdom/create-element.js":58}],54:[function(require,module,exports){
 var diff = require("./vtree/diff.js")
 
 module.exports = diff
 
-},{"./vtree/diff.js":76}],53:[function(require,module,exports){
+},{"./vtree/diff.js":78}],55:[function(require,module,exports){
 var h = require("./virtual-hyperscript/index.js")
 
 module.exports = h
 
-},{"./virtual-hyperscript/index.js":63}],54:[function(require,module,exports){
+},{"./virtual-hyperscript/index.js":65}],56:[function(require,module,exports){
 var patch = require("./vdom/patch.js")
 
 module.exports = patch
 
-},{"./vdom/patch.js":59}],55:[function(require,module,exports){
+},{"./vdom/patch.js":61}],57:[function(require,module,exports){
 var isObject = require("is-object")
 var isHook = require("../vnode/is-vhook.js")
 
@@ -3028,7 +3066,7 @@ function getPrototype(value) {
     }
 }
 
-},{"../vnode/is-vhook.js":67,"is-object":40}],56:[function(require,module,exports){
+},{"../vnode/is-vhook.js":69,"is-object":48}],58:[function(require,module,exports){
 var document = require("global/document")
 
 var applyProperties = require("./apply-properties")
@@ -3076,7 +3114,7 @@ function createElement(vnode, opts) {
     return node
 }
 
-},{"../vnode/handle-thunk.js":65,"../vnode/is-vnode.js":68,"../vnode/is-vtext.js":69,"../vnode/is-widget.js":70,"./apply-properties":55,"global/document":35}],57:[function(require,module,exports){
+},{"../vnode/handle-thunk.js":67,"../vnode/is-vnode.js":70,"../vnode/is-vtext.js":71,"../vnode/is-widget.js":72,"./apply-properties":57,"global/document":45}],59:[function(require,module,exports){
 // Maps a virtual DOM tree onto a real DOM tree in an efficient manner.
 // We don't want to read all of the DOM nodes in the tree so we use
 // the in-order tree indexing to eliminate recursion down certain branches.
@@ -3163,7 +3201,7 @@ function ascending(a, b) {
     return a > b ? 1 : -1
 }
 
-},{}],58:[function(require,module,exports){
+},{}],60:[function(require,module,exports){
 var applyProperties = require("./apply-properties")
 
 var isWidget = require("../vnode/is-widget.js")
@@ -3316,7 +3354,7 @@ function replaceRoot(oldRoot, newRoot) {
     return newRoot;
 }
 
-},{"../vnode/is-widget.js":70,"../vnode/vpatch.js":73,"./apply-properties":55,"./update-widget":60}],59:[function(require,module,exports){
+},{"../vnode/is-widget.js":72,"../vnode/vpatch.js":75,"./apply-properties":57,"./update-widget":62}],61:[function(require,module,exports){
 var document = require("global/document")
 var isArray = require("x-is-array")
 
@@ -3398,7 +3436,7 @@ function patchIndices(patches) {
     return indices
 }
 
-},{"./create-element":56,"./dom-index":57,"./patch-op":58,"global/document":35,"x-is-array":78}],60:[function(require,module,exports){
+},{"./create-element":58,"./dom-index":59,"./patch-op":60,"global/document":45,"x-is-array":80}],62:[function(require,module,exports){
 var isWidget = require("../vnode/is-widget.js")
 
 module.exports = updateWidget
@@ -3415,7 +3453,7 @@ function updateWidget(a, b) {
     return false
 }
 
-},{"../vnode/is-widget.js":70}],61:[function(require,module,exports){
+},{"../vnode/is-widget.js":72}],63:[function(require,module,exports){
 'use strict';
 
 var EvStore = require('ev-store');
@@ -3444,7 +3482,7 @@ EvHook.prototype.unhook = function(node, propertyName) {
     es[propName] = undefined;
 };
 
-},{"ev-store":33}],62:[function(require,module,exports){
+},{"ev-store":43}],64:[function(require,module,exports){
 'use strict';
 
 module.exports = SoftSetHook;
@@ -3463,7 +3501,7 @@ SoftSetHook.prototype.hook = function (node, propertyName) {
     }
 };
 
-},{}],63:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 'use strict';
 
 var isArray = require('x-is-array');
@@ -3602,7 +3640,7 @@ function errorString(obj) {
     }
 }
 
-},{"../vnode/is-thunk":66,"../vnode/is-vhook":67,"../vnode/is-vnode":68,"../vnode/is-vtext":69,"../vnode/is-widget":70,"../vnode/vnode.js":72,"../vnode/vtext.js":74,"./hooks/ev-hook.js":61,"./hooks/soft-set-hook.js":62,"./parse-tag.js":64,"x-is-array":78}],64:[function(require,module,exports){
+},{"../vnode/is-thunk":68,"../vnode/is-vhook":69,"../vnode/is-vnode":70,"../vnode/is-vtext":71,"../vnode/is-widget":72,"../vnode/vnode.js":74,"../vnode/vtext.js":76,"./hooks/ev-hook.js":63,"./hooks/soft-set-hook.js":64,"./parse-tag.js":66,"x-is-array":80}],66:[function(require,module,exports){
 'use strict';
 
 var split = require('browser-split');
@@ -3658,7 +3696,7 @@ function parseTag(tag, props) {
     return props.namespace ? tagName : tagName.toUpperCase();
 }
 
-},{"browser-split":28}],65:[function(require,module,exports){
+},{"browser-split":39}],67:[function(require,module,exports){
 var isVNode = require("./is-vnode")
 var isVText = require("./is-vtext")
 var isWidget = require("./is-widget")
@@ -3700,14 +3738,14 @@ function renderThunk(thunk, previous) {
     return renderedThunk
 }
 
-},{"./is-thunk":66,"./is-vnode":68,"./is-vtext":69,"./is-widget":70}],66:[function(require,module,exports){
+},{"./is-thunk":68,"./is-vnode":70,"./is-vtext":71,"./is-widget":72}],68:[function(require,module,exports){
 module.exports = isThunk
 
 function isThunk(t) {
     return t && t.type === "Thunk"
 }
 
-},{}],67:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 module.exports = isHook
 
 function isHook(hook) {
@@ -3716,7 +3754,7 @@ function isHook(hook) {
        typeof hook.unhook === "function" && !hook.hasOwnProperty("unhook"))
 }
 
-},{}],68:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = isVirtualNode
@@ -3725,7 +3763,7 @@ function isVirtualNode(x) {
     return x && x.type === "VirtualNode" && x.version === version
 }
 
-},{"./version":71}],69:[function(require,module,exports){
+},{"./version":73}],71:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = isVirtualText
@@ -3734,17 +3772,17 @@ function isVirtualText(x) {
     return x && x.type === "VirtualText" && x.version === version
 }
 
-},{"./version":71}],70:[function(require,module,exports){
+},{"./version":73}],72:[function(require,module,exports){
 module.exports = isWidget
 
 function isWidget(w) {
     return w && w.type === "Widget"
 }
 
-},{}],71:[function(require,module,exports){
+},{}],73:[function(require,module,exports){
 module.exports = "2"
 
-},{}],72:[function(require,module,exports){
+},{}],74:[function(require,module,exports){
 var version = require("./version")
 var isVNode = require("./is-vnode")
 var isWidget = require("./is-widget")
@@ -3818,7 +3856,7 @@ function VirtualNode(tagName, properties, children, key, namespace) {
 VirtualNode.prototype.version = version
 VirtualNode.prototype.type = "VirtualNode"
 
-},{"./is-thunk":66,"./is-vhook":67,"./is-vnode":68,"./is-widget":70,"./version":71}],73:[function(require,module,exports){
+},{"./is-thunk":68,"./is-vhook":69,"./is-vnode":70,"./is-widget":72,"./version":73}],75:[function(require,module,exports){
 var version = require("./version")
 
 VirtualPatch.NONE = 0
@@ -3842,7 +3880,7 @@ function VirtualPatch(type, vNode, patch) {
 VirtualPatch.prototype.version = version
 VirtualPatch.prototype.type = "VirtualPatch"
 
-},{"./version":71}],74:[function(require,module,exports){
+},{"./version":73}],76:[function(require,module,exports){
 var version = require("./version")
 
 module.exports = VirtualText
@@ -3854,7 +3892,7 @@ function VirtualText(text) {
 VirtualText.prototype.version = version
 VirtualText.prototype.type = "VirtualText"
 
-},{"./version":71}],75:[function(require,module,exports){
+},{"./version":73}],77:[function(require,module,exports){
 var isObject = require("is-object")
 var isHook = require("../vnode/is-vhook")
 
@@ -3914,7 +3952,7 @@ function getPrototype(value) {
   }
 }
 
-},{"../vnode/is-vhook":67,"is-object":40}],76:[function(require,module,exports){
+},{"../vnode/is-vhook":69,"is-object":48}],78:[function(require,module,exports){
 var isArray = require("x-is-array")
 
 var VPatch = require("../vnode/vpatch")
@@ -4343,7 +4381,7 @@ function appendPatch(apply, patch) {
     }
 }
 
-},{"../vnode/handle-thunk":65,"../vnode/is-thunk":66,"../vnode/is-vnode":68,"../vnode/is-vtext":69,"../vnode/is-widget":70,"../vnode/vpatch":73,"./diff-props":75,"x-is-array":78}],77:[function(require,module,exports){
+},{"../vnode/handle-thunk":67,"../vnode/is-thunk":68,"../vnode/is-vnode":70,"../vnode/is-vtext":71,"../vnode/is-widget":72,"../vnode/vpatch":75,"./diff-props":77,"x-is-array":80}],79:[function(require,module,exports){
 var h = require('virtual-dom/h')
 var diff = require('virtual-dom/diff')
 var patch = require('virtual-dom/patch')
@@ -4440,7 +4478,7 @@ module.exports = function makeRenderer(stateRouter) {
 	}
 }
 
-},{"events":34,"virtual-dom/create-element":51,"virtual-dom/diff":52,"virtual-dom/h":53,"virtual-dom/patch":54,"xtend":79}],78:[function(require,module,exports){
+},{"events":44,"virtual-dom/create-element":53,"virtual-dom/diff":54,"virtual-dom/h":55,"virtual-dom/patch":56,"xtend":81}],80:[function(require,module,exports){
 var nativeIsArray = Array.isArray
 var toString = Object.prototype.toString
 
@@ -4450,25 +4488,6 @@ function isArray(obj) {
     return toString.call(obj) === "[object Array]"
 }
 
-},{}],79:[function(require,module,exports){
-module.exports = extend
-
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-
-function extend() {
-    var target = {}
-
-    for (var i = 0; i < arguments.length; i++) {
-        var source = arguments[i]
-
-        for (var key in source) {
-            if (hasOwnProperty.call(source, key)) {
-                target[key] = source[key]
-            }
-        }
-    }
-
-    return target
-}
-
-},{}]},{},[12]);
+},{}],81:[function(require,module,exports){
+arguments[4][34][0].apply(exports,arguments)
+},{"dup":34}]},{},[12]);
