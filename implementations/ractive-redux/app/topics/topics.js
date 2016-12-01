@@ -94,7 +94,9 @@ module.exports = function(stateRouter) {
 			})
 		},
 		activate: function(context) {
-			var dispatch = context.domApi.store.dispatch
+			function dispatch(action) {
+				context.domApi.fire('dispatch', action.type, action)
+			}
 
 			var recalculateTasks = topicId => recalculateTasksLeftToDoInTopic(topicId, dispatch)
 

@@ -444,7 +444,8 @@ module.exports = function (stateRouter) {
 			})
 		},
 		activate: function activate(context) {
-			var dispatch = context.domApi.store.dispatch;
+			function dispatch(action) {
+			}
 
 			var recalculateTasks = function recalculateTasks(topicId) {
 				return recalculateTasksLeftToDoInTopic(topicId, dispatch);
