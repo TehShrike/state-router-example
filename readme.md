@@ -11,10 +11,11 @@ cd state-router-example
 npm install
 ```
 
-At this point you can `npm run build` to build a deployable version of all three versions, minified and everything, or you can run one of these if you want to play with the code:
+At this point you can `npm run build` to build a deployable version of all versions, minified and everything, or you can run one of these if you want to play with the code:
 
 - `npm run watch:riot`
 - `npm run watch:ractive`
 - `npm run watch:ractive-redux`
 - `npm run watch:virtualdom`
 - `npm run watch:ko`
+- `npm run watch:svelte`
