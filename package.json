@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
-    "build": "npm run build:riot && npm run build:ractive && npm run build:ractive-redux && npm run build:virtualdom && npm run build:ko",
+    "build": "npm run build:riot && npm run build:ractive && npm run build:ractive-redux && npm run build:virtualdom && npm run build:ko && npm run build:svelte",
     "watch:riot": "watchify -t riotify -d implementations/riot/index.js -o implementations/riot/bundle.js",
     "build:riot": "browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js",
     "watch:ractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js",
@@ -15,7 +15,9 @@
     "watch:virtualdom": "watchify -d implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
     "build:virtualdom": "browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
     "watch:ko": "watchify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js",
-    "build:ko": "browserify -t brfs implementations/knockout/index.js -o implementations/knockout/bundle.js"
+    "build:ko": "browserify -t brfs implementations/knockout/index.js -o implementations/knockout/bundle.js",
+    "watch:svelte": "watchify -t sveltify -t [ babelify --presets [ es2015 ] ] -d implementations/svelte/index.js -o implementations/svelte/bundle.js",
+    "build:svelte": "browserify -t sveltify -t [ babelify --presets [ es2015 ] ] implementations/svelte/index.js -o implementations/svelte/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -28,7 +30,7 @@
   },
   "homepage": "https://github.com/TehShrike/state-router-example",
   "dependencies": {
-    "abstract-state-router": "^5.14.0",
+    "abstract-state-router": "^5.15.0",
     "array.prototype.findindex": "^1.0.0",
     "async-all": "1.0.1",
     "async-each": "0.1.6",
@@ -42,6 +44,7 @@
     "riot": "^2.1.0",
     "riot-state-renderer": "^4.0.1",
     "state-router-redux-ractive": "~2.0.0",
+    "svelte-state-renderer": "1.0.1",
     "virtualdom-state-renderer": "1.0.0"
   },
   "devDependencies": {
@@ -52,6 +55,7 @@
     "browserify": "11.2.0",
     "redux": "~3.1.0",
     "riotify": "^0.1.0",
+    "sveltify": "~1.0.0",
     "watchify": "^3.2.1"
   }
 }
