@@ -7,17 +7,17 @@
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "npm run build:riot && npm run build:ractive && npm run build:ractive-redux && npm run build:virtualdom && npm run build:ko && npm run build:svelte",
     "watch:riot": "watchify -t riotify -d implementations/riot/index.js -o implementations/riot/bundle.js",
-    "build:riot": "browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js",
+    "build:riot": "browserify -t riotify implementations/riot/index.js | uglifyjs - -mc -o implementations/riot/bundle.js",
     "watch:ractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js",
-    "build:ractive": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js",
+    "build:ractive": "browserify -t brfs implementations/ractive/index.js | uglifyjs - -mc -o implementations/ractive/bundle.js",
     "watch:ractive-redux": "watchify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs -d implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
-    "build:ractive-redux": "browserify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
+    "build:ractive-redux": "browserify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs implementations/ractive-redux/index.js | uglifyjs - -mc -o implementations/ractive-redux/bundle.js",
     "watch:virtualdom": "watchify -d implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
-    "build:virtualdom": "browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
+    "build:virtualdom": "browserify implementations/virtualdom/index.js | uglifyjs - -mc -o implementations/virtualdom/bundle.js",
     "watch:ko": "watchify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js",
-    "build:ko": "browserify -t brfs implementations/knockout/index.js -o implementations/knockout/bundle.js",
-    "watch:svelte": "watchify -t sveltify -t [ babelify --presets [ es2015 ] ] -d implementations/svelte/index.js -o implementations/svelte/bundle.js",
-    "build:svelte": "browserify -t sveltify -t [ babelify --presets [ es2015 ] ] implementations/svelte/index.js -o implementations/svelte/bundle.js"
+    "build:ko": "browserify -t brfs implementations/knockout/index.js | uglifyjs - -mc -o implementations/knockout/bundle.js",
+    "watch:svelte": "watchify -t sveltify -t [ babelify --presets [ es2015 ] --extensions .js,.html ] -d implementations/svelte/index.js -o implementations/svelte/bundle.js",
+    "build:svelte": "browserify -t sveltify -t [ babelify --presets [ es2015 ] --extensions .js,.html ] implementations/svelte/index.js | uglifyjs - -mc -o implementations/svelte/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -44,7 +44,7 @@
     "riot": "^2.1.0",
     "riot-state-renderer": "^4.0.1",
     "state-router-redux-ractive": "~2.0.0",
-    "svelte-state-renderer": "1.0.1",
+    "svelte-state-renderer": "~1.1.0",
     "virtualdom-state-renderer": "1.0.0"
   },
   "devDependencies": {
@@ -56,6 +56,7 @@
     "redux": "~3.1.0",
     "riotify": "^0.1.0",
     "sveltify": "~1.0.0",
+    "uglify-js": "2.7.5",
     "watchify": "^3.2.1"
   }
 }
