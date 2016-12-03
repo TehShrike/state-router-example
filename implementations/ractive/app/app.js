@@ -13,7 +13,7 @@ module.exports = function(stateRouter) {
 
 			if (currentUser.name) {
 				cb(null, {
-					currentUser
+					currentUser: currentUser
 				})
 			} else {
 				cb.redirect('login')
