@@ -27,13 +27,13 @@
 					{{#if done}}
 						<button
 						class="btn btn-primary full-width"
-						on-click="fire('dispatch', 'SET_TASK_DONE', { index: i, done: false })">
+						on-click="@this.fire('dispatch', 'SET_TASK_DONE', { index: i, done: false })">
 							Restore
 						</button>
 					{{else}}
 						<button
 						class="btn btn-success full-width"
-						on-click="fire('dispatch', 'SET_TASK_DONE', { index: i, done: true })">
+						on-click="@this.fire('dispatch', 'SET_TASK_DONE', { index: i, done: true })">
 							Complete
 						</button>
 					{{/if}}
@@ -41,7 +41,7 @@
 				<td>
 					<button
 					class="btn btn-danger full-width"
-					on-click="fire('dispatch', 'REMOVE_TASK', { index: i })">
+					on-click="@this.fire('dispatch', 'REMOVE_TASK', { index: i })">
 						Remove
 					</button>
 				</td>
@@ -49,12 +49,12 @@
 		{{/tasks}}
 		<tr>
 			<td>
-				<form action="" onsubmit="return false" on-submit="fire('dispatch', 'ADD_NEW_TASK')">
+				<form action="" onsubmit="return false" on-submit="@this.fire('dispatch', 'ADD_NEW_TASK')">
 					<input type="text"
 					class="form-control add-new-task"
 					placeholder="New task"
 					value="{{newTaskName}}"
-					on-change="fire('dispatchInput', 'SET_NEW_TASK', event.node)">
+					on-change="@this.fire('dispatchInput', 'SET_NEW_TASK', event.node)">
 				</form>
 			</td>
 		</tr>

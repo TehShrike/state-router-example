@@ -5,7 +5,7 @@
 				{{#topics}}
 					<a href="{{ makePath('app.topics.tasks', { topicId: id }) }}"
 					class="list-group-item"
-					decorator="active:'app.topics.tasks','topicId:{{id}}'">
+					as-active="'app.topics.tasks', { topicId: id }">
 						{{name}} <span class="badge">{{ tasksUndone[id] }}</span>
 					</a>
 				{{/topics}}

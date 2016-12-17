@@ -25,13 +25,13 @@
 				</td>
 				<td>
 					{{#if done}}
-						<button class="btn btn-primary full-width" on-click="restore(i)">Restore</button>
+						<button class="btn btn-primary full-width" on-click="@this.restore(i)">Restore</button>
 					{{else}}
-						<button class="btn btn-success full-width" on-click="complete(i)">Complete</button>
+						<button class="btn btn-success full-width" on-click="@this.complete(i)">Complete</button>
 					{{/if}}
 				</td>
 				<td>
-					<button class="btn btn-danger full-width" on-click="remove(i)">
+					<button class="btn btn-danger full-width" on-click="@this.remove(i)">
 						Remove
 					</button>
 				</td>
