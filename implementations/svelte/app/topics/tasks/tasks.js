@@ -8,70 +8,71 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: 'app.topics.tasks',
 		route: '/:topicId(' + UUID_V4_REGEX + ')',
- 		template: {
- 			component,
- 			options: {
- 				methods: {
-	 				setTaskDone(index, done) {
-	 					const topicId = this.get('topicId')
-		 				const tasks = this.get('tasks').slice()
-		 				tasks[index].done = done
+		template: {
+			component,
+			options: {
+				methods: {
+					setTaskDone: function(index, done) {
+						const topicId = this.get('topicId')
+						const tasks = this.get('tasks').slice()
+						tasks[index].done = done
 
-		 				this.set({ tasks })
+						this.set({ tasks })
 
-		 				model.saveTasks(topicId, tasks)
-	 				},
-	 				remove(taskIndex) {
-	 					const topicId = this.get('topicId')
-		 				const tasksWithIndexElementRemoved = this.get('tasks').slice()
+						model.saveTasks(topicId, tasks)
+					}
+				}
+			}
+		},
+		resolve: function(data, parameters, cb) {
+			all({
+				topic: model.getTopic.bind(null, parameters.topicId),
+				tasks: model.getTasks.bind(null, parameters.topicId),
+				topicId: parameters.topicId
+			}, cb)
+		},
+		activate: function(context) {
+			const svelte = context.domApi
+			const topicId = context.parameters.topicId
 
-		 				tasksWithIndexElementRemoved.splice(taskIndex, 1)
+			svelte.on('newTaskKeyup', function(e) {
+				const newTaskName = svelte.get('newTaskName')
+				if (e.keyCode === 13 && newTaskName) {
+					createNewTask(newTaskName)
+					svelte.set({
+						newTaskName: ''
+					})
+				}
+			})
 
-		 				this.set({
-		 					tasks: tasksWithIndexElementRemoved
-		 				})
+			svelte.on('remove', function(taskIndex) {
+				const topicId = this.get('topicId')
+				const tasksWithIndexElementRemoved = this.get('tasks').slice()
 
-		 				model.saveTasks(topicId, tasksWithIndexElementRemoved)
-		 			}
- 				}
- 			}
- 		},
- 		resolve: function(data, parameters, cb) {
- 			all({
- 				topic: model.getTopic.bind(null, parameters.topicId),
- 				tasks: model.getTasks.bind(null, parameters.topicId),
- 				topicId: parameters.topicId
- 			}, cb)
- 		},
- 		activate: function(context) {
- 			const svelte = context.domApi
- 			const topicId = context.parameters.topicId
+				tasksWithIndexElementRemoved.splice(taskIndex, 1)
 
- 			svelte.on('newTaskKeyup', function(e) {
- 				const newTaskName = svelte.get('newTaskName')
- 				if (e.keyCode === 13 && newTaskName) {
- 					createNewTask(newTaskName)
- 					svelte.set({
- 						newTaskName: ''
- 					})
- 				}
- 			})
+				this.set({
+					tasks: tasksWithIndexElementRemoved
+				})
 
- 			function createNewTask(taskName) {
- 				const task = model.saveTask(topicId, taskName)
- 				const newTasks = svelte.get('tasks').concat(task)
- 				svelte.set({
- 					tasks: newTasks
- 				})
- 			}
+				model.saveTasks(topicId, tasksWithIndexElementRemoved)
+			})
 
- 			svelte.mountedToTarget.querySelector('.add-new-task').focus()
- 		}
+			function createNewTask(taskName) {
+				const task = model.saveTask(topicId, taskName)
+				const newTasks = svelte.get('tasks').concat(task)
+				svelte.set({
+					tasks: newTasks
+				})
+			}
+
+			svelte.mountedToTarget.querySelector('.add-new-task').focus()
+		}
 	})
 
 	stateRouter.addState({
 		name: 'app.topics.no-task',
 		route: '',
- 		template: require('./no-task-selected.html')
+		template: require('./no-task-selected.html')
 	})
 }
