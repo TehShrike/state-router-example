@@ -1,4 +1,4 @@
-const component = require('./tasks.html')
+const component = require('./Tasks.html')
 const model = require('model.js')
 const all = require('async-all')
 
@@ -20,15 +20,15 @@ module.exports = function(stateRouter) {
 						this.set({ tasks })
 
 						model.saveTasks(topicId, tasks)
-					}
-				}
-			}
+					},
+				},
+			},
 		},
 		resolve: function(data, parameters, cb) {
 			all({
 				topic: model.getTopic.bind(null, parameters.topicId),
 				tasks: model.getTasks.bind(null, parameters.topicId),
-				topicId: parameters.topicId
+				topicId: parameters.topicId,
 			}, cb)
 		},
 		activate: function(context) {
@@ -40,7 +40,7 @@ module.exports = function(stateRouter) {
 				if (e.keyCode === 13 && newTaskName) {
 					createNewTask(newTaskName)
 					svelte.set({
-						newTaskName: ''
+						newTaskName: '',
 					})
 				}
 			})
@@ -52,7 +52,7 @@ module.exports = function(stateRouter) {
 				tasksWithIndexElementRemoved.splice(taskIndex, 1)
 
 				this.set({
-					tasks: tasksWithIndexElementRemoved
+					tasks: tasksWithIndexElementRemoved,
 				})
 
 				model.saveTasks(topicId, tasksWithIndexElementRemoved)
@@ -62,17 +62,17 @@ module.exports = function(stateRouter) {
 				const task = model.saveTask(topicId, taskName)
 				const newTasks = svelte.get('tasks').concat(task)
 				svelte.set({
-					tasks: newTasks
+					tasks: newTasks,
 				})
 			}
 
 			svelte.mountedToTarget.querySelector('.add-new-task').focus()
-		}
+		},
 	})
 
 	stateRouter.addState({
 		name: 'app.topics.no-task',
 		route: '',
-		template: require('./no-task-selected.html')
+		template: require('./NoTaskSelected.html'),
 	})
 }

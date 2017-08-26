@@ -1,4 +1,4 @@
-const component = require('./app.html')
+const component = require('./App.html')
 const model = require('model.js')
 
 module.exports = function(stateRouter) {
@@ -12,7 +12,7 @@ module.exports = function(stateRouter) {
 
 			if (currentUser.name) {
 				cb(null, {
-					currentUser
+					currentUser,
 				})
 			} else {
 				cb.redirect('login')
@@ -23,7 +23,7 @@ module.exports = function(stateRouter) {
 				model.saveCurrentUser(null)
 				stateRouter.go('login')
 			})
-		}
+		},
 	})
 
 	require('./about/about')(stateRouter)

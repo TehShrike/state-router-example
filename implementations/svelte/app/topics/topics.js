@@ -1,4 +1,4 @@
-const component = require('./topics.html')
+const component = require('./Topics.html')
 const model = require('model.js')
 const all = require('async-all')
 
@@ -11,7 +11,7 @@ module.exports = function(stateRouter) {
 		resolve: function(data, parameters, cb) {
 			all({
 				topics: model.getTopics,
-				tasks: model.getTasks
+				tasks: model.getTasks,
 			}, cb)
 		},
 		activate: function(context) {
@@ -31,8 +31,8 @@ module.exports = function(stateRouter) {
 
 					svelte.set({
 						tasksUndone: Object.assign({}, svelte.get('tasksUndone'), {
-							[topicId]: leftToDo
-						})
+							[topicId]: leftToDo,
+						}),
 					})
 				})
 			}
@@ -52,19 +52,19 @@ module.exports = function(stateRouter) {
 
 					svelte.set({
 						topics: svelte.get('topics').concat(newTopic),
-						newTopic: ''
+						newTopic: '',
 					})
 
 					recalculateTasksLeftToDoInTopic(newTopic.id)
 					stateRouter.go('app.topics.tasks', {
-						topicId: newTopic.id
+						topicId: newTopic.id,
 					})
 				} else if (!addingTopic) {
 					setFocusOnAddTopicEdit()
 				}
 
 				svelte.set({
-					addingTopic: !addingTopic
+					addingTopic: !addingTopic,
 				})
 
 				return false
@@ -73,7 +73,7 @@ module.exports = function(stateRouter) {
 			context.on('destroy', function() {
 				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
 			})
-		}
+		},
 	})
 
 	require('./tasks/tasks')(stateRouter)

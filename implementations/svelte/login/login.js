@@ -1,4 +1,4 @@
-const component = require('./login.html')
+const component = require('./Login.html')
 const model = require('model.js')
 
 module.exports = function(stateRouter) {
@@ -15,6 +15,6 @@ module.exports = function(stateRouter) {
 				}
 				return false
 			})
-		}
+		},
 	})
 }

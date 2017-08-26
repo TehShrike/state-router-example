@@ -46,7 +46,7 @@
     "riot-state-renderer": "^4.0.1",
     "state-router-redux-ractive": "~2.0.0",
     "svelte": "1.30.0",
-    "svelte-state-renderer": "~1.2.3",
+    "svelte-state-renderer": "~1.2.4",
     "virtualdom-state-renderer": "1.0.0"
   },
   "devDependencies": {
