@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/TehShrike/state-router-example",
   "dependencies": {
-    "abstract-state-router": "^5.15.0",
+    "abstract-state-router": "6.0.4",
     "array.prototype.findindex": "^1.0.0",
     "async-all": "1.0.1",
     "async-each": "0.1.6",
@@ -46,7 +46,7 @@
     "riot-state-renderer": "^4.0.1",
     "state-router-redux-ractive": "~2.0.0",
     "svelte": "1.30.0",
-    "svelte-state-renderer": "~1.2.4",
+    "svelte-state-renderer": "1.2.5",
     "virtualdom-state-renderer": "1.0.0"
   },
   "devDependencies": {
