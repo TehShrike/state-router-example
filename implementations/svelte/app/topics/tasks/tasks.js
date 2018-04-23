@@ -13,8 +13,7 @@ module.exports = function(stateRouter) {
 			options: {
 				methods: {
 					setTaskDone: function(index, done) {
-						const topicId = this.get('topicId')
-						const tasks = this.get('tasks').slice()
+						const { topicId, tasks } = this.get()
 						tasks[index].done = done
 
 						this.set({ tasks })
@@ -36,7 +35,7 @@ module.exports = function(stateRouter) {
 			const topicId = context.parameters.topicId
 
 			svelte.on('newTaskKeyup', function(e) {
-				const newTaskName = svelte.get('newTaskName')
+				const { newTaskName } = svelte.get()
 				if (e.keyCode === 13 && newTaskName) {
 					createNewTask(newTaskName)
 					svelte.set({
@@ -46,8 +45,8 @@ module.exports = function(stateRouter) {
 			})
 
 			svelte.on('remove', function(taskIndex) {
-				const topicId = this.get('topicId')
-				const tasksWithIndexElementRemoved = this.get('tasks').slice()
+				const topicId = this.get().topicId
+				const tasksWithIndexElementRemoved = this.get().tasks.slice()
 
 				tasksWithIndexElementRemoved.splice(taskIndex, 1)
 
@@ -60,7 +59,7 @@ module.exports = function(stateRouter) {
 
 			function createNewTask(taskName) {
 				const task = model.saveTask(topicId, taskName)
-				const newTasks = svelte.get('tasks').concat(task)
+				const newTasks = svelte.get().tasks.concat(task)
 				svelte.set({
 					tasks: newTasks,
 				})

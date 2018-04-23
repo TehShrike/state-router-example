@@ -8,7 +8,7 @@ module.exports = function(stateRouter) {
 		template: component,
 		activate: function({ domApi: svelte }) {
 			svelte.on('login', function() {
-				const username = svelte.get('username')
+				const username = svelte.get().username
 				if (username) {
 					model.saveCurrentUser(username)
 					stateRouter.go('app')

@@ -1,4 +1,4 @@
-<h1>{{topic.name}}</h1>
+<h1>{topic.name}</h1>
 
 <table class="table table-striped">
 	<thead>
@@ -15,23 +15,23 @@
 		</tr>
 	</thead>
 	<tbody>
-		{{#each tasks as task, i}}
+		{#each tasks as task, i}
 			<tr>
-				<td class="{{ifThenStr(task.done, 'text-muted')}} center-y">
+				<td class="{ifThenStr(task.done, 'text-muted')} center-y">
 					<span class="center-y">
-						{{task.name}}
-						{{#if task.done}}
+						{task.name}
+						{#if task.done}
 							<span class="glyphicon glyphicon-ok text-success done-checkbox"></span>
-						{{/if}}
+						{/if}
 					</span>
 
 				</td>
 				<td>
-					{{#if task.done}}
+					{#if task.done}
 						<button class="btn btn-primary full-width" on:click="restore(i)">Restore</button>
-					{{else}}
+					{:else}
 						<button class="btn btn-success full-width" on:click="complete(i)">Complete</button>
-					{{/if}}
+					{/if}
 				</td>
 				<td>
 					<button class="btn btn-danger full-width" on:click="fire('remove', i)">
@@ -39,7 +39,7 @@
 					</button>
 				</td>
 			</tr>
-		{{/each}}
+		{/each}
 		<tr>
 			<td>
 				<input

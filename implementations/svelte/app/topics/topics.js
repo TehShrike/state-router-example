@@ -30,7 +30,7 @@ module.exports = function(stateRouter) {
 					}, 0)
 
 					svelte.set({
-						tasksUndone: Object.assign({}, svelte.get('tasksUndone'), {
+						tasksUndone: Object.assign({}, svelte.get().tasksUndone, {
 							[topicId]: leftToDo,
 						}),
 					})
@@ -44,14 +44,14 @@ module.exports = function(stateRouter) {
 			})
 
 			svelte.on('add-topic', function() {
-				const addingTopic = svelte.get('addingTopic')
-				const newTopicName = svelte.get('newTopic')
+				const addingTopic = svelte.get().addingTopic
+				const newTopicName = svelte.get().newTopic
 
 				if (addingTopic && newTopicName) {
 					const newTopic = model.addTopic(newTopicName)
 
 					svelte.set({
-						topics: svelte.get('topics').concat(newTopic),
+						topics: svelte.get().topics.concat(newTopic),
 						newTopic: '',
 					})
 

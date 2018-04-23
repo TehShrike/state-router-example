@@ -2,14 +2,14 @@
 	<div class="row">
 		<div class="col-sm-4">
 			<div class="list-group">
-				{{#each topics as topic}}
+				{#each topics as topic}
 					<a
-						href="{{ asr.makePath('app.topics.tasks', { topicId: topic.id }) }}"
-						class="list-group-item {{ asr.stateIsActive('app.topics.tasks', { topicId: topic.id }) ? 'active' : '' }}"
+						href="{ asr.makePath('app.topics.tasks', { topicId: topic.id }) }"
+						class="list-group-item { asr.stateIsActive('app.topics.tasks', { topicId: topic.id }) ? 'active' : '' }"
 					>
-						{{topic.name}} <span class="badge">{{ tasksUndone[topic.id] }}</span>
+						{topic.name} <span class="badge">{ tasksUndone[topic.id] }</span>
 					</a>
-				{{/each}}
+				{/each}
 			</div>
 			<form action="" onsubmit="return false" on:submit="fire('add-topic', event)">
 				<div class="table">
@@ -18,7 +18,7 @@
 							<div class="table-cell">
 								<input
 									type="text"
-									class="new-topic-name form-control {{hiddenIfNot(addingTopic)}}"
+									class="new-topic-name form-control {hiddenIfNot(addingTopic)}"
 									placeholder="Topic name"
 									bind:value="newTopic"
 								>
