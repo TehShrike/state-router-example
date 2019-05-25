@@ -1,3 +1,11 @@
+<script>
+	import { createEventDispatcher } from 'svelte';
+
+	const dispatch = createEventDispatcher();
+
+	export let username = '';
+</script>
+
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-sm-offset-3 col-sm-6">
@@ -18,13 +26,13 @@
 			<div class="form-group panel">
 				<form
 					onsubmit="return false"
-					on:submit="fire('login', event)"
+					on:submit="{event => dispatch('login', event)}"
 					class="panel-body"
 					action=""
 				>
 					<label>
 						Put in whatever username you feel like:
-						<input type="text" class="form-control" bind:value="username">
+						<input type="text" class="form-control" bind:value="{username}">
 					</label>
 					<button type="submit" class="btn btn-primary">"Log in"</button>
 				</form>
@@ -32,10 +40,3 @@
 		</div>
 	</div>
 </div>
-<script>
-export default {
-	data: () => ({
-		username: ''
-	})
-}
-</script>
