@@ -1,14 +1,12 @@
-var StateRouter = require('abstract-state-router')
-var SvelteRenderer = require('svelte-state-renderer')
-var domready = require('domready')
+const StateRouter = require(`abstract-state-router`)
+const SvelteRenderer = require(`svelte-state-renderer`)
+const domready = require(`domready`)
 
-domready(function() {
-	var stateRouter = StateRouter(SvelteRenderer(), document.querySelector('body'))
+domready(() => {
+	const stateRouter = StateRouter(SvelteRenderer(), document.querySelector(`body`))
 
-	stateRouter.setMaxListeners(20)
+	require(`./login/login.js`)(stateRouter)
+	require(`./app/app.js`)(stateRouter)
 
-	require('./login/login')(stateRouter)
-	require('./app/app')(stateRouter)
-
-	stateRouter.evaluateCurrentRoute('login')
+	stateRouter.evaluateCurrentRoute(`login`)
 })

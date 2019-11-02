@@ -1,38 +1,53 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from 'svelte'
 
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher()
 
-	export let topics;
-	export let asr;
-	export let tasksUndone = {};
-	export let addingTopic = false;
-	export let newTopic = '';
+	export let topicsStore
+	export let tasksUndoneStore
+	export let asr
 
-	const hiddenIfNot = bool => bool ? '' : 'hidden';
+	let addingTopic = false
+	let newTopic = ''
+	let newTopicNameInput = null
+
+
+	const addTopic = () => {
+		if (addingTopic && newTopic) {
+			dispatch('add-topic', newTopic)
+			newTopic = ''
+		} else if (!addingTopic) {
+			newTopicNameInput.focus()
+		}
+
+		addingTopic = !addingTopic
+	}
+
+	const hiddenIfNot = bool => bool ? '' : 'hidden'
 </script>
 
 <div class="container">
 	<div class="row">
 		<div class="col-sm-4">
 			<div class="list-group">
-				{#each topics as topic}
+				{#each $topicsStore as topic}
 					<a
 						href="{ asr.makePath('app.topics.tasks', { topicId: topic.id }) }"
 						class="list-group-item { asr.stateIsActive('app.topics.tasks', { topicId: topic.id }) ? 'active' : '' }"
 					>
-						{topic.name} <span class="badge">{ tasksUndone[topic.id] }</span>
+						{topic.name} <span class="badge">{ $tasksUndoneStore[topic.id] }</span>
 					</a>
 				{/each}
 			</div>
-			<form action="" onsubmit="return false" on:submit="{event => dispatch('add-topic', event)}">
+			<form action="" onsubmit="return false" on:submit="{addTopic}">
 				<div class="table">
 					<div class="table-row-group">
 						<div class="table-row">
 							<div class="table-cell">
 								<input
 									type="text"
-									class="new-topic-name form-control {hiddenIfNot(addingTopic)}"
+									bind:this={newTopicNameInput}
+									class="form-control {hiddenIfNot(addingTopic)}"
 									placeholder="Topic name"
 									bind:value="{newTopic}"
 								>

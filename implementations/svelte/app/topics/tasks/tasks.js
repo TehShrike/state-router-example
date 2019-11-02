@@ -1,4 +1,4 @@
-const component = require(`./Tasks.html`)
+const component = require(`./Tasks.svelte`)
 const model = require(`model.js`)
 const all = require(`async-all`)
 
@@ -25,18 +25,18 @@ module.exports = function(stateRouter) {
 				},
 			},
 		},
-		resolve(data, parameters, cb) {
+		resolve(data, { topicId }, cb) {
 			all({
-				topic: model.getTopic.bind(null, parameters.topicId),
-				tasks: model.getTasks.bind(null, parameters.topicId),
-				topicId: parameters.topicId,
+				topic: cb => model.getTopic(topicId, cb),
+				tasks: cb => model.getTasks(topicId, cb),
+				topicId,
 			}, cb)
 		},
 		activate(context) {
 			const svelte = context.domApi
 			const topicId = context.parameters.topicId
 
-			svelte.on(`newTaskKeyup`, e => {
+			svelte.$on(`newTaskKeyup`, e => {
 				const { newTaskName } = svelte.get()
 				if (e.keyCode === 13 && newTaskName) {
 					createNewTask(newTaskName)
@@ -46,7 +46,7 @@ module.exports = function(stateRouter) {
 				}
 			})
 
-			svelte.on(`remove`, function(taskIndex) {
+			svelte.$on(`remove`, function(taskIndex) {
 				const topicId = this.get().topicId
 				const tasksWithIndexElementRemoved = this.get().tasks.slice()
 
@@ -74,6 +74,6 @@ module.exports = function(stateRouter) {
 	stateRouter.addState({
 		name: `app.topics.no-task`,
 		route: ``,
-		template: require(`./NoTaskSelected.html`),
+		template: require(`./NoTaskSelected.svelte`),
 	})
 }

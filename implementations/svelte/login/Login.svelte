@@ -1,9 +1,14 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher } from 'svelte'
 
-	const dispatch = createEventDispatcher();
+	const dispatch = createEventDispatcher()
+	let username = ''
 
-	export let username = '';
+	const onSubmit = () => {
+		if (username) {
+			dispatch('login', username)
+		}
+	}
 </script>
 
 <div class="container-fluid">
@@ -26,7 +31,7 @@
 			<div class="form-group panel">
 				<form
 					onsubmit="return false"
-					on:submit="{event => dispatch('login', event)}"
+					on:submit="{onSubmit}"
 					class="panel-body"
 					action=""
 				>

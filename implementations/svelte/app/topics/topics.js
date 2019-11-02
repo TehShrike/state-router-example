@@ -1,6 +1,13 @@
-const component = require(`./Topics.html`)
+const component = require(`./Topics.svelte`)
 const model = require(`model.js`)
-const all = require(`async-all`)
+const { value, computed } = require(`warg`)
+const mapObject = require(`map-obj`)
+
+const makeUndoneTasksComputed = tasks => computed({
+	tasks,
+}, ({ tasks }) =>
+	mapObject(tasks, (taskId, tasks) => [ taskId, tasks.reduce((toDo, task) => toDo + (task.done ? 0 : 1), 0) ])
+)
 
 module.exports = function(stateRouter) {
 	stateRouter.addState({
@@ -9,67 +16,49 @@ module.exports = function(stateRouter) {
 		defaultChild: `no-task`,
 		template: component,
 		resolve(data, parameters, cb) {
-			all({
-				topics: model.getTopics,
-				tasks: model.getTasks,
-			}, cb)
+			model.getTopics((err, topics) => {
+				const tasksStore = value({})
+				const topicsStore = value(topics)
+				cb(null, {
+					topicsStore,
+					tasksStore,
+					tasksUndoneStore: makeUndoneTasksComputed(tasksStore),
+				})
+			})
 		},
 		activate(context) {
 			const svelte = context.domApi
+			const { tasksStore, topicsStore } = context.content
 
-			function setFocusOnAddTopicEdit() {
-				process.nextTick(() => {
-					svelte.mountedToTarget.querySelector(`.new-topic-name`).focus()
-				})
-			}
-
-			function recalculateTasksLeftToDoInTopic(topicId) {
+			const updateTasks = topicId => {
 				model.getTasks(topicId, (err, tasks) => {
-					const leftToDo = tasks.reduce((toDo, task) => toDo + (task.done ? 0 : 1), 0)
-
-					svelte.set({
-						tasksUndone: Object.assign({}, svelte.get().tasksUndone, {
-							[topicId]: leftToDo,
-						}),
-					})
+					tasksStore.set(
+						Object.assign({}, tasksStore.get(), {
+							[topicId]: tasks,
+						})
+					)
 				})
 			}
 
-			model.on(`tasks saved`, recalculateTasksLeftToDoInTopic)
+			topicsStore.get().forEach(({ id: topicId }) => updateTasks(topicId))
 
-			context.content.topics.forEach(topic => {
-				recalculateTasksLeftToDoInTopic(topic.id)
-			})
+			model.on(`tasks saved`, updateTasks)
 
-			svelte.on(`add-topic`, () => {
-				const addingTopic = svelte.get().addingTopic
-				const newTopicName = svelte.get().newTopic
+			svelte.$on(`add-topic`, ({ detail: newTopicName }) => {
+				const newTopic = model.addTopic(newTopicName)
 
-				if (addingTopic && newTopicName) {
-					const newTopic = model.addTopic(newTopicName)
+				topicsStore.set([ ...topicsStore.get(), newTopic ])
+				updateTasks(newTopic.id)
 
-					svelte.set({
-						topics: svelte.get().topics.concat(newTopic),
-						newTopic: ``,
-					})
-
-					recalculateTasksLeftToDoInTopic(newTopic.id)
-					stateRouter.go(`app.topics.tasks`, {
-						topicId: newTopic.id,
-					})
-				} else if (!addingTopic) {
-					setFocusOnAddTopicEdit()
-				}
-
-				svelte.set({
-					addingTopic: !addingTopic,
+				stateRouter.go(`app.topics.tasks`, {
+					topicId: newTopic.id,
 				})
 
 				return false
 			})
 
 			context.on(`destroy`, () => {
-				model.removeListener(`tasks saved`, recalculateTasksLeftToDoInTopic)
+				model.removeListener(`tasks saved`, updateTasks)
 			})
 		},
 	})

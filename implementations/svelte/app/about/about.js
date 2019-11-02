@@ -1,9 +1,9 @@
-const component = require('./About.html')
+const component = require(`./About.svelte`)
 
-module.exports = function(stateRouter) {
+module.exports = stateRouter => {
 	stateRouter.addState({
-		name: 'app.about',
-		route: '/about',
+		name: `app.about`,
+		route: `/about`,
 		template: component,
 	})
 }

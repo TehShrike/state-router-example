@@ -1,19 +1,16 @@
-const component = require('./Login.html')
-const model = require('model.js')
+const component = require(`./Login.svelte`)
+const model = require(`model.js`)
 
-module.exports = function(stateRouter) {
+module.exports = stateRouter => {
 	stateRouter.addState({
-		name: 'login',
-		route: '/login',
+		name: `login`,
+		route: `/login`,
 		template: component,
-		activate: function({ domApi: svelte }) {
-			svelte.on('login', function() {
-				const username = svelte.get().username
-				if (username) {
-					model.saveCurrentUser(username)
-					stateRouter.go('app')
-				}
-				return false
+		activate({ domApi: svelte }) {
+			svelte.$on(`login`, event => {
+				const username = event.detail
+				model.saveCurrentUser(username)
+				stateRouter.go(`app`)
 			})
 		},
 	})

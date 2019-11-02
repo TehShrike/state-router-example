@@ -1,13 +1,13 @@
-const component = require('./App.html')
-const model = require('model.js')
+const component = require(`./App.svelte`)
+const model = require(`model.js`)
 
-module.exports = function(stateRouter) {
+module.exports = stateRouter => {
 	stateRouter.addState({
-		name: 'app',
-		route: '/app',
-		defaultChild: 'topics',
+		name: `app`,
+		route: `/app`,
+		defaultChild: `topics`,
 		template: component,
-		resolve: function resolve(data, parameters, cb) {
+		resolve(data, parameters, cb) {
 			const currentUser = model.getCurrentUser()
 
 			if (currentUser.name) {
@@ -15,17 +15,18 @@ module.exports = function(stateRouter) {
 					currentUser,
 				})
 			} else {
-				cb.redirect('login')
+				cb.redirect(`login`)
 			}
 		},
-		activate: function({ domApi: svelte }) {
-			svelte.on('logout', function() {
+		activate({ domApi: svelte }) {
+			console.log(`huh`)
+			svelte.$on(`logout`, () => {
 				model.saveCurrentUser(null)
-				stateRouter.go('login')
+				stateRouter.go(`login`)
 			})
 		},
 	})
 
-	require('./about/about')(stateRouter)
-	require('./topics/topics')(stateRouter)
+	require(`./about/about`)(stateRouter)
+	require(`./topics/topics`)(stateRouter)
 }
