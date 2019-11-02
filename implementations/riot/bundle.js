@@ -1,3 +1,6167 @@
-!function(){function t(e,n,r){function o(a,u){if(!n[a]){if(!e[a]){var s="function"==typeof require&&require;if(!u&&s)return s(a,!0);if(i)return i(a,!0);var c=new Error("Cannot find module '"+a+"'");throw c.code="MODULE_NOT_FOUND",c}var f=n[a]={exports:{}};e[a][0].call(f.exports,function(t){var n=e[a][1][t];return o(n||t)},f,f.exports,t,e,n,r)}return n[a].exports}for(var i="function"==typeof require&&require,a=0;a<r.length;a++)o(r[a]);return o}return t}()({1:[function(t,e,n){(function(n){function r(t){setTimeout(function(){t(null,o())},w)}function o(){return JSON.parse(localStorage.getItem("topics"))}function i(t,e){setTimeout(function(){e(null,a(t))},w)}function a(t){return o().find(function(e){return e.id===t})}function u(t){var e={name:t,id:y()},n=o();return n.push(e),d(e.id,[]),h(n),e}function s(t){var e=o(),r=e.findIndex(function(e){return e.id===t});e.splice(r,1),h(e),n.nextTick(function(){localStorage.removeItem(t)})}function c(t,e){"function"==typeof t&&(e=t,t=null),setTimeout(function(){t?e(null,l(t)):e(null,f())},w)}function f(){var t=o();return t.reduce(function(t,e){var n=e.id;return t[n]=l(n),t},{})}function l(t){var e=localStorage.getItem(t);return e?JSON.parse(localStorage.getItem(t)):[]}function p(t,e){var n=l(t),r={name:e,done:!1};return n.push(r),d(t,n),r}function d(t,e){localStorage.setItem(t,JSON.stringify(e)),x.emit("tasks saved",t)}function h(t){localStorage.setItem("topics",JSON.stringify(t)),x.emit("topics saved")}function v(){return{name:localStorage.getItem("currentUserName")}}function m(t){t?localStorage.setItem("currentUserName",t):localStorage.removeItem("currentUserName")}function g(){console.log("Initializing dummy data");var t={name:"Important stuff",id:y()},e={name:"Not as important",id:y()};h([t,e]),d(t.id,[{name:"Put on pants",done:!1},{name:"Visit chat room to see if you still pass the Turing test",done:!1}]),d(e.id,[{name:"Make cupcakes",done:!0},{name:"Eat cupcakes",done:!0},{name:"Write forum post rant about how chocolate cupcakes are the only good kind of cupcake",done:!1}])}var y=t("random-uuid-v4"),b=t("events").EventEmitter,w=50,x=new b;e.exports=x,x.getTopics=r,x.getTopic=i,x.addTopic=u,x.removeTopic=s,x.getTasks=c,x.saveTasks=d,x.saveTopics=h,x.getCurrentUser=v,x.saveCurrentUser=m,x.saveTask=p,function(){localStorage.getItem("topics")||g()}()}).call(this,t("_process"))},{_process:17,events:21,"random-uuid-v4":31}],2:[function(t,e,n){t("./about.tag"),e.exports=function(t){t.addState({name:"app.about",route:"/about",template:"about",activate:function(){}})}},{"./about.tag":3}],3:[function(t,e,n){var r=t("riot");e.exports=r.tag2("about",'<div class="container"> <div class="row"> <div class="col-sm-offset-2 col-sm-8"> <div class="jumbotron"> <h1>About this example</h1> </div> </div> </div> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <p> Pretty sweet, isn\'t it? Here, let me give some examples or something. </p> </div> </div> </div>',"","",function(t){})},{riot:34}],4:[function(t,e,n){t("array.prototype.findindex");var r=t("model.js");t("./app.tag"),e.exports=function(e){e.addState({name:"app",route:"/app",defaultChild:"topics",template:"app",resolve:function(t,e,n){r.getCurrentUser().name?n(null,{currentUser:r.getCurrentUser()}):n.redirect("login")},activate:function(t){var n=t.domApi;n.currentUser=r.getCurrentUser(),n.update(),n.on("logout",function(){r.saveCurrentUser(null),e.go("login")})}}),t("./about/about")(e),t("./topics/topics")(e)}},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":15,"model.js":1}],5:[function(t,e,n){var r=t("riot");e.exports=r.tag2("app",'<nav class="navbar navbar-default"> <div class="container-fluid"> <div class="navbar-header"> <ul class="nav navbar-nav"> <li class="{active: opts.active(\'app.topics\')}"> <a href="{opts.makePath(\'app.topics\')}">Basic todo app!</a> </li> <li class="{active: opts.active(\'app.about\')}"> <a href="{opts.makePath(\'app.about\')}">About the state router</a> </li> <li> <a href="{opts.makePath(\'login\')}" on-click="logout">"Log out"</a> </li> </ul> </div> <div class="nav navbar-right"> <p class="navbar-text"> Logged in as {currentUser.name} </p> </div> </div> </nav> <ui-view></ui-view>',"","",function(t){})},{riot:34}],6:[function(t,e,n){var r=t("riot");e.exports=r.tag2("no-task-selected","<span> <p> This is a very basic todo app to show off route states. </p> <p> Click on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing! </p> </span>","","",function(t){})},{riot:34}],7:[function(t,e,n){var r=t("model.js"),o=t("async-all"),i="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}";e.exports=function(e){t("./no-task-selected.tag"),t("./tasks.tag"),e.addState({name:"app.topics.tasks",route:"/:topicId("+i+")",template:"tasks",resolve:function(t,e,n){o({topic:r.getTopic.bind(null,e.topicId),tasks:r.getTasks.bind(null,e.topicId)},n)},activate:function(t){function e(){r.saveTasks(o,n.opts.tasks)}var n=t.domApi,o=t.parameters.topicId;n.complete=function(t){t.done=!0,e()},n.restore=function(t){t.done=!1,e()},n.remove=function(t){var r=n.opts.tasks.indexOf(t);n.opts.tasks.splice(r,1),e(),n.update()},n.newTask=function(t){var e=r.saveTask(o,t);n.opts.tasks.push(e),n.update()},n.update(),n.root.querySelector(".add-new-task").focus()}}),e.addState({name:"app.topics.no-task",route:"",template:"no-task-selected"})}},{"./no-task-selected.tag":6,"./tasks.tag":8,"async-all":16,"model.js":1}],8:[function(t,e,n){var r=t("riot");e.exports=r.tag2("tasks",'<h1>{opts.topic.name}</h1> <table class="table table-striped"> <thead> <tr> <th> Task name </th> <th style="width: 100px"> Complete </th> <th style="width: 87px"> Remove </th> </tr> </thead> <tbody> <tr each="{opts.tasks}"> <td class=" center-y"> <span class="center-y"> {name} &nbsp;<span if="{done}" class="glyphicon glyphicon-ok text-success"></span> </span> </td> <td> <button type="button" if="{done}" class="btn btn-primary full-width" onclick="{parent.onRestore}">Restore</button> <button type="button" if="{!done}" class="btn btn-success full-width" onclick="{parent.onComplete}">Complete</button> </td> <td> <button class="btn btn-danger full-width" onclick="{parent.onRemove}"> Remove </button> </td> </tr> <tr> <td> <input type="text" class="form-control add-new-task" placeholder="New task" onkeyup="{newTaskKeyup}" name="newTaskName"> </td> </tr> </tbody> </table>',"","",function(t){this.newTaskKeyup=function(t){var e=this.newTaskName.value;13===t.keyCode&&e&&(this.newTaskName.value="",this.newTask(e))}.bind(this),this.onRestore=function(t){this.restore(t.item)}.bind(this),this.onComplete=function(t){this.complete(t.item)}.bind(this),this.onRemove=function(t){this.remove(t.item)}.bind(this)})},{riot:34}],9:[function(t,e,n){(function(n){var r=t("model.js");t("./topics.tag"),e.exports=function(e){e.addState({name:"app.topics",route:"/topics",defaultChild:"no-task",template:"topics",resolve:function(t,e,n){r.getTopics(function(t,e){n(null,{topics:e})})},activate:function(t){function o(t){r.getTasks(t,function(e,n){var r=n.reduce(function(t,e){return t+(e.done?0:1)},0);i.opts.tasksUndone[t]=r,i.update()})}var i=t.domApi;i.opts.tasksUndone={},i.update(),i.setFocusOnAddTopicEdit=function(){n.nextTick(function(){i.root.querySelector(".new-topic-name").focus()})},r.on("tasks saved",o),i.opts.topics.forEach(function(t){o(t.id)}),i.addTopic=function(t){var n=r.addTopic(t);i.opts.topics.push(n),o(n.id),e.go("app.topics.tasks",{topicId:n.id})},t.on("destroy",function(){r.removeListener("tasks saved",o)})}}),t("./tasks/tasks")(e)}}).call(this,t("_process"))},{"./tasks/tasks":7,"./topics.tag":10,_process:17,"model.js":1}],10:[function(t,e,n){var r=t("riot");e.exports=r.tag2("topics",'<div class="container"> <div class="row"> <div class="col-sm-4"> <div class="list-group"> <a each="{opts.topics}" href="{parent.opts.makePath(\'app.topics.tasks\', \'topicId\', id)}" class="list-group-item {parent.opts.active(\'app.topics.tasks\', \'topicId\', id) ? \'active\' : \'\'}"> {name} <span class="badge">{parent.opts.tasksUndone[id]}</span> </a> </div> <form action="" onsubmit="{onAddTopic}"> <div class="table"> <div class="table-row-group"> <div class="table-row"> <div class="table-cell"> <input if="{opts.addingTopic}" type="text" class="new-topic-name form-control" placeholder="Topic name" name="newTopic"> </div> <div class="table-cell" style="width: 60px; vertical-align: top"> <button type="submit" class="btn btn-default pull-right">Add</button> </div> </div> </div> </div> </form> </div> <div class="col-sm-8"> <ui-view></ui-view> </div> </div> </div>',"","",function(t){this.opts.addingTopic=!1,this.onAddTopic=function(){var t=this.newTopic.value;return this.opts.addingTopic&&t&&(this.newTopic.value="",this.addTopic(t)),this.opts.addingTopic=!this.opts.addingTopic,this.update(),this.opts.addingTopic&&this.setFocusOnAddTopicEdit(),!1}.bind(this)})},{riot:34}],11:[function(t,e,n){var r=t("abstract-state-router"),o=t("riot-state-renderer"),i=t("domready"),a=r(o(),"body");t("./login/login")(a),t("./app/app")(a),i(function(){a.evaluateCurrentRoute("login")})},{"./app/app":4,"./login/login":12,"abstract-state-router":14,domready:19,"riot-state-renderer":32}],12:[function(t,e,n){var r=t("model.js");t("./login.tag"),e.exports=function(t){t.addState({name:"login",route:"/login",template:"login",activate:function(e){var n=e.domApi;n.opts.login=function(e){e&&(r.saveCurrentUser(e),t.go("app"))}}})}},{"./login.tag":13,"model.js":1}],13:[function(t,e,n){var r=t("riot");e.exports=r.tag2("login",'<div class="container-fluid"> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <h1>Welcome to the abstract-state-router demo!</h1> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-3 col-sm-6"> <div class="well"> <p class="lead"> This is a demo webapp showing off basic usage of the <a href="https://github.com/TehShrike/abstract-state-router">abstract-state-router</a> library using a few different templating libraries. </p> </div> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-4 col-sm-4"> <div class="form-group panel"> <form onsubmit="{login}" class="panel-body" action=""> <label> Put in whatever username you feel like: <input type="text" class="form-control" name="username"> </label> <button type="submit" class="btn btn-primary">"Log in"</button> </form> </div> </div> </div> </div>',"","",function(t){this.login=function(){return t.login(this.username.value),!1}.bind(this)})},{riot:34}],14:[function(t,e,n){"use strict";function r(t){return t&&"object"==typeof t&&"default"in t?t.default:t}function o(t,e){return e={exports:{}},t(e,e.exports),e.exports}function i(){var t={};return function(e){return e?(t[e]||(t[e]=p(e).keys.map(function(t){return t.name})),t[e]):[]}}function a(t){var e=t.stateState,n=t.getPathParameters,r=t.stateName,o=t.fromParameters,i=t.toParameters,a=e.get(r),u=a.querystringParameters||[],s=n(a.route).concat(u);return Array.isArray(s)&&s.some(function(t){return o[t]!==i[t]})}function u(t){var e=t.parametersChanged,n=t.original,r=t.destination,o=l({start:y(n.name),end:y(r.name)});return o.map(function(t){var o=t.start,i=t.end;return{nameBefore:o,nameAfter:i,stateNameChanged:o!==i,stateParametersChanged:o===i&&e({stateName:o,fromParameters:n.parameters,toParameters:r.parameters})}})}function s(t,e){var n=y(e);return n.filter(function(e){return t[e]}).reduce(function(e,n){return w(e,t[n])},{})}function c(t,e){return{redirectTo:{name:t,params:e}}}function f(t,e){var n=t.filter(L("resolve")),r=n.map(O("name")),o=Promise.all(n.map(function(t){return new Promise(function(n,r){var o=function(t,e){return t?r(t):n(e)};o.redirect=function(t,e){r(c(t,e))};var i=t.resolve(t.data,e,o);A(i)&&n(i)})}));return o.then(function(t){return l({stateName:r,resolveResult:t}).reduce(function(t,e){return t[e.stateName]=e.resolveResult,t},{})})}var l=r(t("combine-arrays")),p=r(t("path-to-regexp-with-reversible-keys")),d=r(t("then-denodeify")),h=r(t("eventemitter3")),v=r(t("hash-brown-router")),m=r(t("page-path-builder")),g=r(t("iso-next-tick")),y=o(function(t){t.exports=function(t){return t.split(".").reduce(function(t,e){return t.push(t.length?t[t.length-1]+"."+e:e),t},[])}}),b=function(){function t(t){var e=y(t);return e.map(function(t){if(!a[t])throw new Error("State "+t+" not found");return a[t]})}function e(t){var e=n(t);return e&&a[e]}function n(t){var e=y(t);if(e.length>1){var n=e.length-2;return e[n]}return null}function r(t){var e=y(t),n=e.filter(function(t){return!a[t]});if(n.length>0)throw new Error("State "+n[n.length-1]+" does not exist")}function o(e){return t(e).map(function(t){return"/"+(t.route||"")}).join("").replace(/\/{2,}/g,"/")}function i(t){var e=a[t],n=e&&("function"==typeof e.defaultChild?e.defaultChild():e.defaultChild);if(!n)return t;var r=t+"."+n;return i(r)}var a={};return{add:function(t,e){a[t]=e},get:function(t){return t&&a[t]},getHierarchy:t,getParent:e,getParentName:n,guaranteeAllStatesExist:r,buildFullStateRoute:o,applyDefaultChildStates:i}},w=function(){for(var t=arguments.length,e=Array(t),n=0;n<t;n++)e[n]=arguments[n];return Object.assign.apply(Object,[{}].concat(e))},x=function(t){var e=i(),n=function(n){return a(w(n,{stateState:t,getPathParameters:e}))};return function(t){return u(w(t,{parametersChanged:n}))}},_=function(){var t={name:"",parameters:{}};return{get:function(){return t},set:function(e,n){t={name:e,parameters:n}}}},T=function(t){var e=!1,n=!1,r={destroy:[],change:[],create:[]};return t.forEach(function(t){e=e||t.stateParametersChanged,n=n||t.stateNameChanged,t.nameBefore&&(n?r.destroy.push(t.nameBefore):e&&r.change.push(t.nameBefore)),t.nameAfter&&n&&r.create.push(t.nameAfter)}),r},k=function(t){function e(){i=null,a&&n()}function n(){i=a,a=null,i.beginStateChange()}function r(){i.transition.cancelled=!0;var e=new Error("State transition cancelled by the state transition manager");e.wasCancelledBySomeoneElse=!0,t.emit("stateChangeCancelled",e)}function o(t){var e={cancelled:!1,cancellable:!0};return{transition:e,beginStateChange:function(){for(var n=arguments.length,r=Array(n),o=0;o<n;o++)r[o]=arguments[o];return t.apply(void 0,[e].concat(r))}}}var i=null,a=null,u=function(){return!!i};t.on("stateChangeAttempt",function(t){a=o(t),u()&&i.transition.cancellable?r():u()||n()}),t.on("stateChangeError",e),t.on("stateChangeCancelled",e),t.on("stateChangeEnd",e)},C={reverse:!1},E=function(t,e){var n=Promise.resolve();return Promise.all(t.map(function(r,o){return n=n.then(function(){return e(r,o,t)})}))},j="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(t){return typeof t}:function(t){return t&&"function"==typeof Symbol&&t.constructor===Symbol&&t!==Symbol.prototype?"symbol":typeof t},O=function(t){return function(e){return e[t]}},S=function(t){return t.slice().reverse()},L=function(t){return function(e){return"function"==typeof e[t]}},A=function(t){return t&&("object"===("undefined"==typeof t?"undefined":j(t))||"function"==typeof t)&&"function"==typeof t.then},P=function(t){for(var e=arguments.length,n=Array(e>1?e-1:0),r=1;r<e;r++)n[r-1]=arguments[r];return new Promise(function(e){return e(t.apply(void 0,n))})},N=["name","route","defaultChild","data","template","resolve","activate","querystringParameters","defaultQuerystringParameters","defaultParameters"],I=function(t,e){function n(t,e){g(function(){if(F.emit(t,e),console.error(t+" - "+e.message),B)throw e})}function r(t){var e=M.get(t);return F.emit("beforeDestroyState",{state:e,domApi:W[t]}),Z[t].emit("destroy"),Z[t].removeAllListeners(),delete Z[t],delete J[t],V(W[t]).then(function(){delete W[t],F.emit("afterDestroyState",{state:e})})}function o(t,e){var n=W[e],r=s(J,e),o=M.get(e);return F.emit("beforeResetState",{domApi:n,content:r,state:o,parameters:t}),Z[e].emit("destroy"),delete Z[e],Q({domApi:n,content:r,template:o.template,parameters:t}).then(function(n){n&&(W[e]=n),F.emit("afterResetState",{domApi:W[e],content:r,state:o,parameters:t})})}function i(t){return new Promise(function(n){var r=M.getParent(t);if(r){var o=W[r.name];n(z(o))}else n(e)})}function a(t,e){return i(e).then(function(n){var r=M.get(e),o=s(J,e);return F.emit("beforeCreateState",{state:r,content:o,parameters:t}),G({template:r.template,element:n,content:o,parameters:t}).then(function(n){return W[e]=n,F.emit("afterCreateState",{state:r,domApi:n,content:o,parameters:t}),n})})}function u(t,e){return E(t,function(t){return a(e,t)})}function l(t,e){try{var r=M.applyDefaultChildStates(t.name);if(r===t.name)O(r,e);else{var o=A(r,e),i=K.location.get();o===i?O(r,e):F.go(r,e,{replace:!0})}}catch(t){n("stateError",t)}}function p(t){if("undefined"==typeof t)throw new Error("Expected 'state' to be passed in.");if("undefined"==typeof t.name)throw new Error("Expected the 'name' option to be passed in.");if("undefined"==typeof t.template)throw new Error("Expected the 'template' option to be passed in.");Object.keys(t).filter(function(t){return N.indexOf(t)===-1}).forEach(function(t){console.warn("Unexpected property passed to addState:",t)}),M.add(t.name,t);var e=M.buildFullStateRoute(t.name);K.add(e,function(e){return l(t,e)})}function j(t){return t.change.concat(t.create).map(M.get)}function O(t,e){F.emit("stateChangeAttempt",function(n){L(t,e,n)})}function L(t,e,i){function a(e){return function(){if(i.cancelled){var n=new Error("The transition to "+t+" was cancelled");throw n.wasCancelledBySomeoneElse=!0,n}return e.apply(void 0,arguments)}}return P(M.guaranteeAllStatesExist,t).then(function(){var n=M.get(t),r=n.defaultParameters||n.defaultQuerystringParameters||{},o=Object.keys(r).some(function(t){return"undefined"==typeof e[t]});if(o)throw c(t,w(r,e));return n}).then(a(function(t){F.emit("stateChangeStart",t,e,q(t.name)),U.set(t.name,e)})).then(function(){var n=$({original:R.get(),destination:{name:t,parameters:e}});return T(n)}).then(a(function(t){function n(t){return t.map(M.get).forEach(function(t){var n=new h,r=Object.create(n);r.domApi=W[t.name],r.data=t.data,r.parameters=e,r.content=s(J,t.name),Z[t.name]=n;try{t.activate&&t.activate(r)}catch(t){g(function(){throw t})}})}return f(j(t),w(e)).catch(function(t){throw t.stateChangeError=!0,t}).then(a(function(a){i.cancellable=!1;var s=function(){return n(t.change.concat(t.create))};return J=w(J,a),E(S(t.destroy),r).then(function(){return E(S(t.change),function(t){return o(w(e),t)})}).then(function(){return u(t.create,w(e)).then(s)})}))})).then(function(){R.set(t,e);try{F.emit("stateChangeEnd",M.get(t),e,q(t))}catch(t){n("stateError",t)}}).catch(a(function(t){return t&&t.redirectTo?(F.emit("stateChangeCancelled",t),F.go(t.redirectTo.name,t.redirectTo.params,{replace:!0})):void(t&&n("stateChangeError",t))})).catch(function(t){if(!t||!t.wasCancelledBySomeoneElse)throw new Error("This probably shouldn't happen, maybe file an issue or something "+t)})}function A(t,e,n){function r(){if(!U.get().name)throw new Error("makePath required a previous state to exist, and none was found");return U.get()}n&&n.inherit&&(e=w(r().parameters,e));var o=null===t?r().name:t,i=M.get(o)||{},a=i.defaultParameters||i.defaultQuerystringParameters;e=w(a,e),M.guaranteeAllStatesExist(o);var u=M.buildFullStateRoute(o);return m(u,e||{})}var I=arguments.length>2&&void 0!==arguments[2]?arguments[2]:{},M=b(),R=_(),U=_(),F=new h,$=x(M),q=function(t){return y(t).map(M.get)};k(F);var D=w({throwOnError:!0,pathPrefix:"#"},I),B=D.throwOnError,H=D.pathPrefix,K=I.router||v(C);K.on("not found",function(t,e){F.emit("routeNotFound",t,e)});var V=null,z=null,G=null,Q=null,J={},W={},Z={},X={replace:!1};F.addState=p,F.go=function(t,e,r){r=w(X,r);var o=r.replace?K.replace:K.go;return P(A,t,e,r).then(o,function(t){return n("stateChangeError",t)})},F.evaluateCurrentRoute=function(t,e){return P(A,t,e).then(function(t){K.evaluateCurrent(t)}).catch(function(t){return n("stateError",t)})},F.makePath=function(t,e,n){return H+A(t,e,n)},F.stateIsActive=function(t){var e=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null,n=R.get(),r=n.name===t||0===n.name.indexOf(t+"."),o=!e;return r&&(o||Object.keys(e).every(function(t){return e[t]===n.parameters[t]}))};var Y=t(F);return V=d(Y.destroy),z=d(Y.getChildElement),G=d(Y.render),Q=d(Y.reset),F};e.exports=I},{"combine-arrays":18,eventemitter3:20,"hash-brown-router":23,"iso-next-tick":25,"page-path-builder":27,"path-to-regexp-with-reversible-keys":29,"then-denodeify":36}],15:[function(t,e,n){!function(t){if(!Array.prototype.findIndex){var e=function(t){var e=Object(this),n=Math.max(0,e.length)>>>0;if(0===n)return-1;if("function"!=typeof t||"[object Function]"!==Object.prototype.toString.call(t))throw new TypeError("Array#findIndex: predicate must be a function");for(var r=arguments.length>1?arguments[1]:void 0,o=0;o<n;o++)if(t.call(r,e[o],o,e))return o;return-1};if(Object.defineProperty)try{Object.defineProperty(Array.prototype,"findIndex",{value:e,configurable:!0,writable:!0})}catch(t){}Array.prototype.findIndex||(Array.prototype.findIndex=e)}}(this)},{}],16:[function(t,e,n){(function(t){e.exports=function(e,n){function r(){function e(){"function"==typeof n&&(c?n(c):n(null,s))}a?t.nextTick(e):e()}function o(){0!==u||i||(r(),i=!0)}var i=!1,a=!0,u=0,s={},c=null;if(!e||"object"!=typeof e||Array.isArray(e))throw new Error("async-all requires you to pass in an object!");Object.keys(e).forEach(function(t){var n=!1;"function"==typeof e[t]?(u++,e[t](function(e,r){n||(n=!0,u--,c||(e?c=e:s[t]=r),o())})):s[t]=e[t]}),o(),a=!1}}).call(this,t("_process"))},{_process:17}],17:[function(t,e,n){function r(){throw new Error("setTimeout has not been defined")}function o(){throw new Error("clearTimeout has not been defined")}function i(t){if(l===setTimeout)return setTimeout(t,0);if((l===r||!l)&&setTimeout)return l=setTimeout,setTimeout(t,0);try{return l(t,0)}catch(e){try{return l.call(null,t,0)}catch(e){return l.call(this,t,0)}}}function a(t){if(p===clearTimeout)return clearTimeout(t);if((p===o||!p)&&clearTimeout)return p=clearTimeout,clearTimeout(t);try{return p(t)}catch(e){try{return p.call(null,t)}catch(e){return p.call(this,t)}}}function u(){m&&h&&(m=!1,h.length?v=h.concat(v):g=-1,v.length&&s())}function s(){if(!m){var t=i(u);m=!0;for(var e=v.length;e;){for(h=v,v=[];++g<e;)h&&h[g].run();g=-1,e=v.length}h=null,m=!1,a(t)}}function c(t,e){this.fun=t,this.array=e}function f(){}var l,p,d=e.exports={};!function(){try{l="function"==typeof setTimeout?setTimeout:r}catch(t){l=r}try{p="function"==typeof clearTimeout?clearTimeout:o}catch(t){p=o}}();var h,v=[],m=!1,g=-1;d.nextTick=function(t){var e=new Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)e[n-1]=arguments[n];v.push(new c(t,e)),1!==v.length||m||i(s)},c.prototype.run=function(){this.fun.apply(null,this.array)},d.title="browser",d.browser=!0,d.env={},d.argv=[],d.version="",d.versions={},d.on=f,d.addListener=f,d.once=f,d.off=f,d.removeListener=f,d.removeAllListeners=f,d.emit=f,d.prependListener=f,d.prependOnceListener=f,d.listeners=function(t){return[]},d.binding=function(t){throw new Error("process.binding is not supported")},d.cwd=function(){return"/"},d.chdir=function(t){throw new Error("process.chdir is not supported")},d.umask=function(){return 0}},{}],18:[function(t,e,n){e.exports=function(t){function e(e){var r={};return n.forEach(function(n){r[n]=t[n][e]}),r}var n=Object.keys(t);n.forEach(function(e){if(!Array.isArray(t[e]))throw new Error(e+" is not an array")});for(var r=n.reduce(function(e,n){var r=t[n].length;return e>r?e:r},0),o=[],i=0;i<r;++i)o.push(e(i));return o}},{}],19:[function(t,e,n){!function(t,n){"undefined"!=typeof e?e.exports=n():"function"==typeof define&&"object"==typeof define.amd?define(n):this[t]=n()}("domready",function(){var t,e=[],n=document,r=n.documentElement.doScroll,o="DOMContentLoaded",i=(r?/^loaded|^c/:/^loaded|^i|^c/).test(n.readyState);return i||n.addEventListener(o,t=function(){for(n.removeEventListener(o,t),i=1;t=e.shift();)t()}),function(t){i?setTimeout(t,0):e.push(t)}})},{}],20:[function(t,e,n){"use strict";function r(){}function o(t,e,n){this.fn=t,this.context=e,this.once=n||!1}function i(){this._events=new r,this._eventsCount=0}var a=Object.prototype.hasOwnProperty,u="~";Object.create&&(r.prototype=Object.create(null),(new r).__proto__||(u=!1)),i.prototype.eventNames=function(){var t,e,n=[];if(0===this._eventsCount)return n;for(e in t=this._events)a.call(t,e)&&n.push(u?e.slice(1):e);return Object.getOwnPropertySymbols?n.concat(Object.getOwnPropertySymbols(t)):n},i.prototype.listeners=function(t,e){var n=u?u+t:t,r=this._events[n];if(e)return!!r;if(!r)return[];if(r.fn)return[r.fn];for(var o=0,i=r.length,a=new Array(i);o<i;o++)a[o]=r[o].fn;return a},i.prototype.emit=function(t,e,n,r,o,i){var a=u?u+t:t;if(!this._events[a])return!1;var s,c,f=this._events[a],l=arguments.length;if(f.fn){switch(f.once&&this.removeListener(t,f.fn,void 0,!0),l){case 1:return f.fn.call(f.context),!0;case 2:return f.fn.call(f.context,e),!0;case 3:return f.fn.call(f.context,e,n),!0;case 4:return f.fn.call(f.context,e,n,r),!0;case 5:return f.fn.call(f.context,e,n,r,o),!0;case 6:return f.fn.call(f.context,e,n,r,o,i),!0}for(c=1,s=new Array(l-1);c<l;c++)s[c-1]=arguments[c];f.fn.apply(f.context,s)}else{var p,d=f.length;for(c=0;c<d;c++)switch(f[c].once&&this.removeListener(t,f[c].fn,void 0,!0),l){case 1:f[c].fn.call(f[c].context);break;case 2:f[c].fn.call(f[c].context,e);break;case 3:f[c].fn.call(f[c].context,e,n);break;case 4:f[c].fn.call(f[c].context,e,n,r);break;default:if(!s)for(p=1,s=new Array(l-1);p<l;p++)s[p-1]=arguments[p];f[c].fn.apply(f[c].context,s)}}return!0},i.prototype.on=function(t,e,n){var r=new o(e,n||this),i=u?u+t:t;return this._events[i]?this._events[i].fn?this._events[i]=[this._events[i],r]:this._events[i].push(r):(this._events[i]=r,this._eventsCount++),this},i.prototype.once=function(t,e,n){var r=new o(e,n||this,!0),i=u?u+t:t;return this._events[i]?this._events[i].fn?this._events[i]=[this._events[i],r]:this._events[i].push(r):(this._events[i]=r,this._eventsCount++),this},i.prototype.removeListener=function(t,e,n,o){var i=u?u+t:t;if(!this._events[i])return this;if(!e)return 0===--this._eventsCount?this._events=new r:delete this._events[i],this;var a=this._events[i];if(a.fn)a.fn!==e||o&&!a.once||n&&a.context!==n||(0===--this._eventsCount?this._events=new r:delete this._events[i]);else{for(var s=0,c=[],f=a.length;s<f;s++)(a[s].fn!==e||o&&!a[s].once||n&&a[s].context!==n)&&c.push(a[s]);c.length?this._events[i]=1===c.length?c[0]:c:0===--this._eventsCount?this._events=new r:delete this._events[i]}return this},i.prototype.removeAllListeners=function(t){var e;return t?(e=u?u+t:t,this._events[e]&&(0===--this._eventsCount?this._events=new r:delete this._events[e])):(this._events=new r,this._eventsCount=0),this},i.prototype.off=i.prototype.removeListener,i.prototype.addListener=i.prototype.on,i.prototype.setMaxListeners=function(){return this},i.prefixed=u,i.EventEmitter=i,"undefined"!=typeof e&&(e.exports=i)},{}],21:[function(t,e,n){function r(){this._events&&Object.prototype.hasOwnProperty.call(this,"_events")||(this._events=x(null),this._eventsCount=0),this._maxListeners=this._maxListeners||void 0}function o(t){return void 0===t._maxListeners?r.defaultMaxListeners:t._maxListeners}function i(t,e,n){if(e)t.call(n);else for(var r=t.length,o=m(t,r),i=0;i<r;++i)o[i].call(n)}function a(t,e,n,r){if(e)t.call(n,r);else for(var o=t.length,i=m(t,o),a=0;a<o;++a)i[a].call(n,r)}function u(t,e,n,r,o){if(e)t.call(n,r,o);else for(var i=t.length,a=m(t,i),u=0;u<i;++u)a[u].call(n,r,o)}function s(t,e,n,r,o,i){if(e)t.call(n,r,o,i);else for(var a=t.length,u=m(t,a),s=0;s<a;++s)u[s].call(n,r,o,i)}function c(t,e,n,r){if(e)t.apply(n,r);else for(var o=t.length,i=m(t,o),a=0;a<o;++a)i[a].apply(n,r)}function f(t,e,n,r){var i,a,u;if("function"!=typeof n)throw new TypeError('"listener" argument must be a function');if(a=t._events,a?(a.newListener&&(t.emit("newListener",e,n.listener?n.listener:n),a=t._events),u=a[e]):(a=t._events=x(null),t._eventsCount=0),u){if("function"==typeof u?u=a[e]=r?[n,u]:[u,n]:r?u.unshift(n):u.push(n),!u.warned&&(i=o(t),i&&i>0&&u.length>i)){u.warned=!0;var s=new Error("Possible EventEmitter memory leak detected. "+u.length+' "'+String(e)+'" listeners added. Use emitter.setMaxListeners() to increase limit.');s.name="MaxListenersExceededWarning",s.emitter=t,s.type=e,s.count=u.length,"object"==typeof console&&console.warn&&console.warn("%s: %s",s.name,s.message)}}else u=a[e]=n,++t._eventsCount;return t}function l(){if(!this.fired)switch(this.target.removeListener(this.type,this.wrapFn),this.fired=!0,arguments.length){case 0:return this.listener.call(this.target);case 1:return this.listener.call(this.target,arguments[0]);case 2:return this.listener.call(this.target,arguments[0],arguments[1]);case 3:return this.listener.call(this.target,arguments[0],arguments[1],arguments[2]);default:for(var t=new Array(arguments.length),e=0;e<t.length;++e)t[e]=arguments[e];this.listener.apply(this.target,t)}}function p(t,e,n){var r={fired:!1,wrapFn:void 0,target:t,type:e,listener:n},o=T.call(l,r);return o.listener=n,r.wrapFn=o,o}function d(t,e,n){var r=t._events;if(!r)return[];var o=r[e];return o?"function"==typeof o?n?[o.listener||o]:[o]:n?g(o):m(o,o.length):[]}function h(t){var e=this._events;if(e){var n=e[t];if("function"==typeof n)return 1;if(n)return n.length}return 0}function v(t,e){for(var n=e,r=n+1,o=t.length;r<o;n+=1,r+=1)t[n]=t[r];t.pop()}function m(t,e){for(var n=new Array(e),r=0;r<e;++r)n[r]=t[r];return n}function g(t){for(var e=new Array(t.length),n=0;n<e.length;++n)e[n]=t[n].listener||t[n];return e}function y(t){var e=function(){};return e.prototype=t,new e}function b(t){var e=[];for(var n in t)Object.prototype.hasOwnProperty.call(t,n)&&e.push(n);return n}function w(t){var e=this;return function(){return e.apply(t,arguments)}}var x=Object.create||y,_=Object.keys||b,T=Function.prototype.bind||w;e.exports=r,r.EventEmitter=r,r.prototype._events=void 0,r.prototype._maxListeners=void 0;var k,C=10;try{var E={};Object.defineProperty&&Object.defineProperty(E,"x",{value:0}),k=0===E.x}catch(t){k=!1}k?Object.defineProperty(r,"defaultMaxListeners",{enumerable:!0,get:function(){return C},set:function(t){if("number"!=typeof t||t<0||t!==t)throw new TypeError('"defaultMaxListeners" must be a positive number');C=t}}):r.defaultMaxListeners=C,r.prototype.setMaxListeners=function(t){if("number"!=typeof t||t<0||isNaN(t))throw new TypeError('"n" argument must be a positive number');return this._maxListeners=t,this},r.prototype.getMaxListeners=function(){return o(this)},r.prototype.emit=function(t){var e,n,r,o,f,l,p="error"===t;if(l=this._events)p=p&&null==l.error;else if(!p)return!1;if(p){if(arguments.length>1&&(e=arguments[1]),e instanceof Error)throw e;var d=new Error('Unhandled "error" event. ('+e+")");throw d.context=e,d}if(n=l[t],!n)return!1;var h="function"==typeof n;switch(r=arguments.length){case 1:i(n,h,this);break;case 2:a(n,h,this,arguments[1]);break;case 3:u(n,h,this,arguments[1],arguments[2]);break;case 4:s(n,h,this,arguments[1],arguments[2],arguments[3]);break;default:for(o=new Array(r-1),f=1;f<r;f++)o[f-1]=arguments[f];c(n,h,this,o)}return!0},r.prototype.addListener=function(t,e){return f(this,t,e,!1)},r.prototype.on=r.prototype.addListener,r.prototype.prependListener=function(t,e){return f(this,t,e,!0)},r.prototype.once=function(t,e){if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');return this.on(t,p(this,t,e)),this},r.prototype.prependOnceListener=function(t,e){if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');return this.prependListener(t,p(this,t,e)),this},r.prototype.removeListener=function(t,e){var n,r,o,i,a;if("function"!=typeof e)throw new TypeError('"listener" argument must be a function');if(r=this._events,!r)return this;if(n=r[t],!n)return this;if(n===e||n.listener===e)0===--this._eventsCount?this._events=x(null):(delete r[t],r.removeListener&&this.emit("removeListener",t,n.listener||e));else if("function"!=typeof n){
-for(o=-1,i=n.length-1;i>=0;i--)if(n[i]===e||n[i].listener===e){a=n[i].listener,o=i;break}if(o<0)return this;0===o?n.shift():v(n,o),1===n.length&&(r[t]=n[0]),r.removeListener&&this.emit("removeListener",t,a||e)}return this},r.prototype.removeAllListeners=function(t){var e,n,r;if(n=this._events,!n)return this;if(!n.removeListener)return 0===arguments.length?(this._events=x(null),this._eventsCount=0):n[t]&&(0===--this._eventsCount?this._events=x(null):delete n[t]),this;if(0===arguments.length){var o,i=_(n);for(r=0;r<i.length;++r)o=i[r],"removeListener"!==o&&this.removeAllListeners(o);return this.removeAllListeners("removeListener"),this._events=x(null),this._eventsCount=0,this}if(e=n[t],"function"==typeof e)this.removeListener(t,e);else if(e)for(r=e.length-1;r>=0;r--)this.removeListener(t,e[r]);return this},r.prototype.listeners=function(t){return d(this,t,!0)},r.prototype.rawListeners=function(t){return d(this,t,!1)},r.listenerCount=function(t,e){return"function"==typeof t.listenerCount?t.listenerCount(e):h.call(t,e)},r.prototype.listenerCount=h,r.prototype.eventNames=function(){return this._eventsCount>0?Reflect.ownKeys(this._events):[]}},{}],22:[function(t,e,n){function r(t,e){t.location.replace(o(t.location.href)+"#"+e)}function o(t){var e=t.indexOf("#");return e===-1?t:t.substring(0,e)}function i(t,e){t.location.hash=e}function a(t,e){var n=u(t.location.hash);return e?decodeURI(n):n}function u(t){return t&&"#"===t[0]?t.substr(1):t}function s(){var t=document.createElement("a");return t.href="#x x",!/x x/.test(t.hash)}var c=t("eventemitter3");e.exports=function(t){function e(e){return function(n){n!==o&&e(t,n)}}var n=new c,o="",u=s();return t.addEventListener("hashchange",function(){o!==n.get()&&(o=n.get(),n.emit("hashchange"))}),n.go=e(i),n.replace=e(r),n.get=a.bind(null,t,u),n}},{eventemitter3:20}],23:[function(t,e,n){function r(t,e,n,r){i(t,e.get(),n,r)}function o(t){var e=t.split("?");return{path:e.shift(),queryString:d.parse(e.join(""))}}function i(t,e,n,r){var i=o(e);e=i.path;var s=i.queryString,c=l(n?a(t):t,e);if(c){var f=c.exec(e),p=u(c.keys,f),d=h(s,p);c.fn(d)}else r(e,s)}function a(t){return t.slice().reverse()}function u(t,e){return t.reduce(function(t,n,r){return t[n.name]=e[r+1],t},{})}function s(t,e,n){if("function"!=typeof n)throw new Error("The router add function must be passed a callback function");var r=p(e);r.fn=n,t.push(r)}function c(t,e,n,o,i){var a=e.get(),u=a&&("/"!==a||"/"===i);if(u){var s=t.slice();r(s,e,n,o)}else e.go(i)}function f(t){return t&&t.go&&t.replace&&t.on}function l(t,e){for(var n=0;n<t.length;++n)if(e.match(t[n]))return t[n]}var p=t("path-to-regexp-with-reversible-keys"),d=t("query-string"),h=t("xtend"),v=t("./hash-location.js"),m=t("eventemitter3");e.exports=function(t,e){function n(t,e){i.emit("not found",t,e)}function o(){e.removeListener("hashchange",u)}var i=new m;f(t)&&(e=t,t=null),t=t||{},e||(e=v(window));var a=[],u=r.bind(null,a,e,!!t.reverse,n);return e.on("hashchange",u),i.add=s.bind(null,a),i.stop=o,i.evaluateCurrent=c.bind(null,a,e,!!t.reverse,n),i.replace=e.replace,i.go=e.go,i.location=e,i}},{"./hash-location.js":22,eventemitter3:20,"path-to-regexp-with-reversible-keys":29,"query-string":30,xtend:39}],24:[function(t,e,n){e.exports=Array.isArray||function(t){return"[object Array]"==Object.prototype.toString.call(t)}},{}],25:[function(t,e,n){(function(t){e.exports=function(e){"function"==typeof t?t(e):setTimeout(e,0)}}).call(this,t("timers").setImmediate)},{timers:37}],26:[function(t,e,n){"use strict";function r(t){if(null===t||void 0===t)throw new TypeError("Object.assign cannot be called with null or undefined");return Object(t)}function o(){try{if(!Object.assign)return!1;var t=new String("abc");if(t[5]="de","5"===Object.getOwnPropertyNames(t)[0])return!1;for(var e={},n=0;n<10;n++)e["_"+String.fromCharCode(n)]=n;var r=Object.getOwnPropertyNames(e).map(function(t){return e[t]});if("0123456789"!==r.join(""))return!1;var o={};return"abcdefghijklmnopqrst".split("").forEach(function(t){o[t]=t}),"abcdefghijklmnopqrst"===Object.keys(Object.assign({},o)).join("")}catch(t){return!1}}var i=Object.getOwnPropertySymbols,a=Object.prototype.hasOwnProperty,u=Object.prototype.propertyIsEnumerable;e.exports=o()?Object.assign:function(t,e){for(var n,o,s=r(t),c=1;c<arguments.length;c++){n=Object(arguments[c]);for(var f in n)a.call(n,f)&&(s[f]=n[f]);if(i){o=i(n);for(var l=0;l<o.length;l++)u.call(n,o[l])&&(s[o[l]]=n[o[l]])}}return s}},{}],27:[function(t,e,n){function r(t,e,n){var r=o(e,n);return 0===Object.keys(r).length?t:t+"?"+a(r)}function o(t,e){var n=e.reduce(function(t,e){return e.string||(t[e.name]=e),t},{});return Object.keys(t).filter(function(t){return!n[t]}).reduce(function(e,n){return e[n]=t[n],e},{})}var i=t("./path-parser"),a=t("query-string").stringify;e.exports=function(t,e){var n="string"==typeof t?i(t):t,o=n.allTokens,a=n.regex;if(e){var u=o.map(function(n){if(n.string)return n.string;var r="undefined"!=typeof e[n.name];if(!n.optional&&!r)throw new Error("Must supply argument "+n.name+" for path "+t);return r?n.delimiter+encodeURIComponent(e[n.name]):""}).join("");if(!a.test(u))throw new Error("Provided arguments do not match the original arguments");return r(u,e,o)}return n}},{"./path-parser":28,"query-string":30}],28:[function(t,e,n){var r=t("path-to-regexp-with-reversible-keys");e.exports=function(t){var e=r(t);return{regex:e,allTokens:e.allTokens}}},{"path-to-regexp-with-reversible-keys":29}],29:[function(t,e,n){function r(t){return t.replace(/([=!:$\/()])/g,"\\$1")}function o(t,e,n){return t.keys=e,t.allTokens=n,t}function i(t){return t.sensitive?"":"i"}function a(t,e,n){var r=t.source.match(/\((?!\?)/g);if(r)for(var i=0;i<r.length;i++)e.push({name:i,delimiter:null,optional:!1,repeat:!1});return o(t,e,n)}function u(t,e,n,r){for(var a=[],u=0;u<t.length;u++)a.push(c(t[u],e,n,r).source);var s=new RegExp("(?:"+a.join("|")+")",i(n));return o(s,e,r)}function s(t,e,n){function o(t){0===u&&"/"!==t[0]&&(t="/"+t),n.push({string:t})}function i(i,s,c,f,l,p,d,h,v){if(s)return s;if(h)return"\\"+h;var m="+"===d||"*"===d,g="?"===d||"*"===d;v>u&&o(t.substring(u,v)),u=v+i.length;var y={name:f||a++,delimiter:c||"/",optional:g,repeat:m};return e.push(y),n.push(y),c=c?"\\"+c:"",l=r(l||p||"[^"+(c||"\\/")+"]+?"),m&&(l=l+"(?:"+c+l+")*"),g?"(?:"+c+"("+l+"))?":c+"("+l+")"}var a=0,u=0,s=t.replace(l,i);return u<t.length&&o(t.substring(u)),s}function c(t,e,n,r){if(e=e||[],r=r||[],f(e)?n||(n={}):(n=e,e=[]),t instanceof RegExp)return a(t,e,n,r);if(f(t))return u(t,e,n,r);var c=n.strict,l=n.end!==!1,p=s(t,e,r),d="/"===t.charAt(t.length-1);return c||(p=(d?p.slice(0,-2):p)+"(?:\\/(?=$))?"),p+=l?"$":c&&d?"":"(?=\\/|$)",o(new RegExp("^"+p,i(n)),e,r)}var f=t("isarray");e.exports=c;var l=new RegExp(["(\\\\.)","([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?","([.+*?=^!:${}()[\\]|\\/])"].join("|"),"g")},{isarray:24}],30:[function(t,e,n){"use strict";function r(t){switch(t.arrayFormat){case"index":return function(e,n,r){return null===n?[i(e,t),"[",r,"]"].join(""):[i(e,t),"[",i(r,t),"]=",i(n,t)].join("")};case"bracket":return function(e,n){return null===n?i(e,t):[i(e,t),"[]=",i(n,t)].join("")};default:return function(e,n){return null===n?i(e,t):[i(e,t),"=",i(n,t)].join("")}}}function o(t){var e;switch(t.arrayFormat){case"index":return function(t,n,r){return e=/\[(\d*)\]$/.exec(t),t=t.replace(/\[\d*\]$/,""),e?(void 0===r[t]&&(r[t]={}),void(r[t][e[1]]=n)):void(r[t]=n)};case"bracket":return function(t,n,r){return e=/(\[\])$/.exec(t),t=t.replace(/\[\]$/,""),e?void 0===r[t]?void(r[t]=[n]):void(r[t]=[].concat(r[t],n)):void(r[t]=n)};default:return function(t,e,n){return void 0===n[t]?void(n[t]=e):void(n[t]=[].concat(n[t],e))}}}function i(t,e){return e.encode?e.strict?u(t):encodeURIComponent(t):t}function a(t){return Array.isArray(t)?t.sort():"object"==typeof t?a(Object.keys(t)).sort(function(t,e){return Number(t)-Number(e)}).map(function(e){return t[e]}):t}var u=t("strict-uri-encode"),s=t("object-assign");n.extract=function(t){return t.split("?")[1]||""},n.parse=function(t,e){e=s({arrayFormat:"none"},e);var n=o(e),r=Object.create(null);return"string"!=typeof t?r:(t=t.trim().replace(/^(\?|#|&)/,""))?(t.split("&").forEach(function(t){var e=t.replace(/\+/g," ").split("="),o=e.shift(),i=e.length>0?e.join("="):void 0;i=void 0===i?null:decodeURIComponent(i),n(decodeURIComponent(o),i,r)}),Object.keys(r).sort().reduce(function(t,e){var n=r[e];return Boolean(n)&&"object"==typeof n&&!Array.isArray(n)?t[e]=a(n):t[e]=n,t},Object.create(null))):r},n.stringify=function(t,e){var n={encode:!0,strict:!0,arrayFormat:"none"};e=s(n,e);var o=r(e);return t?Object.keys(t).sort().map(function(n){var r=t[n];if(void 0===r)return"";if(null===r)return i(n,e);if(Array.isArray(r)){var a=[];return r.slice().forEach(function(t){void 0!==t&&a.push(o(n,t,a.length))}),a.join("&")}return i(n,e)+"="+i(r,e)}).filter(function(t){return t.length>0}).join("&"):""}},{"object-assign":26,"strict-uri-encode":35}],31:[function(t,e,n){e.exports=function(){var t=(new Date).getTime();return"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(e){var n=(t+16*Math.random())%16|0;return t=Math.floor(t/16),("x"==e?n:3&n|8).toString(16)})}},{}],32:[function(t,e,n){function r(){try{for(var t=Array.prototype.slice.call(arguments),e=t.shift(),n=t.shift(),r={},o=0;o<t.length;o+=2)r[t[o]]=t[o+1];return e(n,r)}catch(t){console.log(t)}}var o=t("riot"),i=t("xtend");e.exports=function(t){var e=i(t);return function(t){return e.makePath=r.bind(null,t.makePath),e.active=r.bind(null,t.stateIsActive),t.on("stateChangeEnd",function(){o.update()}),{render:function(t,n){var r=t.element,a=t.template,u=t.content;"string"==typeof r&&(r=document.querySelector(r));try{var s=o.mount(r,a,i(e,u))[0];s||console.error("Error creating riot tag",a,"on",r),s.root.attributes["riot-tag"]&&s.root.attributes["riot-tag"].value!==a&&(s.root.attributes["riot-tag"].value=a),n(null,s)}catch(t){n(t)}},reset:function(t,n){var r=t.domApi;r.trigger("reset"),r.opts=i(e,t.content),r.update(),n()},destroy:function(t,e){t.unmount(!0),e()},getChildElement:function(t,e){try{var n=t.root.querySelector("ui-view");e(null,n)}catch(t){e(t)}}}}}},{riot:33,xtend:39}],33:[function(t,e,n){!function(t,r){"use strict";function o(t,e,n){var r={};return r[t.key]=e,t.pos&&(r[t.pos]=n),r}function i(t,e){for(var n,r=e.length,o=t.length;r>o;)n=e[--r],e.splice(r,1),n.unmount()}function a(t,e){Object.keys(t.tags).forEach(function(n){var r=t.tags[n];R(r)?g(r,function(t){S(t,n,e)}):S(r,n,e)})}function u(t,e,n){var r,o=t._root;for(t._virts=[];o;)r=o.nextSibling,n?e.insertBefore(o,n._root):e.appendChild(o),t._virts.push(o),o=r}function s(t,e,n,r){for(var o,i=t._root,a=0;a<r;a++)o=i.nextSibling,e.insertBefore(i,n._root),i=o}function c(t,e,n,r,o,i,a){D(e.root)||(t?i(e,r,n,a.childNodes.length):r.insertBefore(e.root,n.root))}function f(t,e,n){T(t,"each");var r,f=typeof C(t,"no-reorder")!==ot||T(t,"no-reorder"),l=N(t),p=Y[l]||{tmpl:b(t)},h=ft.test(l),v=t.parentNode,m=document.createTextNode(""),g=j(t),y="option"===l.toLowerCase(),w=[],x=[],_="VIRTUAL"==t.tagName;n=mt.loopKeys(n),v.insertBefore(m,t),e.one("before-mount",function(){t.parentNode.removeChild(t),v.stub&&(v=e.root)}).on("update",function(){var b=mt(n.val,e),T=document.createDocumentFragment();R(b)||(r=b||!1,b=r?Object.keys(b).map(function(t){return o(n,t,b[t])}):[]);for(var k=0,C=b.length;k<C;k++){var E=b[k],j=f&&typeof E==it&&!r,O=x.indexOf(E),S=~O&&j?O:k,L=w[S];E=!r&&n.key?o(n,E,k):E,!j&&!L||j&&!~O||!L?(L=new d(p,{parent:e,isLoop:!0,hasImpl:!!Y[l],root:h?v:t.cloneNode(),item:E},t.innerHTML),L.mount(),_&&(L._root=L.root.firstChild),k!=w.length&&w[k]?(c(_,L,w[k],v,w,u,t),x.splice(k,0,E)):_?u(L,T):T.appendChild(L.root),w.splice(k,0,L),S=k):L.update(E,!0),S!==k&&j&&w[k]&&(M(b,x[k])&&c(_,L,w[k],v,w,s,t),n.pos&&(L[n.pos]=k),w.splice(k,0,w.splice(S,1)[0]),x.splice(k,0,x.splice(S,1)[0]),!g&&L.tags&&a(L,k)),L._item=E,P(L,"_parent",e)}if(i(b,w),v.insertBefore(T,m),y&&ht&&!v.multiple)for(var A=0;A<v.length;A++)if(v[A].__riot1374){v.selectedIndex=A,delete v[A].__riot1374;break}g&&(e.tags[l]=w),x=b.slice()})}function l(t,e,n,r){$(t,function(t){if(1==t.nodeType){if(t.isLoop=t.isLoop||t.parentNode&&t.parentNode.isLoop||C(t,"each")?1:0,n){var o=j(t);o&&!t.isLoop&&n.push(L(o,{root:t,parent:e},t.innerHTML,e))}t.isLoop&&!r||G(t,e,[])}})}function p(t,e,n){function r(t,e,r){mt.hasExpr(e)&&n.push(I({dom:t,expr:e},r))}$(t,function(t){var n,o=t.nodeType;if(3==o&&"STYLE"!=t.parentNode.tagName&&r(t,t.nodeValue),1==o)return(n=C(t,"each"))?(f(t,e,n),!1):(g(t.attributes,function(e){var n=e.name,o=n.split("__")[1];if(r(t,e.value,{attr:o||n,bool:o}),o)return T(t,n),!1}),!j(t)&&void 0)})}function d(t,e,n){function o(){var t=b&&v?f:h||f;g(j.attributes,function(e){if(!(e.name in S)){var n=e.value;d[k(e.name)]=mt.hasExpr(n)?mt(n,t):n}}),g(Object.keys(S),function(e){d[k(e)]=mt(S[e],t)})}function i(t){for(var e in w)typeof f[e]!==at&&U(f,e)&&(f[e]=t[e])}function a(t){g(Object.keys(t),function(e){var n=!lt.test(e)&&M(L,e);(typeof f[e]===at||n)&&(n||L.push(e),f[e]=t[e])})}function u(t){f.update(t,!0)}function s(t){if(g(C,function(e){e[t?"mount":"unmount"]()}),h){var e=t?"on":"off";v?h[e]("unmount",f.unmount):h[e]("update",u)[e]("unmount",f.unmount)}}var c,f=W.observable(this),d=V(e.opts)||{},h=e.parent,v=e.isLoop,b=e.hasImpl,w=F(e.item),x=[],C=[],j=e.root,O=j.tagName.toLowerCase(),S={},L=[];t.name&&j._tag&&j._tag.unmount(!0),this.isMounted=!1,j.isLoop=v,j._tag=this,P(this,"_riot_id",++Z),I(this,{parent:h,root:j,opts:d},w),P(this,"tags",{}),g(j.attributes,function(t){var e=t.value;mt.hasExpr(e)&&(S[t.name]=e)}),c=gt(t.tmpl,n,v),P(this,"update",function(t,e){return t=F(t),v&&a(f.parent),t&&_(w)&&(i(t),w=t),I(f,t),o(),f.trigger("update",t),m(x,f),e&&f.parent?f.parent.one("updated",function(){f.trigger("updated")}):bt(function(){f.trigger("updated")}),this}),P(this,"mixin",function(){return g(arguments,function(t){var e,n,r=[];t=typeof t===ot?W.mixin(t):t,e=y(t)?new t:t;var o=Object.getPrototypeOf(e);do r=r.concat(Object.getOwnPropertyNames(n||e));while(n=Object.getPrototypeOf(n||e));g(r,function(t){if("init"!=t&&"__proto__"!=t){var n=Object.getOwnPropertyDescriptor(e,t)||Object.getOwnPropertyDescriptor(o,t),r=n&&(n.get||n.set);!f.hasOwnProperty(t)&&r?Object.defineProperty(f,t,n):f[t]=y(e[t])?e[t].bind(f):e[t]}}),e.init&&e.init.bind(f)()}),this}),P(this,"mount",function(){o();var e=W.mixin(tt);if(e)for(var n in e)e.hasOwnProperty(n)&&f.mixin(e[n]);if(f._parent&&f._parent.root.isLoop&&a(f._parent),t.fn&&t.fn.call(f,d),p(c,f,x),s(!0),t.attrs&&q(t.attrs,function(t,e){E(j,t,e)}),(t.attrs||b)&&p(f.root,f,x),f.parent&&!v||f.update(w),f.trigger("before-mount"),v&&!b)j=c.firstChild;else{for(;c.firstChild;)j.appendChild(c.firstChild);j.stub&&(j=h.root)}P(f,"root",j),v&&l(f.root,f.parent,null,!0),!f.parent||f.parent.isMounted?(f.isMounted=!0,f.trigger("mount")):f.parent.one("mount",function(){D(f.root)||(f.parent.isMounted=f.isMounted=!0,f.trigger("mount"))})}),P(this,"unmount",function(t){var e,n=j,o=n.parentNode,i=X.indexOf(f);if(f.trigger("before-unmount"),~i&&X.splice(i,1),o){if(h)e=A(h),R(e.tags[O])?g(e.tags[O],function(t,n){t._riot_id==f._riot_id&&e.tags[O].splice(n,1)}):e.tags[O]=r;else for(;n.firstChild;)n.removeChild(n.firstChild);t?(T(o,rt),T(o,nt)):o.removeChild(n)}this._virts&&g(this._virts,function(t){t.parentNode&&t.parentNode.removeChild(t)}),f.trigger("unmount"),s(),f.off("*"),f.isMounted=!1,delete j._tag}),l(c,this,C)}function h(e,n,r,o){r[e]=function(e){var i,a=o._parent,u=o._item;if(!u)for(;a&&!u;)u=a._item,a=a._parent;e=e||t.event,U(e,"currentTarget")&&(e.currentTarget=r),U(e,"target")&&(e.target=e.srcElement),U(e,"which")&&(e.which=e.charCode||e.keyCode),e.item=u,n.call(o,e)===!0||/radio|check/.test(r.type)||(e.preventDefault&&e.preventDefault(),e.returnValue=!1),e.preventUpdate||(i=u?A(a):o,i.update())}}function v(t,e,n){t&&(t.insertBefore(n,e),t.removeChild(e))}function m(t,e){g(t,function(t,n){var r=t.dom,o=t.attr,i=mt(t.expr,e),a=t.parent||t.dom.parentNode;if(t.bool?i=!!i:null==i&&(i=""),t.value!==i){if(t.value=i,!o)return i+="",void(a&&(t.parent=a,"TEXTAREA"===a.tagName?(a.value=i,dt||(r.nodeValue=i)):r.nodeValue=i));if("value"===o)return void(r.value!==i&&(r.value=i,E(r,o,i)));if(T(r,o),y(i))h(o,i,r,e);else if("if"==o){var u=t.stub,s=function(){v(u.parentNode,u,r)},c=function(){v(r.parentNode,r,u)};i?u&&(s(),r.inStub=!1,D(r)||$(r,function(t){t._tag&&!t._tag.isMounted&&(t._tag.isMounted=!!t._tag.trigger("mount"))})):(u=t.stub=u||document.createTextNode(""),r.parentNode?c():(e.parent||e).one("updated",c),r.inStub=!0)}else"show"===o?r.style.display=i?"":"none":"hide"===o?r.style.display=i?"none":"":t.bool?(r[o]=i,i&&E(r,o,o),ht&&"selected"===o&&"OPTION"===r.tagName&&(r.__riot1374=i)):(0===i||i&&typeof i!==it)&&(Q(o,et)&&o!=nt&&(o=o.slice(et.length)),E(r,o,i))}})}function g(t,e){for(var n,r=t?t.length:0,o=0;o<r;o++)n=t[o],null!=n&&e(n,o)===!1&&o--;return t}function y(t){return typeof t===ut||!1}function b(t){if(t.outerHTML)return t.outerHTML;var e=B("div");return e.appendChild(t.cloneNode(!0)),e.innerHTML}function w(t,e){if(typeof t.innerHTML!=at)t.innerHTML=e;else{var n=(new DOMParser).parseFromString(e,"application/xml");t.appendChild(t.ownerDocument.importNode(n.documentElement,!0))}}function x(t){return~pt.indexOf(t)}function _(t){return t&&typeof t===it}function T(t,e){t.removeAttribute(e)}function k(t){return t.replace(/-(\w)/g,function(t,e){return e.toUpperCase()})}function C(t,e){return t.getAttribute(e)}function E(t,e,n){var r=ct.exec(e);r&&r[1]?t.setAttributeNS(st,r[1],n):t.setAttribute(e,n)}function j(t){return t.tagName&&Y[C(t,rt)||C(t,nt)||t.tagName.toLowerCase()]}function O(t,e,n){var r=n.tags[e];r?(R(r)||r!==t&&(n.tags[e]=[r]),M(n.tags[e],t)||n.tags[e].push(t)):n.tags[e]=t}function S(t,e,n){var r,o=t.parent;o&&(r=o.tags[e],R(r)?r.splice(n,0,r.splice(r.indexOf(t),1)[0]):O(t,e,o))}function L(t,e,n,r){var o=new d(t,e,n),i=N(e.root),a=A(r);return o.parent=a,o._parent=r,O(o,i,a),a!==r&&O(o,i,r),e.root.innerHTML="",o}function A(t){for(var e=t;!j(e.root)&&e.parent;)e=e.parent;return e}function P(t,e,n,r){return Object.defineProperty(t,e,I({value:n,enumerable:!1,writable:!1,configurable:!0},r)),t}function N(t){var e=j(t),n=C(t,"name"),r=n&&!mt.hasExpr(n)?n:e?e.name:t.tagName.toLowerCase();return r}function I(t){for(var e,n=arguments,r=1;r<n.length;++r)if(e=n[r])for(var o in e)U(t,o)&&(t[o]=e[o]);return t}function M(t,e){return~t.indexOf(e)}function R(t){return Array.isArray(t)||t instanceof Array}function U(t,e){var n=Object.getOwnPropertyDescriptor(t,e);return typeof t[e]===at||n&&n.writable}function F(t){if(!(t instanceof d||t&&typeof t.trigger==ut))return t;var e={};for(var n in t)lt.test(n)||(e[n]=t[n]);return e}function $(t,e){if(t){if(e(t)===!1)return;for(t=t.firstChild;t;)$(t,e),t=t.nextSibling}}function q(t,e){for(var n,r=/([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g;n=r.exec(t);)e(n[1].toLowerCase(),n[2]||n[3]||n[4])}function D(t){for(;t;){if(t.inStub)return!0;t=t.parentNode}return!1}function B(t,e){return e?document.createElementNS("http://www.w3.org/2000/svg","svg"):document.createElement(t)}function H(t,e){return(e||document).querySelectorAll(t)}function K(t,e){return(e||document).querySelector(t)}function V(t){return Object.create(t||null)}function z(t){return C(t,"id")||C(t,"name")}function G(t,e,n){var r,o=z(t),i=function(i){M(n,o)||(r=R(i),i?(!r||r&&!M(i,t))&&(r?i.push(t):e[o]=[i,t]):e[o]=t)};o&&(mt.hasExpr(o)?e.one("mount",function(){o=z(t),i(e[o])}):i(e[o]))}function Q(t,e){return t.slice(0,e.length)===e}function J(t,e,n){var r=Y[e],o=t._innerHTML=t._innerHTML||t.innerHTML;return t.innerHTML="",r&&t&&(r=new d(r,{root:t,opts:n},o)),r&&r.mount&&(r.mount(),M(X,r)||X.push(r)),r}var W={version:"v2.6.9",settings:{}},Z=0,X=[],Y={},tt="__global_mixin",et="riot-",nt=et+"tag",rt="data-is",ot="string",it="object",at="undefined",ut="function",st="http://www.w3.org/1999/xlink",ct=/^xlink:(\w+)/,ft=/^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,lt=/^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/,pt=["altGlyph","animate","animateColor","circle","clipPath","defs","ellipse","feBlend","feColorMatrix","feComponentTransfer","feComposite","feConvolveMatrix","feDiffuseLighting","feDisplacementMap","feFlood","feGaussianBlur","feImage","feMerge","feMorphology","feOffset","feSpecularLighting","feTile","feTurbulence","filter","font","foreignObject","g","glyph","glyphRef","image","line","linearGradient","marker","mask","missing-glyph","path","pattern","polygon","polyline","radialGradient","rect","stop","svg","switch","symbol","text","textPath","tref","tspan","use"],dt=0|(t&&t.document||{}).documentMode,ht=t&&!!t.InstallTrigger;W.observable=function(t){function e(t,e){for(var n=t.split(" "),r=n.length,o=0;o<r;o++){var i=n[o];i&&e(i,o)}}t=t||{};var n={},r=Array.prototype.slice;return Object.defineProperties(t,{on:{value:function(r,o){return"function"!=typeof o?t:(e(r,function(t,e){(n[t]=n[t]||[]).push(o),o.typed=e>0}),t)},enumerable:!1,writable:!1,configurable:!1},off:{value:function(r,o){return"*"!=r||o?e(r,function(t,e){if(o)for(var r,i=n[t],a=0;r=i&&i[a];++a)r==o&&i.splice(a--,1);else delete n[t]}):n={},t},enumerable:!1,writable:!1,configurable:!1},one:{value:function(e,n){function r(){t.off(e,r),n.apply(t,arguments)}return t.on(e,r)},enumerable:!1,writable:!1,configurable:!1},trigger:{value:function(o){for(var i,a=arguments.length-1,u=new Array(a),s=0;s<a;s++)u[s]=arguments[s+1];return e(o,function(e,o){i=r.call(n[e]||[],0);for(var a,s=0;a=i[s];++s)a.busy||(a.busy=1,a.apply(t,a.typed?[e].concat(u):u),i[s]!==a&&s--,a.busy=0);n["*"]&&"*"!=e&&t.trigger.apply(t,["*",e].concat(u))}),t},enumerable:!1,writable:!1,configurable:!1}}),t},function(e){function n(t){return t.split(/[\/?#]/)}function r(t,e){var n=new RegExp("^"+e[k](/\*/g,"([^/?#]+?)")[k](/\.\./,".*")+"$"),r=t.match(n);if(r)return r.slice(1)}function o(t,e){var n;return function(){clearTimeout(n),n=setTimeout(t,e)}}function i(t){h=o(l,1),S[_](C,h),S[_](E,h),L[_](I,p),t&&l(!0)}function a(){this.$=[],e.observable(this),R.on("stop",this.s.bind(this)),R.on("emit",this.e.bind(this))}function u(t){return t[k](/^\/|\/$/,"")}function s(t){return"string"==typeof t}function c(t){return(t||P.href)[k](b,"")}function f(t){return"#"==v[0]?(t||P.href||"").split(v)[1]||"":(P?c(t):t||"")[k](v,"")}function l(t){var e,n=0==$;if(!(O<=$)&&($++,F.push(function(){var e=f();(t||e!=m)&&(R[j]("emit",e),m=e)}),n)){for(;e=F.shift();)e();$=0}}function p(t){if(!(1!=t.which||t.metaKey||t.ctrlKey||t.shiftKey||t.defaultPrevented)){for(var e=t.target;e&&"A"!=e.nodeName;)e=e.parentNode;!e||"A"!=e.nodeName||e[T]("download")||!e[T]("href")||e.target&&"_self"!=e.target||e.href.indexOf(P.href.match(b)[0])==-1||e.href!=P.href&&(e.href.split("#")[0]==P.href.split("#")[0]||"#"!=v[0]&&0!==c(e.href).indexOf(v)||"#"==v[0]&&e.href.split(v)[0]!=P.href.split(v)[0]||!d(f(e.href),e.title||L.title))||t.preventDefault()}}function d(t,e,n){return A?(t=v+u(t),e=e||L.title,n?A.replaceState(null,e,t):A.pushState(null,e,t),L.title=e,U=!1,l(),U):R[j]("emit",f(t))}var h,v,m,g,y,b=/^.+?\/\/+[^\/]+/,w="EventListener",x="remove"+w,_="add"+w,T="hasAttribute",k="replace",C="popstate",E="hashchange",j="trigger",O=3,S="undefined"!=typeof t&&t,L="undefined"!=typeof document&&document,A=S&&history,P=S&&(A.location||S.location),N=a.prototype,I=L&&L.ontouchstart?"touchstart":"click",M=!1,R=e.observable(),U=!1,F=[],$=0;N.m=function(t,e,n){!s(t)||e&&!s(e)?e?this.r(t,e):this.r("@",t):d(t,e,n||!1)},N.s=function(){this.off("*"),this.$=[]},N.e=function(t){this.$.concat("@").some(function(e){var n=("@"==e?g:y)(u(t),u(e));if("undefined"!=typeof n)return this[j].apply(null,[e].concat(n)),U=!0},this)},N.r=function(t,e){"@"!=t&&(t="/"+u(t),this.$.push(t)),this.on(t,e)};var q=new a,D=q.m.bind(q);D.create=function(){var t=new a,e=t.m.bind(t);return e.stop=t.s.bind(t),e},D.base=function(t){v=t||"#",m=f()},D.exec=function(){l(!0)},D.parser=function(t,e){t||e||(g=n,y=r),t&&(g=t),e&&(y=e)},D.query=function(){var t={},e=P.href||m;return e[k](/[?&](.+?)=([^&]*)/g,function(e,n,r){t[n]=r}),t},D.stop=function(){M&&(S&&(S[x](C,h),S[x](E,h),L[x](I,p)),R[j]("stop"),M=!1)},D.start=function(t){M||(S&&("complete"==document.readyState?i(t):S[_]("load",function(){setTimeout(function(){i(t)},1)})),M=!0)},D.base(),D.parser(),e.route=D}(W);var vt=function(t){function e(t){return t}function n(t,e){return e||(e=b),new RegExp(t.source.replace(/{/g,e[2]).replace(/}/g,e[3]),t.global?c:"")}function r(t){if(t===m)return g;var e=t.split(" ");if(2!==e.length||d.test(t))throw new Error('Unsupported brackets "'+t+'"');return e=e.concat(t.replace(h,"\\").split(" ")),e[4]=n(e[1].length>1?/{[\S\s]*?}/:g[4],e),e[5]=n(t.length>3?/\\({|})/g:g[5],e),e[6]=n(g[6],e),e[7]=RegExp("\\\\("+e[3]+")|([[({])|("+e[3]+")|"+p,c),e[8]=t,e}function o(t){return t instanceof RegExp?u(t):b[t]}function i(t){(t||(t=m))!==b[8]&&(b=r(t),u=t===m?e:n,b[9]=u(g[9])),y=t}function a(t){var e;t=t||{},e=t.brackets,Object.defineProperty(t,"brackets",{set:i,get:function(){return y},enumerable:!0}),s=t,i(e)}var u,s,c="g",f=/\/\*[^*]*\*+(?:[^*\/][^*]*\*+)*\//g,l=/"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'/g,p=l.source+"|"+/(?:\breturn\s+|(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/]))/.source+"|"+/\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?(\/)[gim]*/.source,d=RegExp("[\\x00-\\x1F<>a-zA-Z0-9'\",;\\\\]"),h=/(?=[[\]()*+?.^$|])/g,v={"(":RegExp("([()])|"+p,c),"[":RegExp("([[\\]])|"+p,c),"{":RegExp("([{}])|"+p,c)},m="{ }",g=["{","}","{","}",/{[^}]*}/,/\\([{}])/g,/\\({)|{/g,RegExp("\\\\(})|([[({])|(})|"+p,c),m,/^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S.*)\s*}/,/(^|[^\\]){=[\S\s]*?}/],y=t,b=[];return o.split=function(t,e,n){function r(t){e||a?c.push(t&&t.replace(n[5],"$1")):c.push(t)}function o(t,e,n){var r,o=v[e];for(o.lastIndex=n,n=1;(r=o.exec(t))&&(!r[1]||(r[1]===e?++n:--n)););return n?t.length:o.lastIndex}n||(n=b);var i,a,u,s,c=[],f=n[6];for(a=u=f.lastIndex=0;i=f.exec(t);){if(s=i.index,a){if(i[2]){f.lastIndex=o(t,i[2],f.lastIndex);continue}if(!i[3])continue}i[1]||(r(t.slice(u,s)),u=f.lastIndex,f=n[6+(a^=1)],f.lastIndex=u)}return t&&u<t.length&&r(t.slice(u)),c},o.hasExpr=function(t){return b[4].test(t)},o.loopKeys=function(t){var e=t.match(b[9]);return e?{key:e[1],pos:e[2],val:b[0]+e[3].trim()+b[1]}:{val:t.trim()}},o.array=function(t){return t?r(t):b},Object.defineProperty(o,"settings",{set:a,get:function(){return s}}),o.settings="undefined"!=typeof W&&W.settings||{},o.set=i,o.R_STRINGS=l,o.R_MLCOMMS=f,o.S_QBLOCKS=p,o}(),mt=function(){function e(t,e){return t?(u[t]||(u[t]=r(t))).call(e,n):t}function n(t,n){e.errorHandler&&(t.riotData={tagName:n&&n.root&&n.root.tagName,_riot_id:n&&n._riot_id},e.errorHandler(t))}function r(t){var e=o(t);return"try{return "!==e.slice(0,11)&&(e="return "+e),new Function("E",e+";")}function o(t){var e,n=[],r=vt.split(t.replace(l,'"'),1);if(r.length>2||r[0]){var o,a,u=[];for(o=a=0;o<r.length;++o)e=r[o],e&&(e=1&o?i(e,1,n):'"'+e.replace(/\\/g,"\\\\").replace(/\r\n?|\n/g,"\\n").replace(/"/g,'\\"')+'"')&&(u[a++]=e);e=a<2?u[0]:"["+u.join(",")+'].join("")'}else e=i(r[1],0,n);return n[0]&&(e=e.replace(p,function(t,e){return n[e].replace(/\r/g,"\\r").replace(/\n/g,"\\n")})),e}function i(t,e,n){function r(e,n){var r,o=1,i=d[e];for(i.lastIndex=n.lastIndex;r=i.exec(t);)if(r[0]===e)++o;else if(!--o)break;n.lastIndex=o?t.length:i.lastIndex}if(t=t.replace(f,function(t,e){return t.length>2&&!e?s+(n.push(t)-1)+"~":t}).replace(/\s+/g," ").trim().replace(/\ ?([[\({},?\.:])\ ?/g,"$1")){for(var o,i=[],u=0;t&&(o=t.match(c))&&!o.index;){var l,p,h=/,|([[{(])|$/g;for(t=RegExp.rightContext,l=o[2]?n[o[2]].slice(1,-1).trim().replace(/\s+/g," "):o[1];p=(o=h.exec(t))[1];)r(p,h);p=t.slice(0,o.index),t=RegExp.rightContext,i[u++]=a(p,1,l)}t=u?u>1?"["+i.join(",")+'].join(" ").trim()':i[0]:a(t,e)}return t}function a(t,e,n){var r;return t=t.replace(v,function(t,e,n,o,i){return n&&(o=r?0:o+t.length,"this"!==n&&"global"!==n&&"window"!==n?(t=e+'("'+n+h+n,o&&(r="."===(i=i[o])||"("===i||"["===i)):o&&(r=!m.test(i.slice(o)))),t}),r&&(t="try{return "+t+"}catch(e){E(e,this)}"),n?t=(r?"function(){"+t+"}.call(this)":"("+t+")")+'?"'+n+'":""':e&&(t="function(v){"+(r?t.replace("return ","v="):"v=("+t+")")+';return v||v===0?v:""}.call(this)'),t}var u={};e.haveRaw=vt.hasRaw,e.hasExpr=vt.hasExpr,e.loopKeys=vt.loopKeys,e.clearCache=function(){u={}},e.errorHandler=null;var s=String.fromCharCode(8279),c=/^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/,f=RegExp(vt.S_QBLOCKS,"g"),l=/\u2057/g,p=/\u2057(\d+)~/g,d={"(":/[()]/g,"[":/[[\]]/g,"{":/[{}]/g},h='"in this?this:'+("object"!=typeof t?"global":"window")+").",v=/[,{][\$\w]+(?=:)|(^ *|[^$\w\.{])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,m=/^(?=(\.[$\w]+))\1(?:[^.[(]|$)/;return e.version=vt.version="v2.4.2",e}(),gt=function t(){function t(t,r,o){var i=t&&t.match(/^\s*<([-\w]+)/),a=i&&i[1].toLowerCase(),u=B("div",o&&x(a));return t=n(t,r),s.test(a)?u=e(u,t,a):w(u,t),u.stub=!0,u}function e(t,e,n){var r="o"===n[0],o=r?"select>":"table>";if(t.innerHTML="<"+o+e.trim()+"</"+o,o=t.firstChild,r)o.selectedIndex=-1;else{var i=u[n];i&&1===o.childElementCount&&(o=K(i,o))}return o}function n(t,e){if(!r.test(t))return t;var n={};return e=e&&e.replace(i,function(t,e,r){return n[e]=n[e]||r,""}).trim(),t.replace(a,function(t,e,r){return n[e]||r||""}).replace(o,function(t,n){return e||n||""})}var r=/<yield\b/i,o=/<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>|>)/gi,i=/<yield\s+to=['"]([^'">]*)['"]\s*>([\S\s]*?)<\/yield\s*>/gi,a=/<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/gi,u={tr:"tbody",th:"tr",td:"tr",col:"colgroup"},s=dt&&dt<10?ft:/^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?)$/;return t}(),yt=function(e){if(!t)return{add:function(){},inject:function(){}};var n=function(){var t=B("style");E(t,"type","text/css");var e=K("style[type=riot]");return e?(e.id&&(t.id=e.id),e.parentNode.replaceChild(t,e)):document.getElementsByTagName("head")[0].appendChild(t),t}(),r=n.styleSheet,o="";return Object.defineProperty(e,"styleNode",{value:n,writable:!0}),{add:function(t){o+=t},inject:function(){o&&(r?r.cssText+=o:n.innerHTML+=o,o="")}}}(W),bt=function(t){var e=t.requestAnimationFrame||t.mozRequestAnimationFrame||t.webkitRequestAnimationFrame;if(!e||/iP(ad|hone|od).*OS 6/.test(t.navigator.userAgent)){var n=0;e=function(t){var e=Date.now(),r=Math.max(16-(e-n),0);setTimeout(function(){t(n=e+r)},r)}}return e}(t||{});W.util={brackets:vt,tmpl:mt},W.mixin=function(){var t={},e=t[tt]={},n=0;return function(r,o,i){if(_(r))return void W.mixin("__unnamed_"+n++,r,!0);var a=i?e:t;if(!o){if(typeof a[r]===at)throw new Error("Unregistered mixin: "+r);return a[r]}y(o)?(I(o.prototype,a[r]||{}),a[r]=o):a[r]=I(a[r]||{},o)}}(),W.tag=function(t,e,n,r,o){return y(r)&&(o=r,/^[\w\-]+\s?=/.test(n)?(r=n,n=""):r=""),n&&(y(n)?o=n:yt.add(n)),t=t.toLowerCase(),Y[t]={name:t,tmpl:e,attrs:r,fn:o},t},W.tag2=function(t,e,n,r,o){return n&&yt.add(n),Y[t]={name:t,tmpl:e,attrs:r,fn:o},t},W.mount=function(t,e,n){function r(t){var e="";return g(t,function(t){/[^-\w]/.test(t)||(t=t.trim().toLowerCase(),e+=",["+rt+'="'+t+'"],['+nt+'="'+t+'"]')}),e}function o(){var t=Object.keys(Y);return t+r(t)}function i(t){if(t.tagName){var r=C(t,rt)||C(t,nt);e&&r!==e&&(r=e,E(t,rt,e),E(t,nt,e));var o=J(t,r||t.tagName.toLowerCase(),n);o&&s.push(o)}else t.length&&g(t,i)}var a,u,s=[];if(yt.inject(),_(e)&&(n=e,e=0),typeof t===ot?("*"===t?t=u=o():t+=r(t.split(/, */)),a=t?H(t):[]):a=t,"*"===e){if(e=u||o(),a.tagName)a=H(e,a);else{var c=[];g(a,function(t){c.push(H(e,t))}),a=c}e=0}return i(a),s},W.update=function(){return g(X,function(t){t.update()})},W.vdom=X,W.Tag=d,typeof n===it?e.exports=W:typeof define===ut&&typeof define.amd!==at?define(function(){return W}):t.riot=W}("undefined"!=typeof window?window:void 0)},{}],34:[function(t,e,n){arguments[4][33][0].apply(n,arguments);
-},{dup:33}],35:[function(t,e,n){"use strict";e.exports=function(t){return encodeURIComponent(t).replace(/[!'()*]/g,function(t){return"%"+t.charCodeAt(0).toString(16).toUpperCase()})}},{}],36:[function(t,e,n){e.exports=function(t){return function(){var e=this,n=Array.prototype.slice.call(arguments);return new Promise(function(r,o){n.push(function(t,e){t?o(t):r(e)});var i=t.apply(e,n),a=i&&("object"==typeof i||"function"==typeof i)&&"function"==typeof i.then;a&&r(i)})}}},{}],37:[function(t,e,n){(function(e,r){function o(t,e){this._id=t,this._clearFn=e}var i=t("process/browser.js").nextTick,a=Function.prototype.apply,u=Array.prototype.slice,s={},c=0;n.setTimeout=function(){return new o(a.call(setTimeout,window,arguments),clearTimeout)},n.setInterval=function(){return new o(a.call(setInterval,window,arguments),clearInterval)},n.clearTimeout=n.clearInterval=function(t){t.close()},o.prototype.unref=o.prototype.ref=function(){},o.prototype.close=function(){this._clearFn.call(window,this._id)},n.enroll=function(t,e){clearTimeout(t._idleTimeoutId),t._idleTimeout=e},n.unenroll=function(t){clearTimeout(t._idleTimeoutId),t._idleTimeout=-1},n._unrefActive=n.active=function(t){clearTimeout(t._idleTimeoutId);var e=t._idleTimeout;e>=0&&(t._idleTimeoutId=setTimeout(function(){t._onTimeout&&t._onTimeout()},e))},n.setImmediate="function"==typeof e?e:function(t){var e=c++,r=!(arguments.length<2)&&u.call(arguments,1);return s[e]=!0,i(function(){s[e]&&(r?t.apply(null,r):t.call(null),n.clearImmediate(e))}),e},n.clearImmediate="function"==typeof r?r:function(t){delete s[t]}}).call(this,t("timers").setImmediate,t("timers").clearImmediate)},{"process/browser.js":38,timers:37}],38:[function(t,e,n){arguments[4][17][0].apply(n,arguments)},{dup:17}],39:[function(t,e,n){function r(){for(var t={},e=0;e<arguments.length;e++){var n=arguments[e];for(var r in n)o.call(n,r)&&(t[r]=n[r])}return t}e.exports=r;var o=Object.prototype.hasOwnProperty},{}]},{},[11]);
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+(function (process){
+const uuid4 = require(`random-uuid-v4`)
+const EventEmitter = require(`events`).EventEmitter
+
+const artificialDelay = 50
+
+const emitter = new EventEmitter()
+
+module.exports = emitter
+
+emitter.getTopics = getTopics
+emitter.getTopic = getTopic
+emitter.addTopic = addTopic
+emitter.removeTopic = removeTopic
+emitter.getTasks = getTasks
+emitter.saveTasks = saveTasks
+emitter.saveTopics = saveTopics
+emitter.getCurrentUser = getCurrentUser
+emitter.saveCurrentUser = saveCurrentUser
+emitter.saveTask = saveTask
+
+function getTopics(cb) {
+	setTimeout(() => {
+		cb(null, getTopicsSync())
+	}, artificialDelay)
+}
+
+function getTopicsSync() {
+	return JSON.parse(localStorage.getItem(`topics`))
+}
+
+function getTopic(topicId, cb) {
+	setTimeout(() => {
+		cb(null, getTopicSync(topicId))
+	}, artificialDelay)
+}
+
+function getTopicSync(topicId) {
+	return getTopicsSync().find(topic => topic.id === topicId)
+}
+
+function addTopic(name) {
+	const topic = {
+		name,
+		id: uuid4(),
+	}
+
+	const topics = getTopicsSync()
+
+	topics.push(topic)
+
+	saveTasks(topic.id, [])
+	saveTopics(topics)
+
+	return topic
+}
+
+function removeTopic(topicId) {
+	const topics = getTopicsSync()
+	const index = topics.findIndex(topic => topic.id === topicId)
+	topics.splice(index, 1)
+
+	saveTopics(topics)
+	process.nextTick(() => {
+		localStorage.removeItem(topicId)
+	})
+}
+
+function getTasks(topicId, cb) {
+	if (typeof topicId === `function`) {
+		cb = topicId
+		topicId = null
+	}
+
+	setTimeout(() => {
+		if (topicId) {
+			cb(null, getTasksSync(topicId))
+		} else {
+			cb(null, getTasksMap())
+		}
+	}, artificialDelay)
+}
+
+function getTasksMap() {
+	const topics = getTopicsSync()
+
+	return topics.reduce((map, topic) => {
+		const topicId = topic.id
+		map[topicId] = getTasksSync(topicId)
+		return map
+	}, {})
+}
+
+function getTasksSync(topicId) {
+	const json = localStorage.getItem(topicId)
+	return json ? JSON.parse(localStorage.getItem(topicId)) : []
+}
+
+function saveTask(topicId, newTaskName) {
+	const topicTasks = getTasksSync(topicId)
+	const task = {
+		name: newTaskName,
+		done: false,
+	}
+	topicTasks.push(task)
+	saveTasks(topicId, topicTasks)
+
+	return task
+}
+
+function saveTasks(topicId, topicTasks) {
+	localStorage.setItem(topicId, JSON.stringify(topicTasks))
+	emitter.emit(`tasks saved`, topicId)
+}
+
+function saveTopics(topics) {
+	localStorage.setItem(`topics`, JSON.stringify(topics))
+
+	emitter.emit(`topics saved`)
+}
+
+function getCurrentUser() {
+	return {
+		name: localStorage.getItem(`currentUserName`),
+	}
+}
+
+function saveCurrentUser(username) {
+	if (username) {
+		localStorage.setItem(`currentUserName`, username)
+	} else {
+		localStorage.removeItem(`currentUserName`)
+	}
+}
+
+(function initialize() {
+	if (!localStorage.getItem(`topics`)) {
+		initializeDummyData()
+	}
+})()
+
+function initializeDummyData() {
+	console.log(`Initializing dummy data`)
+
+	const topic1 = {
+		name: `Important stuff`,
+		id: uuid4(),
+	}
+	const topic2 = {
+		name: `Not as important`,
+		id: uuid4(),
+	}
+
+	saveTopics([ topic1, topic2 ])
+
+	saveTasks(topic1.id, [{
+		name: `Put on pants`,
+		done: false,
+	}, {
+		name: `Visit chat room to see if you still pass the Turing test`,
+		done: false,
+	}])
+
+	saveTasks(topic2.id, [{
+		name: `Make cupcakes`,
+		done: true,
+	}, {
+		name: `Eat cupcakes`,
+		done: true,
+	}, {
+		name: `Write forum post rant about how chocolate cupcakes are the only good kind of cupcake`,
+		done: false,
+	}])
+}
+
+
+}).call(this,require('_process'))
+},{"_process":17,"events":21,"random-uuid-v4":31}],2:[function(require,module,exports){
+require('./about.tag')
+
+module.exports = function(stateRouter) {
+	stateRouter.addState({
+		name: 'app.about',
+		route: '/about',
+ 		template: 'about',
+ 		activate: function noop() {}
+	})
+}
+
+},{"./about.tag":3}],3:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag2('about', '<div class="container"> <div class="row"> <div class="col-sm-offset-2 col-sm-8"> <div class="jumbotron"> <h1>About this example</h1> </div> </div> </div> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <p> Pretty sweet, isn\'t it? Here, let me give some examples or something. </p> </div> </div> </div>', '', '', function(opts) {
+});
+
+},{"riot":34}],4:[function(require,module,exports){
+require('array.prototype.findindex')
+var model = require('model.js')
+
+require('./app.tag')
+
+module.exports = function(stateRouter) {
+	stateRouter.addState({
+		name: 'app',
+		route: '/app',
+		defaultChild: 'topics',
+		template: 'app',
+		resolve: function resolve(data, parameters, cb) {
+			if (!model.getCurrentUser().name) {
+				cb.redirect('login')
+			} else {
+				cb(null, {
+					currentUser: model.getCurrentUser()
+				})
+			}
+		},
+		activate: function(context) {
+			var tag = context.domApi
+
+			tag.currentUser = model.getCurrentUser()
+			tag.update()
+
+			tag.on('logout', function() {
+				model.saveCurrentUser(null)
+				stateRouter.go('login')
+			})
+		}
+	})
+
+	require('./about/about')(stateRouter)
+	require('./topics/topics')(stateRouter)
+}
+
+},{"./about/about":2,"./app.tag":5,"./topics/topics":9,"array.prototype.findindex":15,"model.js":1}],5:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag2('app', '<nav class="navbar navbar-default"> <div class="container-fluid"> <div class="navbar-header"> <ul class="nav navbar-nav"> <li class="{active: opts.active(\'app.topics\')}"> <a href="{opts.makePath(\'app.topics\')}">Basic todo app!</a> </li> <li class="{active: opts.active(\'app.about\')}"> <a href="{opts.makePath(\'app.about\')}">About the state router</a> </li> <li> <a href="{opts.makePath(\'login\')}" on-click="logout">"Log out"</a> </li> </ul> </div> <div class="nav navbar-right"> <p class="navbar-text"> Logged in as {currentUser.name} </p> </div> </div> </nav> <ui-view></ui-view>', '', '', function(opts) {
+});
+},{"riot":34}],6:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag2('no-task-selected', '<span> <p> This is a very basic todo app to show off route states. </p> <p> Click on one of the topics on the left, and watch both the url and this half of the screen change, without anything else in the dom changing! </p> </span>', '', '', function(opts) {
+});
+
+},{"riot":34}],7:[function(require,module,exports){
+var model = require('model.js')
+var all = require('async-all')
+
+var UUID_V4_REGEX = '[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+
+module.exports = function(stateRouter) {
+	require('./no-task-selected.tag')
+	require('./tasks.tag')
+
+	stateRouter.addState({
+		name: 'app.topics.tasks',
+		route: '/:topicId(' + UUID_V4_REGEX + ')',
+ 		template: 'tasks',
+ 		resolve: function(data, parameters, cb) {
+ 			all({
+ 				topic: model.getTopic.bind(null, parameters.topicId),
+ 				tasks: model.getTasks.bind(null, parameters.topicId)
+ 			}, cb)
+ 		},
+ 		activate: function(context) {
+ 			var tag = context.domApi
+ 			var topicId = context.parameters.topicId
+
+ 			function saveTasks() {
+ 				model.saveTasks(topicId, tag.opts.tasks)
+ 			}
+
+  			tag.complete = function complete(task) {
+  				task.done = true
+  				saveTasks()
+ 			}
+ 			tag.restore = function restore(task) {
+ 				task.done = false
+ 				saveTasks()
+ 			}
+ 			tag.remove = function remove(task) {
+ 				var index = tag.opts.tasks.indexOf(task)
+ 				tag.opts.tasks.splice(index, 1)
+ 				saveTasks()
+ 				tag.update()
+ 			}
+
+ 			tag.newTask = function(newTaskName) {
+				var task = model.saveTask(topicId, newTaskName)
+				tag.opts.tasks.push(task)
+				tag.update()
+ 			}
+
+ 			tag.update()
+
+ 			tag.root.querySelector('.add-new-task').focus()
+ 		}
+	})
+
+	stateRouter.addState({
+		name: 'app.topics.no-task',
+		route: '',
+ 		template: 'no-task-selected'
+	})
+}
+
+},{"./no-task-selected.tag":6,"./tasks.tag":8,"async-all":16,"model.js":1}],8:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag2('tasks', '<h1>{opts.topic.name}</h1> <table class="table table-striped"> <thead> <tr> <th> Task name </th> <th style="width: 100px"> Complete </th> <th style="width: 87px"> Remove </th> </tr> </thead> <tbody> <tr each="{opts.tasks}"> <td class=" center-y"> <span class="center-y"> {name} &nbsp;<span if="{done}" class="glyphicon glyphicon-ok text-success"></span> </span> </td> <td> <button type="button" if="{done}" class="btn btn-primary full-width" onclick="{parent.onRestore}">Restore</button> <button type="button" if="{!done}" class="btn btn-success full-width" onclick="{parent.onComplete}">Complete</button> </td> <td> <button class="btn btn-danger full-width" onclick="{parent.onRemove}"> Remove </button> </td> </tr> <tr> <td> <input type="text" class="form-control add-new-task" placeholder="New task" onkeyup="{newTaskKeyup}" name="newTaskName"> </td> </tr> </tbody> </table>', '', '', function(opts) {
+
+	this.newTaskKeyup = function(e) {
+		var newTaskName = this.newTaskName.value
+
+		if (e.keyCode === 13 && newTaskName) {
+			this.newTaskName.value = ''
+			this.newTask(newTaskName)
+		}
+	}.bind(this)
+
+	this.onRestore = function(e) {
+		this.restore(e.item)
+	}.bind(this)
+
+	this.onComplete = function(e) {
+		this.complete(e.item)
+	}.bind(this)
+
+	this.onRemove = function(e) {
+		this.remove(e.item)
+	}.bind(this)
+});
+
+},{"riot":34}],9:[function(require,module,exports){
+(function (process){
+var model = require('model.js')
+
+require('./topics.tag')
+
+module.exports = function(stateRouter) {
+
+	stateRouter.addState({
+		name: 'app.topics',
+		route: '/topics',
+		defaultChild: 'no-task',
+ 		template: 'topics',
+ 		resolve: function(data, parameters, cb) {
+ 			model.getTopics(function(err, topics) {
+ 				cb(null, {
+	 				topics: topics
+	 			})
+ 			})
+ 		},
+ 		activate: function(context) {
+ 			var tag = context.domApi
+
+ 			tag.opts.tasksUndone = {}
+ 			tag.update()
+
+ 			tag.setFocusOnAddTopicEdit = function() {
+ 				process.nextTick(function() {
+ 					tag.root.querySelector('.new-topic-name').focus()
+ 				})
+ 			}
+
+ 			function recalculateTasksLeftToDoInTopic(topicId) {
+ 				model.getTasks(topicId, function(err, tasks) {
+	 				var leftToDo =  tasks.reduce(function(toDo, task) {
+	 					return toDo + (task.done ? 0 : 1)
+	 				}, 0)
+
+	 				tag.opts.tasksUndone[topicId] = leftToDo
+	 				tag.update()
+ 				})
+ 			}
+
+ 			model.on('tasks saved', recalculateTasksLeftToDoInTopic)
+
+ 			tag.opts.topics.forEach(function(topic) {
+ 				recalculateTasksLeftToDoInTopic(topic.id)
+ 			})
+
+ 			tag.addTopic = function addTopic(newTopicName) {
+				var newTopic = model.addTopic(newTopicName)
+				tag.opts.topics.push(newTopic)
+				recalculateTasksLeftToDoInTopic(newTopic.id)
+				stateRouter.go('app.topics.tasks', {
+					topicId: newTopic.id
+				})
+ 			}
+
+ 			context.on('destroy', function() {
+ 				model.removeListener('tasks saved', recalculateTasksLeftToDoInTopic)
+ 			})
+ 		}
+	})
+
+	require('./tasks/tasks')(stateRouter)
+}
+
+}).call(this,require('_process'))
+},{"./tasks/tasks":7,"./topics.tag":10,"_process":17,"model.js":1}],10:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag2('topics', '<div class="container"> <div class="row"> <div class="col-sm-4"> <div class="list-group"> <a each="{opts.topics}" href="{parent.opts.makePath(\'app.topics.tasks\', \'topicId\', id)}" class="list-group-item {parent.opts.active(\'app.topics.tasks\', \'topicId\', id) ? \'active\' : \'\'}"> {name} <span class="badge">{parent.opts.tasksUndone[id]}</span> </a> </div> <form action="" onsubmit="{onAddTopic}"> <div class="table"> <div class="table-row-group"> <div class="table-row"> <div class="table-cell"> <input if="{opts.addingTopic}" type="text" class="new-topic-name form-control" placeholder="Topic name" name="newTopic"> </div> <div class="table-cell" style="width: 60px; vertical-align: top"> <button type="submit" class="btn btn-default pull-right">Add</button> </div> </div> </div> </div> </form> </div> <div class="col-sm-8"> <ui-view></ui-view> </div> </div> </div>', '', '', function(opts) {
+
+	this.opts.addingTopic = false
+
+	this.onAddTopic = function() {
+		var newTopicName = this.newTopic.value
+		if (this.opts.addingTopic && newTopicName) {
+			this.newTopic.value = ''
+			this.addTopic(newTopicName)
+		}
+
+		this.opts.addingTopic = !this.opts.addingTopic
+		this.update()
+
+		if (this.opts.addingTopic) {
+			this.setFocusOnAddTopicEdit()
+		}
+
+		return false
+	}.bind(this)
+});
+
+},{"riot":34}],11:[function(require,module,exports){
+var StateRouter = require('abstract-state-router')
+var riotRenderer = require('riot-state-renderer')
+var domready = require('domready')
+
+var stateRouter = StateRouter(riotRenderer(), 'body')
+
+require('./login/login')(stateRouter)
+require('./app/app')(stateRouter)
+
+domready(function() {
+	stateRouter.evaluateCurrentRoute('login')
+})
+
+},{"./app/app":4,"./login/login":12,"abstract-state-router":14,"domready":19,"riot-state-renderer":32}],12:[function(require,module,exports){
+var model = require('model.js')
+
+require('./login.tag')
+
+module.exports = function(stateRouter) {
+	stateRouter.addState({
+		name: 'login',
+		route: '/login',
+		template: 'login',
+		activate: function(context) {
+			var tag = context.domApi
+
+			tag.opts.login = function login(username) {
+				if (username) {
+					model.saveCurrentUser(username)
+					stateRouter.go('app')
+				}
+			}
+		}
+	})
+}
+
+},{"./login.tag":13,"model.js":1}],13:[function(require,module,exports){
+var riot = require('riot');
+module.exports = riot.tag2('login', '<div class="container-fluid"> <div class="row"> <div class="col-sm-offset-3 col-sm-6"> <h1>Welcome to the abstract-state-router demo!</h1> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-3 col-sm-6"> <div class="well"> <p class="lead"> This is a demo webapp showing off basic usage of the <a href="https://github.com/TehShrike/abstract-state-router">abstract-state-router</a> library using a few different templating libraries. </p> </div> </div> </div> <div class="row margin-top-20"> <div class="col-sm-offset-4 col-sm-4"> <div class="form-group panel"> <form onsubmit="{login}" class="panel-body" action=""> <label> Put in whatever username you feel like: <input type="text" class="form-control" name="username"> </label> <button type="submit" class="btn btn-primary">"Log in"</button> </form> </div> </div> </div> </div>', '', '', function(opts) {
+
+	this.login = function() {
+		opts.login(this.username.value)
+
+		return false
+	}.bind(this)
+});
+
+},{"riot":34}],14:[function(require,module,exports){
+'use strict';
+
+function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'default' in ex) ? ex['default'] : ex; }
+
+var combineArrays = _interopDefault(require('combine-arrays'));
+var pathToRegexpWithReversibleKeys = _interopDefault(require('path-to-regexp-with-reversible-keys'));
+var thenDenodeify = _interopDefault(require('then-denodeify'));
+var eventemitter3 = _interopDefault(require('eventemitter3'));
+var hashBrownRouter = _interopDefault(require('hash-brown-router'));
+var pagePathBuilder = _interopDefault(require('page-path-builder'));
+var isoNextTick = _interopDefault(require('iso-next-tick'));
+
+function createCommonjsModule(fn, module) {
+	return module = { exports: {} }, fn(module, module.exports), module.exports;
+}
+
+var stateStringParser = createCommonjsModule(function (module) {
+	module.exports = function (stateString) {
+		return stateString.split('.').reduce(function (stateNames, latestNameChunk) {
+			stateNames.push(stateNames.length ? stateNames[stateNames.length - 1] + '.' + latestNameChunk : latestNameChunk);
+
+			return stateNames;
+		}, []);
+	};
+});
+
+var stateState = function StateState() {
+	var states = {};
+
+	function getHierarchy(name) {
+		var names = stateStringParser(name);
+
+		return names.map(function (name) {
+			if (!states[name]) {
+				throw new Error('State ' + name + ' not found');
+			}
+			return states[name];
+		});
+	}
+
+	function getParent(name) {
+		var parentName = getParentName(name);
+
+		return parentName && states[parentName];
+	}
+
+	function getParentName(name) {
+		var names = stateStringParser(name);
+
+		if (names.length > 1) {
+			var secondToLast = names.length - 2;
+
+			return names[secondToLast];
+		} else {
+			return null;
+		}
+	}
+
+	function guaranteeAllStatesExist(newStateName) {
+		var stateNames = stateStringParser(newStateName);
+		var statesThatDontExist = stateNames.filter(function (name) {
+			return !states[name];
+		});
+
+		if (statesThatDontExist.length > 0) {
+			throw new Error('State ' + statesThatDontExist[statesThatDontExist.length - 1] + ' does not exist');
+		}
+	}
+
+	function buildFullStateRoute(stateName) {
+		return getHierarchy(stateName).map(function (state) {
+			return '/' + (state.route || '');
+		}).join('').replace(/\/{2,}/g, '/');
+	}
+
+	function applyDefaultChildStates(stateName) {
+		var state = states[stateName];
+
+		var defaultChildStateName = state && (typeof state.defaultChild === 'function' ? state.defaultChild() : state.defaultChild);
+
+		if (!defaultChildStateName) {
+			return stateName;
+		}
+
+		var fullStateName = stateName + '.' + defaultChildStateName;
+
+		return applyDefaultChildStates(fullStateName);
+	}
+
+	return {
+		add: function add(name, state) {
+			states[name] = state;
+		},
+		get: function get(name) {
+			return name && states[name];
+		},
+
+		getHierarchy: getHierarchy,
+		getParent: getParent,
+		getParentName: getParentName,
+		guaranteeAllStatesExist: guaranteeAllStatesExist,
+		buildFullStateRoute: buildFullStateRoute,
+		applyDefaultChildStates: applyDefaultChildStates
+	};
+};
+
+var extend = function extend() {
+  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+    args[_key] = arguments[_key];
+  }
+
+  return Object.assign.apply(Object, [{}].concat(args));
+};
+
+var stateComparison_1 = function StateComparison(stateState) {
+	var getPathParameters = pathParameters();
+
+	var parametersChanged = function parametersChanged(args) {
+		return parametersThatMatterWereChanged(extend(args, { stateState: stateState, getPathParameters: getPathParameters }));
+	};
+
+	return function (args) {
+		return stateComparison(extend(args, { parametersChanged: parametersChanged }));
+	};
+};
+
+function pathParameters() {
+	var parameters = {};
+
+	return function (path) {
+		if (!path) {
+			return [];
+		}
+
+		if (!parameters[path]) {
+			parameters[path] = pathToRegexpWithReversibleKeys(path).keys.map(function (key) {
+				return key.name;
+			});
+		}
+
+		return parameters[path];
+	};
+}
+
+function parametersThatMatterWereChanged(_ref) {
+	var stateState = _ref.stateState,
+	    getPathParameters = _ref.getPathParameters,
+	    stateName = _ref.stateName,
+	    fromParameters = _ref.fromParameters,
+	    toParameters = _ref.toParameters;
+
+	var state = stateState.get(stateName);
+	var querystringParameters = state.querystringParameters || [];
+	var parameters = getPathParameters(state.route).concat(querystringParameters);
+
+	return Array.isArray(parameters) && parameters.some(function (key) {
+		return fromParameters[key] !== toParameters[key];
+	});
+}
+
+function stateComparison(_ref2) {
+	var parametersChanged = _ref2.parametersChanged,
+	    original = _ref2.original,
+	    destination = _ref2.destination;
+
+	var states = combineArrays({
+		start: stateStringParser(original.name),
+		end: stateStringParser(destination.name)
+	});
+
+	return states.map(function (_ref3) {
+		var start = _ref3.start,
+		    end = _ref3.end;
+		return {
+			nameBefore: start,
+			nameAfter: end,
+			stateNameChanged: start !== end,
+			stateParametersChanged: start === end && parametersChanged({
+				stateName: start,
+				fromParameters: original.parameters,
+				toParameters: destination.parameters
+			})
+		};
+	});
+}
+
+var currentState = function CurrentState() {
+	var current = {
+		name: '',
+		parameters: {}
+	};
+
+	return {
+		get: function get() {
+			return current;
+		},
+		set: function set(name, parameters) {
+			current = {
+				name: name,
+				parameters: parameters
+			};
+		}
+	};
+};
+
+var stateChangeLogic = function stateChangeLogic(stateComparisonResults) {
+	var hitChangingState = false;
+	var hitDestroyedState = false;
+
+	var output = {
+		destroy: [],
+		change: [],
+		create: []
+	};
+
+	stateComparisonResults.forEach(function (state) {
+		hitChangingState = hitChangingState || state.stateParametersChanged;
+		hitDestroyedState = hitDestroyedState || state.stateNameChanged;
+
+		if (state.nameBefore) {
+			if (hitDestroyedState) {
+				output.destroy.push(state.nameBefore);
+			} else if (hitChangingState) {
+				output.change.push(state.nameBefore);
+			}
+		}
+
+		if (state.nameAfter && hitDestroyedState) {
+			output.create.push(state.nameAfter);
+		}
+	});
+
+	return output;
+};
+
+var stateTransitionManager = function stateTransitionManager(emitter) {
+	var currentTransitionAttempt = null;
+	var nextTransition = null;
+
+	function doneTransitioning() {
+		currentTransitionAttempt = null;
+		if (nextTransition) {
+			beginNextTransitionAttempt();
+		}
+	}
+
+	var isTransitioning = function isTransitioning() {
+		return !!currentTransitionAttempt;
+	};
+
+	function beginNextTransitionAttempt() {
+		currentTransitionAttempt = nextTransition;
+		nextTransition = null;
+		currentTransitionAttempt.beginStateChange();
+	}
+
+	function cancelCurrentTransition() {
+		currentTransitionAttempt.transition.cancelled = true;
+		var err = new Error('State transition cancelled by the state transition manager');
+		err.wasCancelledBySomeoneElse = true;
+		emitter.emit('stateChangeCancelled', err);
+	}
+
+	emitter.on('stateChangeAttempt', function (beginStateChange) {
+		nextTransition = createStateTransitionAttempt(beginStateChange);
+
+		if (isTransitioning() && currentTransitionAttempt.transition.cancellable) {
+			cancelCurrentTransition();
+		} else if (!isTransitioning()) {
+			beginNextTransitionAttempt();
+		}
+	});
+
+	emitter.on('stateChangeError', doneTransitioning);
+	emitter.on('stateChangeCancelled', doneTransitioning);
+	emitter.on('stateChangeEnd', doneTransitioning);
+
+	function createStateTransitionAttempt(_beginStateChange) {
+		var transition = {
+			cancelled: false,
+			cancellable: true
+		};
+		return {
+			transition: transition,
+			beginStateChange: function beginStateChange() {
+				for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+					args[_key] = arguments[_key];
+				}
+
+				return _beginStateChange.apply(undefined, [transition].concat(args));
+			}
+		};
+	}
+};
+
+var defaultRouterOptions = { reverse: false };
+
+// Pulled from https://github.com/joliss/promise-map-series and prettied up a bit
+
+var promiseMapSeries = function sequence(array, iterator) {
+	var currentPromise = Promise.resolve();
+	return Promise.all(array.map(function (value, i) {
+		return currentPromise = currentPromise.then(function () {
+			return iterator(value, i, array);
+		});
+	}));
+};
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+var getProperty = function getProperty(name) {
+	return function (obj) {
+		return obj[name];
+	};
+};
+var reverse = function reverse(ary) {
+	return ary.slice().reverse();
+};
+var isFunction = function isFunction(property) {
+	return function (obj) {
+		return typeof obj[property] === 'function';
+	};
+};
+var isThenable = function isThenable(object) {
+	return object && ((typeof object === 'undefined' ? 'undefined' : _typeof(object)) === 'object' || typeof object === 'function') && typeof object.then === 'function';
+};
+var promiseMe = function promiseMe(fn) {
+	for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+		args[_key - 1] = arguments[_key];
+	}
+
+	return new Promise(function (resolve) {
+		return resolve(fn.apply(undefined, args));
+	});
+};
+
+var expectedPropertiesOfAddState = ['name', 'route', 'defaultChild', 'data', 'template', 'resolve', 'activate', 'querystringParameters', 'defaultQuerystringParameters', 'defaultParameters'];
+
+var abstractStateRouter = function StateProvider(makeRenderer, rootElement) {
+	var stateRouterOptions = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+
+	var prototypalStateHolder = stateState();
+	var lastCompletelyLoadedState = currentState();
+	var lastStateStartedActivating = currentState();
+	var stateProviderEmitter = new eventemitter3();
+	var compareStartAndEndStates = stateComparison_1(prototypalStateHolder);
+
+	var stateNameToArrayofStates = function stateNameToArrayofStates(stateName) {
+		return stateStringParser(stateName).map(prototypalStateHolder.get);
+	};
+
+	stateTransitionManager(stateProviderEmitter);
+
+	var _extend = extend({
+		throwOnError: true,
+		pathPrefix: '#'
+	}, stateRouterOptions),
+	    throwOnError = _extend.throwOnError,
+	    pathPrefix = _extend.pathPrefix;
+
+	var router = stateRouterOptions.router || hashBrownRouter(defaultRouterOptions);
+
+	router.on('not found', function (route, parameters) {
+		stateProviderEmitter.emit('routeNotFound', route, parameters);
+	});
+
+	var destroyDom = null;
+	var getDomChild = null;
+	var renderDom = null;
+	var resetDom = null;
+
+	var activeStateResolveContent = {};
+	var activeDomApis = {};
+	var activeEmitters = {};
+
+	function handleError(event, err) {
+		isoNextTick(function () {
+			stateProviderEmitter.emit(event, err);
+			console.error(event + ' - ' + err.message);
+			if (throwOnError) {
+				throw err;
+			}
+		});
+	}
+
+	function destroyStateName(stateName) {
+		var state = prototypalStateHolder.get(stateName);
+		stateProviderEmitter.emit('beforeDestroyState', {
+			state: state,
+			domApi: activeDomApis[stateName]
+		});
+
+		activeEmitters[stateName].emit('destroy');
+		activeEmitters[stateName].removeAllListeners();
+		delete activeEmitters[stateName];
+		delete activeStateResolveContent[stateName];
+
+		return destroyDom(activeDomApis[stateName]).then(function () {
+			delete activeDomApis[stateName];
+			stateProviderEmitter.emit('afterDestroyState', {
+				state: state
+			});
+		});
+	}
+
+	function resetStateName(parameters, stateName) {
+		var domApi = activeDomApis[stateName];
+		var content = getContentObject(activeStateResolveContent, stateName);
+		var state = prototypalStateHolder.get(stateName);
+
+		stateProviderEmitter.emit('beforeResetState', {
+			domApi: domApi,
+			content: content,
+			state: state,
+			parameters: parameters
+		});
+
+		activeEmitters[stateName].emit('destroy');
+		delete activeEmitters[stateName];
+
+		return resetDom({
+			domApi: domApi,
+			content: content,
+			template: state.template,
+			parameters: parameters
+		}).then(function (newDomApi) {
+			if (newDomApi) {
+				activeDomApis[stateName] = newDomApi;
+			}
+
+			stateProviderEmitter.emit('afterResetState', {
+				domApi: activeDomApis[stateName],
+				content: content,
+				state: state,
+				parameters: parameters
+			});
+		});
+	}
+
+	function getChildElementForStateName(stateName) {
+		return new Promise(function (resolve) {
+			var parent = prototypalStateHolder.getParent(stateName);
+			if (parent) {
+				var parentDomApi = activeDomApis[parent.name];
+				resolve(getDomChild(parentDomApi));
+			} else {
+				resolve(rootElement);
+			}
+		});
+	}
+
+	function renderStateName(parameters, stateName) {
+		return getChildElementForStateName(stateName).then(function (element) {
+			var state = prototypalStateHolder.get(stateName);
+			var content = getContentObject(activeStateResolveContent, stateName);
+
+			stateProviderEmitter.emit('beforeCreateState', {
+				state: state,
+				content: content,
+				parameters: parameters
+			});
+
+			return renderDom({
+				template: state.template,
+				element: element,
+				content: content,
+				parameters: parameters
+			}).then(function (domApi) {
+				activeDomApis[stateName] = domApi;
+				stateProviderEmitter.emit('afterCreateState', {
+					state: state,
+					domApi: domApi,
+					content: content,
+					parameters: parameters
+				});
+				return domApi;
+			});
+		});
+	}
+
+	function renderAll(stateNames, parameters) {
+		return promiseMapSeries(stateNames, function (stateName) {
+			return renderStateName(parameters, stateName);
+		});
+	}
+
+	function onRouteChange(state, parameters) {
+		try {
+			var finalDestinationStateName = prototypalStateHolder.applyDefaultChildStates(state.name);
+
+			if (finalDestinationStateName === state.name) {
+				emitEventAndAttemptStateChange(finalDestinationStateName, parameters);
+			} else {
+				// There are default child states that need to be applied
+
+				var theRouteWeNeedToEndUpAt = makePath(finalDestinationStateName, parameters);
+				var currentRoute = router.location.get();
+
+				if (theRouteWeNeedToEndUpAt === currentRoute) {
+					// the child state has the same route as the current one, just start navigating there
+					emitEventAndAttemptStateChange(finalDestinationStateName, parameters);
+				} else {
+					// change the url to match the full default child state route
+					stateProviderEmitter.go(finalDestinationStateName, parameters, { replace: true });
+				}
+			}
+		} catch (err) {
+			handleError('stateError', err);
+		}
+	}
+
+	function addState(state) {
+		if (typeof state === 'undefined') {
+			throw new Error('Expected \'state\' to be passed in.');
+		} else if (typeof state.name === 'undefined') {
+			throw new Error('Expected the \'name\' option to be passed in.');
+		} else if (typeof state.template === 'undefined') {
+			throw new Error('Expected the \'template\' option to be passed in.');
+		}
+		Object.keys(state).filter(function (key) {
+			return expectedPropertiesOfAddState.indexOf(key) === -1;
+		}).forEach(function (key) {
+			console.warn('Unexpected property passed to addState:', key);
+		});
+
+		prototypalStateHolder.add(state.name, state);
+
+		var route = prototypalStateHolder.buildFullStateRoute(state.name);
+
+		router.add(route, function (parameters) {
+			return onRouteChange(state, parameters);
+		});
+	}
+
+	function getStatesToResolve(stateChanges) {
+		return stateChanges.change.concat(stateChanges.create).map(prototypalStateHolder.get);
+	}
+
+	function emitEventAndAttemptStateChange(newStateName, parameters) {
+		stateProviderEmitter.emit('stateChangeAttempt', function stateGo(transition) {
+			attemptStateChange(newStateName, parameters, transition);
+		});
+	}
+
+	function attemptStateChange(newStateName, parameters, transition) {
+		function ifNotCancelled(fn) {
+			return function () {
+				if (transition.cancelled) {
+					var err = new Error('The transition to ' + newStateName + ' was cancelled');
+					err.wasCancelledBySomeoneElse = true;
+					throw err;
+				} else {
+					return fn.apply(undefined, arguments);
+				}
+			};
+		}
+
+		return promiseMe(prototypalStateHolder.guaranteeAllStatesExist, newStateName).then(function applyDefaultParameters() {
+			var state = prototypalStateHolder.get(newStateName);
+			var defaultParams = state.defaultParameters || state.defaultQuerystringParameters || {};
+			var needToApplyDefaults = Object.keys(defaultParams).some(function missingParameterValue(param) {
+				return typeof parameters[param] === 'undefined';
+			});
+
+			if (needToApplyDefaults) {
+				throw redirector(newStateName, extend(defaultParams, parameters));
+			}
+			return state;
+		}).then(ifNotCancelled(function (state) {
+			stateProviderEmitter.emit('stateChangeStart', state, parameters, stateNameToArrayofStates(state.name));
+			lastStateStartedActivating.set(state.name, parameters);
+		})).then(function getStateChanges() {
+			var stateComparisonResults = compareStartAndEndStates({
+				original: lastCompletelyLoadedState.get(),
+				destination: {
+					name: newStateName,
+					parameters: parameters
+				}
+			});
+			return stateChangeLogic(stateComparisonResults); // { destroy, change, create }
+		}).then(ifNotCancelled(function resolveDestroyAndActivateStates(stateChanges) {
+			return resolveStates(getStatesToResolve(stateChanges), extend(parameters)).catch(function onResolveError(e) {
+				e.stateChangeError = true;
+				throw e;
+			}).then(ifNotCancelled(function destroyAndActivate(stateResolveResultsObject) {
+				transition.cancellable = false;
+
+				var activateAll = function activateAll() {
+					return activateStates(stateChanges.change.concat(stateChanges.create));
+				};
+
+				activeStateResolveContent = extend(activeStateResolveContent, stateResolveResultsObject);
+
+				return promiseMapSeries(reverse(stateChanges.destroy), destroyStateName).then(function () {
+					return promiseMapSeries(reverse(stateChanges.change), function (stateName) {
+						return resetStateName(extend(parameters), stateName);
+					});
+				}).then(function () {
+					return renderAll(stateChanges.create, extend(parameters)).then(activateAll);
+				});
+			}));
+
+			function activateStates(stateNames) {
+				return stateNames.map(prototypalStateHolder.get).forEach(function (state) {
+					var emitter = new eventemitter3();
+					var context = Object.create(emitter);
+					context.domApi = activeDomApis[state.name];
+					context.data = state.data;
+					context.parameters = parameters;
+					context.content = getContentObject(activeStateResolveContent, state.name);
+					activeEmitters[state.name] = emitter;
+
+					try {
+						state.activate && state.activate(context);
+					} catch (e) {
+						isoNextTick(function () {
+							throw e;
+						});
+					}
+				});
+			}
+		})).then(function stateChangeComplete() {
+			lastCompletelyLoadedState.set(newStateName, parameters);
+			try {
+				stateProviderEmitter.emit('stateChangeEnd', prototypalStateHolder.get(newStateName), parameters, stateNameToArrayofStates(newStateName));
+			} catch (e) {
+				handleError('stateError', e);
+			}
+		}).catch(ifNotCancelled(function handleStateChangeError(err) {
+			if (err && err.redirectTo) {
+				stateProviderEmitter.emit('stateChangeCancelled', err);
+				return stateProviderEmitter.go(err.redirectTo.name, err.redirectTo.params, { replace: true });
+			} else if (err) {
+				handleError('stateChangeError', err);
+			}
+		})).catch(function handleCancellation(err) {
+			if (err && err.wasCancelledBySomeoneElse) {
+				// we don't care, the state transition manager has already emitted the stateChangeCancelled for us
+			} else {
+				throw new Error('This probably shouldn\'t happen, maybe file an issue or something ' + err);
+			}
+		});
+	}
+
+	function makePath(stateName, parameters, options) {
+		function getGuaranteedPreviousState() {
+			if (!lastStateStartedActivating.get().name) {
+				throw new Error('makePath required a previous state to exist, and none was found');
+			}
+			return lastStateStartedActivating.get();
+		}
+		if (options && options.inherit) {
+			parameters = extend(getGuaranteedPreviousState().parameters, parameters);
+		}
+
+		var destinationStateName = stateName === null ? getGuaranteedPreviousState().name : stateName;
+
+		var destinationState = prototypalStateHolder.get(destinationStateName) || {};
+		var defaultParams = destinationState.defaultParameters || destinationState.defaultQuerystringParameters;
+
+		parameters = extend(defaultParams, parameters);
+
+		prototypalStateHolder.guaranteeAllStatesExist(destinationStateName);
+		var route = prototypalStateHolder.buildFullStateRoute(destinationStateName);
+		return pagePathBuilder(route, parameters || {});
+	}
+
+	var defaultOptions = {
+		replace: false
+	};
+
+	stateProviderEmitter.addState = addState;
+	stateProviderEmitter.go = function (newStateName, parameters, options) {
+		options = extend(defaultOptions, options);
+		var goFunction = options.replace ? router.replace : router.go;
+
+		return promiseMe(makePath, newStateName, parameters, options).then(goFunction, function (err) {
+			return handleError('stateChangeError', err);
+		});
+	};
+	stateProviderEmitter.evaluateCurrentRoute = function (defaultState, defaultParams) {
+		return promiseMe(makePath, defaultState, defaultParams).then(function (defaultPath) {
+			router.evaluateCurrent(defaultPath);
+		}).catch(function (err) {
+			return handleError('stateError', err);
+		});
+	};
+	stateProviderEmitter.makePath = function (stateName, parameters, options) {
+		return pathPrefix + makePath(stateName, parameters, options);
+	};
+	stateProviderEmitter.getActiveState = function () {
+		return lastCompletelyLoadedState.get();
+	};
+	stateProviderEmitter.stateIsActive = function (stateName) {
+		var parameters = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+		var currentState$$1 = lastCompletelyLoadedState.get();
+		var stateNameMatches = currentState$$1.name === stateName || currentState$$1.name.indexOf(stateName + '.') === 0;
+		var parametersWereNotPassedIn = !parameters;
+
+		return stateNameMatches && (parametersWereNotPassedIn || Object.keys(parameters).every(function (key) {
+			return parameters[key] === currentState$$1.parameters[key];
+		}));
+	};
+
+	var renderer = makeRenderer(stateProviderEmitter);
+
+	destroyDom = thenDenodeify(renderer.destroy);
+	getDomChild = thenDenodeify(renderer.getChildElement);
+	renderDom = thenDenodeify(renderer.render);
+	resetDom = thenDenodeify(renderer.reset);
+
+	return stateProviderEmitter;
+};
+
+function getContentObject(stateResolveResultsObject, stateName) {
+	var allPossibleResolvedStateNames = stateStringParser(stateName);
+
+	return allPossibleResolvedStateNames.filter(function (stateName) {
+		return stateResolveResultsObject[stateName];
+	}).reduce(function (obj, stateName) {
+		return extend(obj, stateResolveResultsObject[stateName]);
+	}, {});
+}
+
+function redirector(newStateName, parameters) {
+	return {
+		redirectTo: {
+			name: newStateName,
+			params: parameters
+		}
+	};
+}
+
+// { [stateName]: resolveResult }
+function resolveStates(states, parameters) {
+	var statesWithResolveFunctions = states.filter(isFunction('resolve'));
+	var stateNamesWithResolveFunctions = statesWithResolveFunctions.map(getProperty('name'));
+
+	var resolves = Promise.all(statesWithResolveFunctions.map(function (state) {
+		return new Promise(function (resolve, reject) {
+			var resolveCb = function resolveCb(err, content) {
+				return err ? reject(err) : resolve(content);
+			};
+
+			resolveCb.redirect = function (newStateName, parameters) {
+				reject(redirector(newStateName, parameters));
+			};
+
+			var res = state.resolve(state.data, parameters, resolveCb);
+			if (isThenable(res)) {
+				resolve(res);
+			}
+		});
+	}));
+
+	return resolves.then(function (resolveResults) {
+		return combineArrays({
+			stateName: stateNamesWithResolveFunctions,
+			resolveResult: resolveResults
+		}).reduce(function (obj, result) {
+			obj[result.stateName] = result.resolveResult;
+			return obj;
+		}, {});
+	});
+}
+
+module.exports = abstractStateRouter;
+
+
+},{"combine-arrays":18,"eventemitter3":20,"hash-brown-router":23,"iso-next-tick":25,"page-path-builder":27,"path-to-regexp-with-reversible-keys":29,"then-denodeify":36}],15:[function(require,module,exports){
+// Array.prototype.findIndex - MIT License (c) 2013 Paul Miller <http://paulmillr.com>
+// For all details and docs: <https://github.com/paulmillr/Array.prototype.findIndex>
+(function (globals) {
+  if (Array.prototype.findIndex) return;
+
+  var findIndex = function(predicate) {
+    var list = Object(this);
+    var length = Math.max(0, list.length) >>> 0; // ES.ToUint32;
+    if (length === 0) return -1;
+    if (typeof predicate !== 'function' || Object.prototype.toString.call(predicate) !== '[object Function]') {
+      throw new TypeError('Array#findIndex: predicate must be a function');
+    }
+    var thisArg = arguments.length > 1 ? arguments[1] : undefined;
+    for (var i = 0; i < length; i++) {
+      if (predicate.call(thisArg, list[i], i, list)) return i;
+    }
+    return -1;
+  };
+
+  if (Object.defineProperty) {
+    try {
+      Object.defineProperty(Array.prototype, 'findIndex', {
+        value: findIndex, configurable: true, writable: true
+      });
+    } catch(e) {}
+  }
+
+  if (!Array.prototype.findIndex) {
+    Array.prototype.findIndex = findIndex;
+  }
+}(this));
+
+},{}],16:[function(require,module,exports){
+(function (process){
+module.exports = function all(o, cb) {
+	var responded = false
+	var zalgoIsAtTheDoor = true
+	var running = 0
+	var results = {}
+	var errorResponse = null
+
+	if (!o || typeof o !== 'object' || Array.isArray(o)) {
+		throw new Error('async-all requires you to pass in an object!')
+	}
+
+	function respond() {
+		function callCallback() {
+			if (typeof cb === 'function') {
+				if (errorResponse) {
+					cb(errorResponse)
+				} else {
+					cb(null, results)
+				}
+			}
+		}
+
+		if (zalgoIsAtTheDoor) {
+			process.nextTick(callCallback)
+		} else {
+			callCallback()
+		}
+	}
+
+	function respondIfItMakesSense() {
+		if (running === 0 && !responded) {
+			respond()
+			responded = true
+		}
+	}
+
+	Object.keys(o).forEach(function(key) {
+		var receivedResponse = false
+		if (typeof o[key] === 'function') {
+			running++
+			o[key](function(err, value) {
+				if (!receivedResponse) {
+					receivedResponse = true
+					running--
+					if (!errorResponse) {
+						if (err) {
+							errorResponse = err
+						} else {
+							results[key] = value
+						}
+					}
+					respondIfItMakesSense()
+				}
+			})
+		} else {
+			results[key] = o[key]
+		}
+	})
+
+	respondIfItMakesSense()
+	zalgoIsAtTheDoor = false
+}
+
+}).call(this,require('_process'))
+},{"_process":17}],17:[function(require,module,exports){
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+},{}],18:[function(require,module,exports){
+module.exports = function(obj) {
+	var keys = Object.keys(obj)
+
+	keys.forEach(function(key) {
+		if (!Array.isArray(obj[key])) {
+			throw new Error(key + ' is not an array')
+		}
+	})
+
+	var maxIndex = keys.reduce(function(maxSoFar, key) {
+		var len = obj[key].length
+		return maxSoFar > len ? maxSoFar : len
+	}, 0)
+
+	var output = []
+
+	function getObject(index) {
+		var o = {}
+		keys.forEach(function(key) {
+			o[key] = obj[key][index]
+		})
+		return o
+	}
+
+	for (var i = 0; i < maxIndex; ++i) {
+		output.push(getObject(i))
+	}
+
+	return output
+}
+
+},{}],19:[function(require,module,exports){
+/*!
+  * domready (c) Dustin Diaz 2014 - License MIT
+  */
+!function (name, definition) {
+
+  if (typeof module != 'undefined') module.exports = definition()
+  else if (typeof define == 'function' && typeof define.amd == 'object') define(definition)
+  else this[name] = definition()
+
+}('domready', function () {
+
+  var fns = [], listener
+    , doc = document
+    , hack = doc.documentElement.doScroll
+    , domContentLoaded = 'DOMContentLoaded'
+    , loaded = (hack ? /^loaded|^c/ : /^loaded|^i|^c/).test(doc.readyState)
+
+
+  if (!loaded)
+  doc.addEventListener(domContentLoaded, listener = function () {
+    doc.removeEventListener(domContentLoaded, listener)
+    loaded = 1
+    while (listener = fns.shift()) listener()
+  })
+
+  return function (fn) {
+    loaded ? setTimeout(fn, 0) : fns.push(fn)
+  }
+
+});
+
+},{}],20:[function(require,module,exports){
+'use strict';
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if ('undefined' !== typeof module) {
+  module.exports = EventEmitter;
+}
+
+},{}],21:[function(require,module,exports){
+// Copyright Joyent, Inc. and other Node contributors.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the
+// "Software"), to deal in the Software without restriction, including
+// without limitation the rights to use, copy, modify, merge, publish,
+// distribute, sublicense, and/or sell copies of the Software, and to permit
+// persons to whom the Software is furnished to do so, subject to the
+// following conditions:
+//
+// The above copyright notice and this permission notice shall be included
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+// MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN
+// NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+// DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+// OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
+// USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+var objectCreate = Object.create || objectCreatePolyfill
+var objectKeys = Object.keys || objectKeysPolyfill
+var bind = Function.prototype.bind || functionBindPolyfill
+
+function EventEmitter() {
+  if (!this._events || !Object.prototype.hasOwnProperty.call(this, '_events')) {
+    this._events = objectCreate(null);
+    this._eventsCount = 0;
+  }
+
+  this._maxListeners = this._maxListeners || undefined;
+}
+module.exports = EventEmitter;
+
+// Backwards-compat with node 0.10.x
+EventEmitter.EventEmitter = EventEmitter;
+
+EventEmitter.prototype._events = undefined;
+EventEmitter.prototype._maxListeners = undefined;
+
+// By default EventEmitters will print a warning if more than 10 listeners are
+// added to it. This is a useful default which helps finding memory leaks.
+var defaultMaxListeners = 10;
+
+var hasDefineProperty;
+try {
+  var o = {};
+  if (Object.defineProperty) Object.defineProperty(o, 'x', { value: 0 });
+  hasDefineProperty = o.x === 0;
+} catch (err) { hasDefineProperty = false }
+if (hasDefineProperty) {
+  Object.defineProperty(EventEmitter, 'defaultMaxListeners', {
+    enumerable: true,
+    get: function() {
+      return defaultMaxListeners;
+    },
+    set: function(arg) {
+      // check whether the input is a positive number (whose value is zero or
+      // greater and not a NaN).
+      if (typeof arg !== 'number' || arg < 0 || arg !== arg)
+        throw new TypeError('"defaultMaxListeners" must be a positive number');
+      defaultMaxListeners = arg;
+    }
+  });
+} else {
+  EventEmitter.defaultMaxListeners = defaultMaxListeners;
+}
+
+// Obviously not all Emitters should be limited to 10. This function allows
+// that to be increased. Set to zero for unlimited.
+EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
+  if (typeof n !== 'number' || n < 0 || isNaN(n))
+    throw new TypeError('"n" argument must be a positive number');
+  this._maxListeners = n;
+  return this;
+};
+
+function $getMaxListeners(that) {
+  if (that._maxListeners === undefined)
+    return EventEmitter.defaultMaxListeners;
+  return that._maxListeners;
+}
+
+EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
+  return $getMaxListeners(this);
+};
+
+// These standalone emit* functions are used to optimize calling of event
+// handlers for fast cases because emit() itself often has a variable number of
+// arguments and can be deoptimized because of that. These functions always have
+// the same number of arguments and thus do not get deoptimized, so the code
+// inside them can execute faster.
+function emitNone(handler, isFn, self) {
+  if (isFn)
+    handler.call(self);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self);
+  }
+}
+function emitOne(handler, isFn, self, arg1) {
+  if (isFn)
+    handler.call(self, arg1);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self, arg1);
+  }
+}
+function emitTwo(handler, isFn, self, arg1, arg2) {
+  if (isFn)
+    handler.call(self, arg1, arg2);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self, arg1, arg2);
+  }
+}
+function emitThree(handler, isFn, self, arg1, arg2, arg3) {
+  if (isFn)
+    handler.call(self, arg1, arg2, arg3);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].call(self, arg1, arg2, arg3);
+  }
+}
+
+function emitMany(handler, isFn, self, args) {
+  if (isFn)
+    handler.apply(self, args);
+  else {
+    var len = handler.length;
+    var listeners = arrayClone(handler, len);
+    for (var i = 0; i < len; ++i)
+      listeners[i].apply(self, args);
+  }
+}
+
+EventEmitter.prototype.emit = function emit(type) {
+  var er, handler, len, args, i, events;
+  var doError = (type === 'error');
+
+  events = this._events;
+  if (events)
+    doError = (doError && events.error == null);
+  else if (!doError)
+    return false;
+
+  // If there is no 'error' event listener then throw.
+  if (doError) {
+    if (arguments.length > 1)
+      er = arguments[1];
+    if (er instanceof Error) {
+      throw er; // Unhandled 'error' event
+    } else {
+      // At least give some kind of context to the user
+      var err = new Error('Unhandled "error" event. (' + er + ')');
+      err.context = er;
+      throw err;
+    }
+    return false;
+  }
+
+  handler = events[type];
+
+  if (!handler)
+    return false;
+
+  var isFn = typeof handler === 'function';
+  len = arguments.length;
+  switch (len) {
+      // fast cases
+    case 1:
+      emitNone(handler, isFn, this);
+      break;
+    case 2:
+      emitOne(handler, isFn, this, arguments[1]);
+      break;
+    case 3:
+      emitTwo(handler, isFn, this, arguments[1], arguments[2]);
+      break;
+    case 4:
+      emitThree(handler, isFn, this, arguments[1], arguments[2], arguments[3]);
+      break;
+      // slower
+    default:
+      args = new Array(len - 1);
+      for (i = 1; i < len; i++)
+        args[i - 1] = arguments[i];
+      emitMany(handler, isFn, this, args);
+  }
+
+  return true;
+};
+
+function _addListener(target, type, listener, prepend) {
+  var m;
+  var events;
+  var existing;
+
+  if (typeof listener !== 'function')
+    throw new TypeError('"listener" argument must be a function');
+
+  events = target._events;
+  if (!events) {
+    events = target._events = objectCreate(null);
+    target._eventsCount = 0;
+  } else {
+    // To avoid recursion in the case that type === "newListener"! Before
+    // adding it to the listeners, first emit "newListener".
+    if (events.newListener) {
+      target.emit('newListener', type,
+          listener.listener ? listener.listener : listener);
+
+      // Re-assign `events` because a newListener handler could have caused the
+      // this._events to be assigned to a new object
+      events = target._events;
+    }
+    existing = events[type];
+  }
+
+  if (!existing) {
+    // Optimize the case of one listener. Don't need the extra array object.
+    existing = events[type] = listener;
+    ++target._eventsCount;
+  } else {
+    if (typeof existing === 'function') {
+      // Adding the second element, need to change to array.
+      existing = events[type] =
+          prepend ? [listener, existing] : [existing, listener];
+    } else {
+      // If we've already got an array, just append.
+      if (prepend) {
+        existing.unshift(listener);
+      } else {
+        existing.push(listener);
+      }
+    }
+
+    // Check for listener leak
+    if (!existing.warned) {
+      m = $getMaxListeners(target);
+      if (m && m > 0 && existing.length > m) {
+        existing.warned = true;
+        var w = new Error('Possible EventEmitter memory leak detected. ' +
+            existing.length + ' "' + String(type) + '" listeners ' +
+            'added. Use emitter.setMaxListeners() to ' +
+            'increase limit.');
+        w.name = 'MaxListenersExceededWarning';
+        w.emitter = target;
+        w.type = type;
+        w.count = existing.length;
+        if (typeof console === 'object' && console.warn) {
+          console.warn('%s: %s', w.name, w.message);
+        }
+      }
+    }
+  }
+
+  return target;
+}
+
+EventEmitter.prototype.addListener = function addListener(type, listener) {
+  return _addListener(this, type, listener, false);
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+EventEmitter.prototype.prependListener =
+    function prependListener(type, listener) {
+      return _addListener(this, type, listener, true);
+    };
+
+function onceWrapper() {
+  if (!this.fired) {
+    this.target.removeListener(this.type, this.wrapFn);
+    this.fired = true;
+    switch (arguments.length) {
+      case 0:
+        return this.listener.call(this.target);
+      case 1:
+        return this.listener.call(this.target, arguments[0]);
+      case 2:
+        return this.listener.call(this.target, arguments[0], arguments[1]);
+      case 3:
+        return this.listener.call(this.target, arguments[0], arguments[1],
+            arguments[2]);
+      default:
+        var args = new Array(arguments.length);
+        for (var i = 0; i < args.length; ++i)
+          args[i] = arguments[i];
+        this.listener.apply(this.target, args);
+    }
+  }
+}
+
+function _onceWrap(target, type, listener) {
+  var state = { fired: false, wrapFn: undefined, target: target, type: type, listener: listener };
+  var wrapped = bind.call(onceWrapper, state);
+  wrapped.listener = listener;
+  state.wrapFn = wrapped;
+  return wrapped;
+}
+
+EventEmitter.prototype.once = function once(type, listener) {
+  if (typeof listener !== 'function')
+    throw new TypeError('"listener" argument must be a function');
+  this.on(type, _onceWrap(this, type, listener));
+  return this;
+};
+
+EventEmitter.prototype.prependOnceListener =
+    function prependOnceListener(type, listener) {
+      if (typeof listener !== 'function')
+        throw new TypeError('"listener" argument must be a function');
+      this.prependListener(type, _onceWrap(this, type, listener));
+      return this;
+    };
+
+// Emits a 'removeListener' event if and only if the listener was removed.
+EventEmitter.prototype.removeListener =
+    function removeListener(type, listener) {
+      var list, events, position, i, originalListener;
+
+      if (typeof listener !== 'function')
+        throw new TypeError('"listener" argument must be a function');
+
+      events = this._events;
+      if (!events)
+        return this;
+
+      list = events[type];
+      if (!list)
+        return this;
+
+      if (list === listener || list.listener === listener) {
+        if (--this._eventsCount === 0)
+          this._events = objectCreate(null);
+        else {
+          delete events[type];
+          if (events.removeListener)
+            this.emit('removeListener', type, list.listener || listener);
+        }
+      } else if (typeof list !== 'function') {
+        position = -1;
+
+        for (i = list.length - 1; i >= 0; i--) {
+          if (list[i] === listener || list[i].listener === listener) {
+            originalListener = list[i].listener;
+            position = i;
+            break;
+          }
+        }
+
+        if (position < 0)
+          return this;
+
+        if (position === 0)
+          list.shift();
+        else
+          spliceOne(list, position);
+
+        if (list.length === 1)
+          events[type] = list[0];
+
+        if (events.removeListener)
+          this.emit('removeListener', type, originalListener || listener);
+      }
+
+      return this;
+    };
+
+EventEmitter.prototype.removeAllListeners =
+    function removeAllListeners(type) {
+      var listeners, events, i;
+
+      events = this._events;
+      if (!events)
+        return this;
+
+      // not listening for removeListener, no need to emit
+      if (!events.removeListener) {
+        if (arguments.length === 0) {
+          this._events = objectCreate(null);
+          this._eventsCount = 0;
+        } else if (events[type]) {
+          if (--this._eventsCount === 0)
+            this._events = objectCreate(null);
+          else
+            delete events[type];
+        }
+        return this;
+      }
+
+      // emit removeListener for all listeners on all events
+      if (arguments.length === 0) {
+        var keys = objectKeys(events);
+        var key;
+        for (i = 0; i < keys.length; ++i) {
+          key = keys[i];
+          if (key === 'removeListener') continue;
+          this.removeAllListeners(key);
+        }
+        this.removeAllListeners('removeListener');
+        this._events = objectCreate(null);
+        this._eventsCount = 0;
+        return this;
+      }
+
+      listeners = events[type];
+
+      if (typeof listeners === 'function') {
+        this.removeListener(type, listeners);
+      } else if (listeners) {
+        // LIFO order
+        for (i = listeners.length - 1; i >= 0; i--) {
+          this.removeListener(type, listeners[i]);
+        }
+      }
+
+      return this;
+    };
+
+function _listeners(target, type, unwrap) {
+  var events = target._events;
+
+  if (!events)
+    return [];
+
+  var evlistener = events[type];
+  if (!evlistener)
+    return [];
+
+  if (typeof evlistener === 'function')
+    return unwrap ? [evlistener.listener || evlistener] : [evlistener];
+
+  return unwrap ? unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
+}
+
+EventEmitter.prototype.listeners = function listeners(type) {
+  return _listeners(this, type, true);
+};
+
+EventEmitter.prototype.rawListeners = function rawListeners(type) {
+  return _listeners(this, type, false);
+};
+
+EventEmitter.listenerCount = function(emitter, type) {
+  if (typeof emitter.listenerCount === 'function') {
+    return emitter.listenerCount(type);
+  } else {
+    return listenerCount.call(emitter, type);
+  }
+};
+
+EventEmitter.prototype.listenerCount = listenerCount;
+function listenerCount(type) {
+  var events = this._events;
+
+  if (events) {
+    var evlistener = events[type];
+
+    if (typeof evlistener === 'function') {
+      return 1;
+    } else if (evlistener) {
+      return evlistener.length;
+    }
+  }
+
+  return 0;
+}
+
+EventEmitter.prototype.eventNames = function eventNames() {
+  return this._eventsCount > 0 ? Reflect.ownKeys(this._events) : [];
+};
+
+// About 1.5x faster than the two-arg version of Array#splice().
+function spliceOne(list, index) {
+  for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1)
+    list[i] = list[k];
+  list.pop();
+}
+
+function arrayClone(arr, n) {
+  var copy = new Array(n);
+  for (var i = 0; i < n; ++i)
+    copy[i] = arr[i];
+  return copy;
+}
+
+function unwrapListeners(arr) {
+  var ret = new Array(arr.length);
+  for (var i = 0; i < ret.length; ++i) {
+    ret[i] = arr[i].listener || arr[i];
+  }
+  return ret;
+}
+
+function objectCreatePolyfill(proto) {
+  var F = function() {};
+  F.prototype = proto;
+  return new F;
+}
+function objectKeysPolyfill(obj) {
+  var keys = [];
+  for (var k in obj) if (Object.prototype.hasOwnProperty.call(obj, k)) {
+    keys.push(k);
+  }
+  return k;
+}
+function functionBindPolyfill(context) {
+  var fn = this;
+  return function () {
+    return fn.apply(context, arguments);
+  };
+}
+
+},{}],22:[function(require,module,exports){
+var EventEmitter = require('eventemitter3')
+
+module.exports = function HashLocation(window) {
+	var emitter = new EventEmitter()
+	var last = ''
+	var needToDecode = getNeedToDecode()
+
+	window.addEventListener('hashchange', function() {
+		if (last !== emitter.get()) {
+			last = emitter.get()
+			emitter.emit('hashchange')
+		}
+
+	})
+
+	function ifRouteIsDifferent(actualNavigateFunction) {
+		return function navigate(newPath) {
+			if (newPath !== last) {
+				actualNavigateFunction(window, newPath)
+			}
+		}
+	}
+
+	emitter.go = ifRouteIsDifferent(go)
+	emitter.replace = ifRouteIsDifferent(replace)
+	emitter.get = get.bind(null, window, needToDecode)
+
+	return emitter
+}
+
+function replace(window, newPath) {
+	window.location.replace(everythingBeforeTheSlash(window.location.href) + '#' + newPath)
+}
+
+function everythingBeforeTheSlash(url) {
+	var hashIndex = url.indexOf('#')
+	return hashIndex === -1 ? url : url.substring(0, hashIndex)
+}
+
+function go(window, newPath) {
+	window.location.hash = newPath
+}
+
+function get(window, needToDecode) {
+	var hash = removeHashFromPath(window.location.hash)
+	return needToDecode ? decodeURI(hash) : hash
+}
+
+function removeHashFromPath(path) {
+	return (path && path[0] === '#') ? path.substr(1) : path
+}
+
+function getNeedToDecode() {
+	var a = document.createElement('a')
+	a.href = '#x x'
+	return !/x x/.test(a.hash)
+}
+
+},{"eventemitter3":20}],23:[function(require,module,exports){
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+var qs = require('query-string')
+var xtend = require('xtend')
+var browserHashLocation = require('./hash-location.js')
+var EventEmitter = require('eventemitter3')
+
+module.exports = function Router(opts, hashLocation) {
+	var emitter = new EventEmitter()
+	if (isHashLocation(opts)) {
+		hashLocation = opts
+		opts = null
+	}
+
+	opts = opts || {}
+
+	if (!hashLocation) {
+		hashLocation = browserHashLocation(window)
+	}
+
+	function onNotFound(path, queryStringParameters) {
+		emitter.emit('not found', path, queryStringParameters)
+	}
+
+	var routes = []
+
+	var onHashChange = evaluateCurrentPath.bind(null, routes, hashLocation, !!opts.reverse, onNotFound)
+
+	hashLocation.on('hashchange', onHashChange)
+
+	function stop() {
+		hashLocation.removeListener('hashchange', onHashChange)
+	}
+
+	emitter.add = add.bind(null, routes)
+	emitter.stop = stop
+	emitter.evaluateCurrent = evaluateCurrentPathOrGoToDefault.bind(null, routes, hashLocation, !!opts.reverse, onNotFound)
+	emitter.replace = hashLocation.replace
+	emitter.go = hashLocation.go
+	emitter.location = hashLocation
+
+	return emitter
+}
+
+function evaluateCurrentPath(routes, hashLocation, reverse, onNotFound) {
+	evaluatePath(routes, stripHashFragment(hashLocation.get()), reverse, onNotFound)
+}
+
+function getPathParts(path) {
+	var chunks = path.split('?')
+	return {
+		path: chunks.shift(),
+		queryString: qs.parse(chunks.join('')),
+	}
+}
+
+function evaluatePath(routes, path, reverse, onNotFound) {
+	var pathParts = getPathParts(path)
+	path = pathParts.path
+	var queryStringParameters = pathParts.queryString
+
+	var matchingRoute = find((reverse ? reverseArray(routes) : routes), path)
+
+	if (matchingRoute) {
+		var regexResult = matchingRoute.exec(path)
+		var routeParameters = makeParametersObjectFromRegexResult(matchingRoute.keys, regexResult)
+		var params = xtend(queryStringParameters, routeParameters)
+		matchingRoute.fn(params)
+	} else {
+		onNotFound(path, queryStringParameters)
+	}
+}
+
+function reverseArray(ary) {
+	return ary.slice().reverse()
+}
+
+function makeParametersObjectFromRegexResult(keys, regexResult) {
+	return keys.reduce(function(memo, urlKey, index) {
+		memo[urlKey.name] = regexResult[index + 1]
+		return memo
+	}, {})
+}
+
+function add(routes, routeString, routeFunction) {
+	if (typeof routeFunction !== 'function') {
+		throw new Error('The router add function must be passed a callback function')
+	}
+	var newRoute = pathToRegexp(routeString)
+	newRoute.fn = routeFunction
+	routes.push(newRoute)
+}
+
+function evaluateCurrentPathOrGoToDefault(routes, hashLocation, reverse, onNotFound, defaultPath) {
+	var currentLocation = stripHashFragment(hashLocation.get())
+	var canUseCurrentLocation = currentLocation && (currentLocation !== '/' || defaultPath === '/')
+
+	if (canUseCurrentLocation) {
+		var routesCopy = routes.slice()
+		evaluateCurrentPath(routesCopy, hashLocation, reverse, onNotFound)
+	} else {
+		hashLocation.go(defaultPath)
+	}
+}
+
+var urlWithoutHashFragmentRegex = /^([^#]*)(:?#.*)?$/
+function stripHashFragment(url) {
+	var match = url.match(urlWithoutHashFragmentRegex)
+	return match ? match[1] : ''
+}
+
+function isHashLocation(hashLocation) {
+	return hashLocation && hashLocation.go && hashLocation.replace && hashLocation.on
+}
+
+function find(aryOfRegexes, str) {
+	for (var i = 0; i < aryOfRegexes.length; ++i) {
+		if (str.match(aryOfRegexes[i])) {
+			return aryOfRegexes[i]
+		}
+	}
+}
+
+},{"./hash-location.js":22,"eventemitter3":20,"path-to-regexp-with-reversible-keys":29,"query-string":30,"xtend":39}],24:[function(require,module,exports){
+module.exports = Array.isArray || function (arr) {
+  return Object.prototype.toString.call(arr) == '[object Array]';
+};
+
+},{}],25:[function(require,module,exports){
+(function (setImmediate){
+module.exports = function (fn) {
+  typeof setImmediate === 'function' ?
+    setImmediate(fn) :
+    setTimeout(fn, 0)
+}
+
+}).call(this,require("timers").setImmediate)
+},{"timers":37}],26:[function(require,module,exports){
+/*
+object-assign
+(c) Sindre Sorhus
+@license MIT
+*/
+
+'use strict';
+/* eslint-disable no-unused-vars */
+var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+
+function toObject(val) {
+	if (val === null || val === undefined) {
+		throw new TypeError('Object.assign cannot be called with null or undefined');
+	}
+
+	return Object(val);
+}
+
+function shouldUseNative() {
+	try {
+		if (!Object.assign) {
+			return false;
+		}
+
+		// Detect buggy property enumeration order in older V8 versions.
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=4118
+		var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+		test1[5] = 'de';
+		if (Object.getOwnPropertyNames(test1)[0] === '5') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test2 = {};
+		for (var i = 0; i < 10; i++) {
+			test2['_' + String.fromCharCode(i)] = i;
+		}
+		var order2 = Object.getOwnPropertyNames(test2).map(function (n) {
+			return test2[n];
+		});
+		if (order2.join('') !== '0123456789') {
+			return false;
+		}
+
+		// https://bugs.chromium.org/p/v8/issues/detail?id=3056
+		var test3 = {};
+		'abcdefghijklmnopqrst'.split('').forEach(function (letter) {
+			test3[letter] = letter;
+		});
+		if (Object.keys(Object.assign({}, test3)).join('') !==
+				'abcdefghijklmnopqrst') {
+			return false;
+		}
+
+		return true;
+	} catch (err) {
+		// We don't expect any of the above to throw, but better to be safe.
+		return false;
+	}
+}
+
+module.exports = shouldUseNative() ? Object.assign : function (target, source) {
+	var from;
+	var to = toObject(target);
+	var symbols;
+
+	for (var s = 1; s < arguments.length; s++) {
+		from = Object(arguments[s]);
+
+		for (var key in from) {
+			if (hasOwnProperty.call(from, key)) {
+				to[key] = from[key];
+			}
+		}
+
+		if (getOwnPropertySymbols) {
+			symbols = getOwnPropertySymbols(from);
+			for (var i = 0; i < symbols.length; i++) {
+				if (propIsEnumerable.call(from, symbols[i])) {
+					to[symbols[i]] = from[symbols[i]];
+				}
+			}
+		}
+	}
+
+	return to;
+};
+
+},{}],27:[function(require,module,exports){
+var parser = require('./path-parser')
+var stringifyQuerystring = require('query-string').stringify
+
+module.exports = function(pathStr, parameters) {
+	var parsed = typeof pathStr === 'string' ? parser(pathStr) : pathStr
+	var allTokens = parsed.allTokens
+	var regex = parsed.regex
+
+	if (parameters) {
+		var path = allTokens.map(function(bit) {
+			if (bit.string) {
+				return bit.string
+			}
+
+			var defined = typeof parameters[bit.name] !== 'undefined'
+			if (!bit.optional && !defined) {
+				throw new Error('Must supply argument ' + bit.name + ' for path ' + pathStr)
+			}
+
+			return defined ? (bit.delimiter + encodeURIComponent(parameters[bit.name])) : ''
+		}).join('')
+
+		if (!regex.test(path)) {
+			throw new Error('Provided arguments do not match the original arguments')
+		}
+
+		return buildPathWithQuerystring(path, parameters, allTokens)
+	} else {
+		return parsed
+	}
+}
+
+function buildPathWithQuerystring(path, parameters, tokenArray) {
+	var parametersInQuerystring = getParametersWithoutMatchingToken(parameters, tokenArray)
+
+	if (Object.keys(parametersInQuerystring).length === 0) {
+		return path
+	}
+
+	return path + '?' + stringifyQuerystring(parametersInQuerystring)
+}
+
+function getParametersWithoutMatchingToken(parameters, tokenArray) {
+	var tokenHash = tokenArray.reduce(function(memo, bit) {
+		if (!bit.string) {
+			memo[bit.name] = bit
+		}
+		return memo
+	}, {})
+
+	return Object.keys(parameters).filter(function(param) {
+		return !tokenHash[param]
+	}).reduce(function(newParameters, param) {
+		newParameters[param] = parameters[param]
+		return newParameters
+	}, {})
+}
+
+},{"./path-parser":28,"query-string":30}],28:[function(require,module,exports){
+// This file to be replaced with an official implementation maintained by
+// the page.js crew if and when that becomes an option
+
+var pathToRegexp = require('path-to-regexp-with-reversible-keys')
+
+module.exports = function(pathString) {
+	var parseResults = pathToRegexp(pathString)
+
+	// The only reason I'm returning a new object instead of the results of the pathToRegexp
+	// function is so that if the official implementation ends up returning an
+	// allTokens-style array via some other mechanism, I may be able to change this file
+	// without having to change the rest of the module in index.js
+	return {
+		regex: parseResults,
+		allTokens: parseResults.allTokens
+	}
+}
+
+},{"path-to-regexp-with-reversible-keys":29}],29:[function(require,module,exports){
+var isArray = require('isarray');
+
+/**
+ * Expose `pathToRegexp`.
+ */
+module.exports = pathToRegexp;
+
+/**
+ * The main path matching regexp utility.
+ *
+ * @type {RegExp}
+ */
+var PATH_REGEXP = new RegExp([
+  // Match escaped characters that would otherwise appear in future matches.
+  // This allows the user to escape special characters that won't transform.
+  '(\\\\.)',
+  // Match Express-style parameters and un-named parameters with a prefix
+  // and optional suffixes. Matches appear as:
+  //
+  // "/:test(\\d+)?" => ["/", "test", "\d+", undefined, "?"]
+  // "/route(\\d+)" => [undefined, undefined, undefined, "\d+", undefined]
+  '([\\/.])?(?:\\:(\\w+)(?:\\(((?:\\\\.|[^)])*)\\))?|\\(((?:\\\\.|[^)])*)\\))([+*?])?',
+  // Match regexp special characters that are always escaped.
+  '([.+*?=^!:${}()[\\]|\\/])'
+].join('|'), 'g');
+
+/**
+ * Escape the capturing group by escaping special characters and meaning.
+ *
+ * @param  {String} group
+ * @return {String}
+ */
+function escapeGroup (group) {
+  return group.replace(/([=!:$\/()])/g, '\\$1');
+}
+
+/**
+ * Attach the keys as a property of the regexp.
+ *
+ * @param  {RegExp} re
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function attachKeys (re, keys, allTokens) {
+  re.keys = keys;
+  re.allTokens = allTokens;
+  return re;
+}
+
+/**
+ * Get the flags for a regexp from the options.
+ *
+ * @param  {Object} options
+ * @return {String}
+ */
+function flags (options) {
+  return options.sensitive ? '' : 'i';
+}
+
+/**
+ * Pull out keys from a regexp.
+ *
+ * @param  {RegExp} path
+ * @param  {Array}  keys
+ * @return {RegExp}
+ */
+function regexpToRegexp (path, keys, allTokens) {
+  // Use a negative lookahead to match only capturing groups.
+  var groups = path.source.match(/\((?!\?)/g);
+
+  if (groups) {
+    for (var i = 0; i < groups.length; i++) {
+      keys.push({
+        name:      i,
+        delimiter: null,
+        optional:  false,
+        repeat:    false
+      });
+    }
+  }
+
+  return attachKeys(path, keys, allTokens);
+}
+
+/**
+ * Transform an array into a regexp.
+ *
+ * @param  {Array}  path
+ * @param  {Array}  keys
+ * @param  {Object} options
+ * @return {RegExp}
+ */
+function arrayToRegexp (path, keys, options, allTokens) {
+  var parts = [];
+
+  for (var i = 0; i < path.length; i++) {
+    parts.push(pathToRegexp(path[i], keys, options, allTokens).source);
+  }
+
+  var regexp = new RegExp('(?:' + parts.join('|') + ')', flags(options));
+  return attachKeys(regexp, keys, allTokens);
+}
+
+/**
+ * Replace the specific tags with regexp strings.
+ *
+ * @param  {String} path
+ * @param  {Array}  keys
+ * @return {String}
+ */
+function replacePath (path, keys, allTokens) {
+  var index = 0;
+  var lastEndIndex = 0
+
+  function addLastToken(lastToken) {
+    if (lastEndIndex === 0 && lastToken[0] !== '/') {
+      lastToken = '/' + lastToken
+    }
+    allTokens.push({
+      string: lastToken
+    });
+  }
+
+
+  function replace (match, escaped, prefix, key, capture, group, suffix, escape, offset) {
+    if (escaped) {
+      return escaped;
+    }
+
+    if (escape) {
+      return '\\' + escape;
+    }
+
+    var repeat   = suffix === '+' || suffix === '*';
+    var optional = suffix === '?' || suffix === '*';
+
+    if (offset > lastEndIndex) {
+      addLastToken(path.substring(lastEndIndex, offset));
+    }
+
+    lastEndIndex = offset + match.length;
+
+    var newKey = {
+      name:      key || index++,
+      delimiter: prefix || '/',
+      optional:  optional,
+      repeat:    repeat
+    }
+
+    keys.push(newKey);
+    allTokens.push(newKey);
+
+    prefix = prefix ? ('\\' + prefix) : '';
+    capture = escapeGroup(capture || group || '[^' + (prefix || '\\/') + ']+?');
+
+    if (repeat) {
+      capture = capture + '(?:' + prefix + capture + ')*';
+    }
+
+    if (optional) {
+      return '(?:' + prefix + '(' + capture + '))?';
+    }
+
+    // Basic parameter support.
+    return prefix + '(' + capture + ')';
+  }
+
+  var newPath = path.replace(PATH_REGEXP, replace);
+
+  if (lastEndIndex < path.length) {
+    addLastToken(path.substring(lastEndIndex))
+  }
+
+  return newPath;
+}
+
+/**
+ * Normalize the given path string, returning a regular expression.
+ *
+ * An empty array can be passed in for the keys, which will hold the
+ * placeholder key descriptions. For example, using `/user/:id`, `keys` will
+ * contain `[{ name: 'id', delimiter: '/', optional: false, repeat: false }]`.
+ *
+ * @param  {(String|RegExp|Array)} path
+ * @param  {Array}                 [keys]
+ * @param  {Object}                [options]
+ * @return {RegExp}
+ */
+function pathToRegexp (path, keys, options, allTokens) {
+  keys = keys || [];
+  allTokens = allTokens || [];
+
+  if (!isArray(keys)) {
+    options = keys;
+    keys = [];
+  } else if (!options) {
+    options = {};
+  }
+
+  if (path instanceof RegExp) {
+    return regexpToRegexp(path, keys, options, allTokens);
+  }
+
+  if (isArray(path)) {
+    return arrayToRegexp(path, keys, options, allTokens);
+  }
+
+  var strict = options.strict;
+  var end = options.end !== false;
+  var route = replacePath(path, keys, allTokens);
+  var endsWithSlash = path.charAt(path.length - 1) === '/';
+
+  // In non-strict mode we allow a slash at the end of match. If the path to
+  // match already ends with a slash, we remove it for consistency. The slash
+  // is valid at the end of a path match, not in the middle. This is important
+  // in non-ending mode, where "/test/" shouldn't match "/test//route".
+  if (!strict) {
+    route = (endsWithSlash ? route.slice(0, -2) : route) + '(?:\\/(?=$))?';
+  }
+
+  if (end) {
+    route += '$';
+  } else {
+    // In non-ending mode, we need the capturing groups to match as much as
+    // possible by using a positive lookahead to the end or next path segment.
+    route += strict && endsWithSlash ? '' : '(?=\\/|$)';
+  }
+
+  return attachKeys(new RegExp('^' + route, flags(options)), keys, allTokens);
+}
+
+},{"isarray":24}],30:[function(require,module,exports){
+'use strict';
+var strictUriEncode = require('strict-uri-encode');
+var objectAssign = require('object-assign');
+
+function encoderForArrayFormat(opts) {
+	switch (opts.arrayFormat) {
+		case 'index':
+			return function (key, value, index) {
+				return value === null ? [
+					encode(key, opts),
+					'[',
+					index,
+					']'
+				].join('') : [
+					encode(key, opts),
+					'[',
+					encode(index, opts),
+					']=',
+					encode(value, opts)
+				].join('');
+			};
+
+		case 'bracket':
+			return function (key, value) {
+				return value === null ? encode(key, opts) : [
+					encode(key, opts),
+					'[]=',
+					encode(value, opts)
+				].join('');
+			};
+
+		default:
+			return function (key, value) {
+				return value === null ? encode(key, opts) : [
+					encode(key, opts),
+					'=',
+					encode(value, opts)
+				].join('');
+			};
+	}
+}
+
+function parserForArrayFormat(opts) {
+	var result;
+
+	switch (opts.arrayFormat) {
+		case 'index':
+			return function (key, value, accumulator) {
+				result = /\[(\d*)\]$/.exec(key);
+
+				key = key.replace(/\[\d*\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				}
+
+				if (accumulator[key] === undefined) {
+					accumulator[key] = {};
+				}
+
+				accumulator[key][result[1]] = value;
+			};
+
+		case 'bracket':
+			return function (key, value, accumulator) {
+				result = /(\[\])$/.exec(key);
+				key = key.replace(/\[\]$/, '');
+
+				if (!result) {
+					accumulator[key] = value;
+					return;
+				} else if (accumulator[key] === undefined) {
+					accumulator[key] = [value];
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+
+		default:
+			return function (key, value, accumulator) {
+				if (accumulator[key] === undefined) {
+					accumulator[key] = value;
+					return;
+				}
+
+				accumulator[key] = [].concat(accumulator[key], value);
+			};
+	}
+}
+
+function encode(value, opts) {
+	if (opts.encode) {
+		return opts.strict ? strictUriEncode(value) : encodeURIComponent(value);
+	}
+
+	return value;
+}
+
+function keysSorter(input) {
+	if (Array.isArray(input)) {
+		return input.sort();
+	} else if (typeof input === 'object') {
+		return keysSorter(Object.keys(input)).sort(function (a, b) {
+			return Number(a) - Number(b);
+		}).map(function (key) {
+			return input[key];
+		});
+	}
+
+	return input;
+}
+
+exports.extract = function (str) {
+	return str.split('?')[1] || '';
+};
+
+exports.parse = function (str, opts) {
+	opts = objectAssign({arrayFormat: 'none'}, opts);
+
+	var formatter = parserForArrayFormat(opts);
+
+	// Create an object with no prototype
+	// https://github.com/sindresorhus/query-string/issues/47
+	var ret = Object.create(null);
+
+	if (typeof str !== 'string') {
+		return ret;
+	}
+
+	str = str.trim().replace(/^(\?|#|&)/, '');
+
+	if (!str) {
+		return ret;
+	}
+
+	str.split('&').forEach(function (param) {
+		var parts = param.replace(/\+/g, ' ').split('=');
+		// Firefox (pre 40) decodes `%3D` to `=`
+		// https://github.com/sindresorhus/query-string/pull/37
+		var key = parts.shift();
+		var val = parts.length > 0 ? parts.join('=') : undefined;
+
+		// missing `=` should be `null`:
+		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+		val = val === undefined ? null : decodeURIComponent(val);
+
+		formatter(decodeURIComponent(key), val, ret);
+	});
+
+	return Object.keys(ret).sort().reduce(function (result, key) {
+		var val = ret[key];
+		if (Boolean(val) && typeof val === 'object' && !Array.isArray(val)) {
+			// Sort object keys, not values
+			result[key] = keysSorter(val);
+		} else {
+			result[key] = val;
+		}
+
+		return result;
+	}, Object.create(null));
+};
+
+exports.stringify = function (obj, opts) {
+	var defaults = {
+		encode: true,
+		strict: true,
+		arrayFormat: 'none'
+	};
+
+	opts = objectAssign(defaults, opts);
+
+	var formatter = encoderForArrayFormat(opts);
+
+	return obj ? Object.keys(obj).sort().map(function (key) {
+		var val = obj[key];
+
+		if (val === undefined) {
+			return '';
+		}
+
+		if (val === null) {
+			return encode(key, opts);
+		}
+
+		if (Array.isArray(val)) {
+			var result = [];
+
+			val.slice().forEach(function (val2) {
+				if (val2 === undefined) {
+					return;
+				}
+
+				result.push(formatter(key, val2, result.length));
+			});
+
+			return result.join('&');
+		}
+
+		return encode(key, opts) + '=' + encode(val, opts);
+	}).filter(function (x) {
+		return x.length > 0;
+	}).join('&') : '';
+};
+
+},{"object-assign":26,"strict-uri-encode":35}],31:[function(require,module,exports){
+/**
+ *
+ * This function was taken from a stackoverflow answer:
+ *
+ * http://stackoverflow.com/questions/105034/how-to-create-a-guid-uuid-in-javascript
+ *
+ * Many thanks to:
+ *
+ * Briguy37 (http://stackoverflow.com/users/508537/briguy37)
+ * broofa (http://stackoverflow.com/users/109538/broofa)
+ *
+ */
+
+module.exports = function() {
+    var d = new Date().getTime();
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+};
+
+},{}],32:[function(require,module,exports){
+var riot = require('riot')
+var xtend = require('xtend')
+
+module.exports = function RiotStateRenderer(options) {
+	var defaultOpts = xtend(options)
+
+	return function makeRenderer(stateRouter) {
+		defaultOpts.makePath = makeRiotPath.bind(null, stateRouter.makePath)
+
+		defaultOpts.active = makeRiotPath.bind(null, stateRouter.stateIsActive)
+
+		stateRouter.on('stateChangeEnd', function() {
+			riot.update()
+		})
+
+		return {
+			render: function render(context, cb) {
+				var element = context.element
+				var template = context.template
+				var content = context.content
+				if (typeof element === 'string') {
+					element = document.querySelector(element)
+				}
+
+				try {
+					var tag = riot.mount(element, template, xtend(defaultOpts, content))[0]
+
+					if (!tag) {
+						console.error('Error creating riot tag', template, 'on', element)
+					}
+					if (tag.root.attributes['riot-tag'] && tag.root.attributes['riot-tag'].value !== template) {
+						tag.root.attributes['riot-tag'].value = template;
+					}
+
+					cb(null, tag)
+				} catch (e) {
+					cb(e)
+				}
+			},
+			reset: function reset(context, cb) {
+				var tag = context.domApi
+
+				tag.trigger('reset')
+				tag.opts = xtend(defaultOpts, context.content)
+				tag.update()
+				cb()
+			},
+			destroy: function destroy(tag, cb) {
+				tag.unmount(true)
+				cb()
+			},
+			getChildElement: function getChildElement(tag, cb) {
+				try {
+					var child = tag.root.querySelector('ui-view')
+					cb(null, child)
+				} catch (e) {
+					cb(e)
+				}
+			}
+		}
+	}
+}
+
+// Since I can't figure out how to use object literals in a Riot expressions
+function makeRiotPath() {
+	try {
+		var args = Array.prototype.slice.call(arguments)
+		var makePath = args.shift()
+		var stateName = args.shift()
+		var opts = {}
+		for (var i = 0; i < args.length; i += 2) {
+			opts[args[i]] = args[i + 1]
+		}
+		return makePath(stateName, opts)
+	} catch (e) {
+		console.log(e)
+	}
+}
+},{"riot":33,"xtend":39}],33:[function(require,module,exports){
+/* Riot v2.6.9, @license MIT */
+
+;(function(window, undefined) {
+  'use strict';
+var riot = { version: 'v2.6.9', settings: {} },
+  // be aware, internal usage
+  // ATTENTION: prefix the global dynamic variables with `__`
+
+  // counter to give a unique id to all the Tag instances
+  __uid = 0,
+  // tags instances cache
+  __virtualDom = [],
+  // tags implementation cache
+  __tagImpl = {},
+
+  /**
+   * Const
+   */
+  GLOBAL_MIXIN = '__global_mixin',
+
+  // riot specific prefixes
+  RIOT_PREFIX = 'riot-',
+  RIOT_TAG = RIOT_PREFIX + 'tag',
+  RIOT_TAG_IS = 'data-is',
+
+  // for typeof == '' comparisons
+  T_STRING = 'string',
+  T_OBJECT = 'object',
+  T_UNDEF  = 'undefined',
+  T_FUNCTION = 'function',
+  XLINK_NS = 'http://www.w3.org/1999/xlink',
+  XLINK_REGEX = /^xlink:(\w+)/,
+  // special native tags that cannot be treated like the others
+  SPECIAL_TAGS_REGEX = /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?|opt(?:ion|group))$/,
+  RESERVED_WORDS_BLACKLIST = /^(?:_(?:item|id|parent)|update|root|(?:un)?mount|mixin|is(?:Mounted|Loop)|tags|parent|opts|trigger|o(?:n|ff|ne))$/,
+  // SVG tags list https://www.w3.org/TR/SVG/attindex.html#PresentationAttributes
+  SVG_TAGS_LIST = ['altGlyph', 'animate', 'animateColor', 'circle', 'clipPath', 'defs', 'ellipse', 'feBlend', 'feColorMatrix', 'feComponentTransfer', 'feComposite', 'feConvolveMatrix', 'feDiffuseLighting', 'feDisplacementMap', 'feFlood', 'feGaussianBlur', 'feImage', 'feMerge', 'feMorphology', 'feOffset', 'feSpecularLighting', 'feTile', 'feTurbulence', 'filter', 'font', 'foreignObject', 'g', 'glyph', 'glyphRef', 'image', 'line', 'linearGradient', 'marker', 'mask', 'missing-glyph', 'path', 'pattern', 'polygon', 'polyline', 'radialGradient', 'rect', 'stop', 'svg', 'switch', 'symbol', 'text', 'textPath', 'tref', 'tspan', 'use'],
+
+  // version# for IE 8-11, 0 for others
+  IE_VERSION = (window && window.document || {}).documentMode | 0,
+
+  // detect firefox to fix #1374
+  FIREFOX = window && !!window.InstallTrigger
+/* istanbul ignore next */
+riot.observable = function(el) {
+
+  /**
+   * Extend the original object or create a new empty one
+   * @type { Object }
+   */
+
+  el = el || {}
+
+  /**
+   * Private variables
+   */
+  var callbacks = {},
+    slice = Array.prototype.slice
+
+  /**
+   * Private Methods
+   */
+
+  /**
+   * Helper function needed to get and loop all the events in a string
+   * @param   { String }   e - event string
+   * @param   {Function}   fn - callback
+   */
+  function onEachEvent(e, fn) {
+    var es = e.split(' '), l = es.length, i = 0
+    for (; i < l; i++) {
+      var name = es[i]
+      if (name) fn(name, i)
+    }
+  }
+
+  /**
+   * Public Api
+   */
+
+  // extend the el object adding the observable methods
+  Object.defineProperties(el, {
+    /**
+     * Listen to the given space separated list of `events` and
+     * execute the `callback` each time an event is triggered.
+     * @param  { String } events - events ids
+     * @param  { Function } fn - callback function
+     * @returns { Object } el
+     */
+    on: {
+      value: function(events, fn) {
+        if (typeof fn != 'function')  return el
+
+        onEachEvent(events, function(name, pos) {
+          (callbacks[name] = callbacks[name] || []).push(fn)
+          fn.typed = pos > 0
+        })
+
+        return el
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    },
+
+    /**
+     * Removes the given space separated list of `events` listeners
+     * @param   { String } events - events ids
+     * @param   { Function } fn - callback function
+     * @returns { Object } el
+     */
+    off: {
+      value: function(events, fn) {
+        if (events == '*' && !fn) callbacks = {}
+        else {
+          onEachEvent(events, function(name, pos) {
+            if (fn) {
+              var arr = callbacks[name]
+              for (var i = 0, cb; cb = arr && arr[i]; ++i) {
+                if (cb == fn) arr.splice(i--, 1)
+              }
+            } else delete callbacks[name]
+          })
+        }
+        return el
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    },
+
+    /**
+     * Listen to the given space separated list of `events` and
+     * execute the `callback` at most once
+     * @param   { String } events - events ids
+     * @param   { Function } fn - callback function
+     * @returns { Object } el
+     */
+    one: {
+      value: function(events, fn) {
+        function on() {
+          el.off(events, on)
+          fn.apply(el, arguments)
+        }
+        return el.on(events, on)
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    },
+
+    /**
+     * Execute all callback functions that listen to
+     * the given space separated list of `events`
+     * @param   { String } events - events ids
+     * @returns { Object } el
+     */
+    trigger: {
+      value: function(events) {
+
+        // getting the arguments
+        var arglen = arguments.length - 1,
+          args = new Array(arglen),
+          fns
+
+        for (var i = 0; i < arglen; i++) {
+          args[i] = arguments[i + 1] // skip first argument
+        }
+
+        onEachEvent(events, function(name, pos) {
+
+          fns = slice.call(callbacks[name] || [], 0)
+
+          for (var i = 0, fn; fn = fns[i]; ++i) {
+            if (fn.busy) continue
+            fn.busy = 1
+            fn.apply(el, fn.typed ? [name].concat(args) : args)
+            if (fns[i] !== fn) { i-- }
+            fn.busy = 0
+          }
+
+          if (callbacks['*'] && name != '*')
+            el.trigger.apply(el, ['*', name].concat(args))
+
+        })
+
+        return el
+      },
+      enumerable: false,
+      writable: false,
+      configurable: false
+    }
+  })
+
+  return el
+
+}
+/* istanbul ignore next */
+;(function(riot) {
+
+/**
+ * Simple client-side router
+ * @module riot-route
+ */
+
+
+var RE_ORIGIN = /^.+?\/\/+[^\/]+/,
+  EVENT_LISTENER = 'EventListener',
+  REMOVE_EVENT_LISTENER = 'remove' + EVENT_LISTENER,
+  ADD_EVENT_LISTENER = 'add' + EVENT_LISTENER,
+  HAS_ATTRIBUTE = 'hasAttribute',
+  REPLACE = 'replace',
+  POPSTATE = 'popstate',
+  HASHCHANGE = 'hashchange',
+  TRIGGER = 'trigger',
+  MAX_EMIT_STACK_LEVEL = 3,
+  win = typeof window != 'undefined' && window,
+  doc = typeof document != 'undefined' && document,
+  hist = win && history,
+  loc = win && (hist.location || win.location), // see html5-history-api
+  prot = Router.prototype, // to minify more
+  clickEvent = doc && doc.ontouchstart ? 'touchstart' : 'click',
+  started = false,
+  central = riot.observable(),
+  routeFound = false,
+  debouncedEmit,
+  base, current, parser, secondParser, emitStack = [], emitStackLevel = 0
+
+/**
+ * Default parser. You can replace it via router.parser method.
+ * @param {string} path - current path (normalized)
+ * @returns {array} array
+ */
+function DEFAULT_PARSER(path) {
+  return path.split(/[/?#]/)
+}
+
+/**
+ * Default parser (second). You can replace it via router.parser method.
+ * @param {string} path - current path (normalized)
+ * @param {string} filter - filter string (normalized)
+ * @returns {array} array
+ */
+function DEFAULT_SECOND_PARSER(path, filter) {
+  var re = new RegExp('^' + filter[REPLACE](/\*/g, '([^/?#]+?)')[REPLACE](/\.\./, '.*') + '$'),
+    args = path.match(re)
+
+  if (args) return args.slice(1)
+}
+
+/**
+ * Simple/cheap debounce implementation
+ * @param   {function} fn - callback
+ * @param   {number} delay - delay in seconds
+ * @returns {function} debounced function
+ */
+function debounce(fn, delay) {
+  var t
+  return function () {
+    clearTimeout(t)
+    t = setTimeout(fn, delay)
+  }
+}
+
+/**
+ * Set the window listeners to trigger the routes
+ * @param {boolean} autoExec - see route.start
+ */
+function start(autoExec) {
+  debouncedEmit = debounce(emit, 1)
+  win[ADD_EVENT_LISTENER](POPSTATE, debouncedEmit)
+  win[ADD_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
+  doc[ADD_EVENT_LISTENER](clickEvent, click)
+  if (autoExec) emit(true)
+}
+
+/**
+ * Router class
+ */
+function Router() {
+  this.$ = []
+  riot.observable(this) // make it observable
+  central.on('stop', this.s.bind(this))
+  central.on('emit', this.e.bind(this))
+}
+
+function normalize(path) {
+  return path[REPLACE](/^\/|\/$/, '')
+}
+
+function isString(str) {
+  return typeof str == 'string'
+}
+
+/**
+ * Get the part after domain name
+ * @param {string} href - fullpath
+ * @returns {string} path from root
+ */
+function getPathFromRoot(href) {
+  return (href || loc.href)[REPLACE](RE_ORIGIN, '')
+}
+
+/**
+ * Get the part after base
+ * @param {string} href - fullpath
+ * @returns {string} path from base
+ */
+function getPathFromBase(href) {
+  return base[0] == '#'
+    ? (href || loc.href || '').split(base)[1] || ''
+    : (loc ? getPathFromRoot(href) : href || '')[REPLACE](base, '')
+}
+
+function emit(force) {
+  // the stack is needed for redirections
+  var isRoot = emitStackLevel == 0, first
+  if (MAX_EMIT_STACK_LEVEL <= emitStackLevel) return
+
+  emitStackLevel++
+  emitStack.push(function() {
+    var path = getPathFromBase()
+    if (force || path != current) {
+      central[TRIGGER]('emit', path)
+      current = path
+    }
+  })
+  if (isRoot) {
+    while (first = emitStack.shift()) first() // stack increses within this call
+    emitStackLevel = 0
+  }
+}
+
+function click(e) {
+  if (
+    e.which != 1 // not left click
+    || e.metaKey || e.ctrlKey || e.shiftKey // or meta keys
+    || e.defaultPrevented // or default prevented
+  ) return
+
+  var el = e.target
+  while (el && el.nodeName != 'A') el = el.parentNode
+
+  if (
+    !el || el.nodeName != 'A' // not A tag
+    || el[HAS_ATTRIBUTE]('download') // has download attr
+    || !el[HAS_ATTRIBUTE]('href') // has no href attr
+    || el.target && el.target != '_self' // another window or frame
+    || el.href.indexOf(loc.href.match(RE_ORIGIN)[0]) == -1 // cross origin
+  ) return
+
+  if (el.href != loc.href
+    && (
+      el.href.split('#')[0] == loc.href.split('#')[0] // internal jump
+      || base[0] != '#' && getPathFromRoot(el.href).indexOf(base) !== 0 // outside of base
+      || base[0] == '#' && el.href.split(base)[0] != loc.href.split(base)[0] // outside of #base
+      || !go(getPathFromBase(el.href), el.title || doc.title) // route not found
+    )) return
+
+  e.preventDefault()
+}
+
+/**
+ * Go to the path
+ * @param {string} path - destination path
+ * @param {string} title - page title
+ * @param {boolean} shouldReplace - use replaceState or pushState
+ * @returns {boolean} - route not found flag
+ */
+function go(path, title, shouldReplace) {
+  // Server-side usage: directly execute handlers for the path
+  if (!hist) return central[TRIGGER]('emit', getPathFromBase(path))
+
+  path = base + normalize(path)
+  title = title || doc.title
+  // browsers ignores the second parameter `title`
+  shouldReplace
+    ? hist.replaceState(null, title, path)
+    : hist.pushState(null, title, path)
+  // so we need to set it manually
+  doc.title = title
+  routeFound = false
+  emit()
+  return routeFound
+}
+
+/**
+ * Go to path or set action
+ * a single string:                go there
+ * two strings:                    go there with setting a title
+ * two strings and boolean:        replace history with setting a title
+ * a single function:              set an action on the default route
+ * a string/RegExp and a function: set an action on the route
+ * @param {(string|function)} first - path / action / filter
+ * @param {(string|RegExp|function)} second - title / action
+ * @param {boolean} third - replace flag
+ */
+prot.m = function(first, second, third) {
+  if (isString(first) && (!second || isString(second))) go(first, second, third || false)
+  else if (second) this.r(first, second)
+  else this.r('@', first)
+}
+
+/**
+ * Stop routing
+ */
+prot.s = function() {
+  this.off('*')
+  this.$ = []
+}
+
+/**
+ * Emit
+ * @param {string} path - path
+ */
+prot.e = function(path) {
+  this.$.concat('@').some(function(filter) {
+    var args = (filter == '@' ? parser : secondParser)(normalize(path), normalize(filter))
+    if (typeof args != 'undefined') {
+      this[TRIGGER].apply(null, [filter].concat(args))
+      return routeFound = true // exit from loop
+    }
+  }, this)
+}
+
+/**
+ * Register route
+ * @param {string} filter - filter for matching to url
+ * @param {function} action - action to register
+ */
+prot.r = function(filter, action) {
+  if (filter != '@') {
+    filter = '/' + normalize(filter)
+    this.$.push(filter)
+  }
+  this.on(filter, action)
+}
+
+var mainRouter = new Router()
+var route = mainRouter.m.bind(mainRouter)
+
+/**
+ * Create a sub router
+ * @returns {function} the method of a new Router object
+ */
+route.create = function() {
+  var newSubRouter = new Router()
+  // assign sub-router's main method
+  var router = newSubRouter.m.bind(newSubRouter)
+  // stop only this sub-router
+  router.stop = newSubRouter.s.bind(newSubRouter)
+  return router
+}
+
+/**
+ * Set the base of url
+ * @param {(str|RegExp)} arg - a new base or '#' or '#!'
+ */
+route.base = function(arg) {
+  base = arg || '#'
+  current = getPathFromBase() // recalculate current path
+}
+
+/** Exec routing right now **/
+route.exec = function() {
+  emit(true)
+}
+
+/**
+ * Replace the default router to yours
+ * @param {function} fn - your parser function
+ * @param {function} fn2 - your secondParser function
+ */
+route.parser = function(fn, fn2) {
+  if (!fn && !fn2) {
+    // reset parser for testing...
+    parser = DEFAULT_PARSER
+    secondParser = DEFAULT_SECOND_PARSER
+  }
+  if (fn) parser = fn
+  if (fn2) secondParser = fn2
+}
+
+/**
+ * Helper function to get url query as an object
+ * @returns {object} parsed query
+ */
+route.query = function() {
+  var q = {}
+  var href = loc.href || current
+  href[REPLACE](/[?&](.+?)=([^&]*)/g, function(_, k, v) { q[k] = v })
+  return q
+}
+
+/** Stop routing **/
+route.stop = function () {
+  if (started) {
+    if (win) {
+      win[REMOVE_EVENT_LISTENER](POPSTATE, debouncedEmit)
+      win[REMOVE_EVENT_LISTENER](HASHCHANGE, debouncedEmit)
+      doc[REMOVE_EVENT_LISTENER](clickEvent, click)
+    }
+    central[TRIGGER]('stop')
+    started = false
+  }
+}
+
+/**
+ * Start routing
+ * @param {boolean} autoExec - automatically exec after starting if true
+ */
+route.start = function (autoExec) {
+  if (!started) {
+    if (win) {
+      if (document.readyState == 'complete') start(autoExec)
+      // the timeout is needed to solve
+      // a weird safari bug https://github.com/riot/route/issues/33
+      else win[ADD_EVENT_LISTENER]('load', function() {
+        setTimeout(function() { start(autoExec) }, 1)
+      })
+    }
+    started = true
+  }
+}
+
+/** Prepare the router **/
+route.base()
+route.parser()
+
+riot.route = route
+})(riot)
+/* istanbul ignore next */
+
+/**
+ * The riot template engine
+ * @version v2.4.2
+ */
+/**
+ * riot.util.brackets
+ *
+ * - `brackets    ` - Returns a string or regex based on its parameter
+ * - `brackets.set` - Change the current riot brackets
+ *
+ * @module
+ */
+
+var brackets = (function (UNDEF) {
+
+  var
+    REGLOB = 'g',
+
+    R_MLCOMMS = /\/\*[^*]*\*+(?:[^*\/][^*]*\*+)*\//g,
+
+    R_STRINGS = /"[^"\\]*(?:\\[\S\s][^"\\]*)*"|'[^'\\]*(?:\\[\S\s][^'\\]*)*'/g,
+
+    S_QBLOCKS = R_STRINGS.source + '|' +
+      /(?:\breturn\s+|(?:[$\w\)\]]|\+\+|--)\s*(\/)(?![*\/]))/.source + '|' +
+      /\/(?=[^*\/])[^[\/\\]*(?:(?:\[(?:\\.|[^\]\\]*)*\]|\\.)[^[\/\\]*)*?(\/)[gim]*/.source,
+
+    UNSUPPORTED = RegExp('[\\' + 'x00-\\x1F<>a-zA-Z0-9\'",;\\\\]'),
+
+    NEED_ESCAPE = /(?=[[\]()*+?.^$|])/g,
+
+    FINDBRACES = {
+      '(': RegExp('([()])|'   + S_QBLOCKS, REGLOB),
+      '[': RegExp('([[\\]])|' + S_QBLOCKS, REGLOB),
+      '{': RegExp('([{}])|'   + S_QBLOCKS, REGLOB)
+    },
+
+    DEFAULT = '{ }'
+
+  var _pairs = [
+    '{', '}',
+    '{', '}',
+    /{[^}]*}/,
+    /\\([{}])/g,
+    /\\({)|{/g,
+    RegExp('\\\\(})|([[({])|(})|' + S_QBLOCKS, REGLOB),
+    DEFAULT,
+    /^\s*{\^?\s*([$\w]+)(?:\s*,\s*(\S+))?\s+in\s+(\S.*)\s*}/,
+    /(^|[^\\]){=[\S\s]*?}/
+  ]
+
+  var
+    cachedBrackets = UNDEF,
+    _regex,
+    _cache = [],
+    _settings
+
+  function _loopback (re) { return re }
+
+  function _rewrite (re, bp) {
+    if (!bp) bp = _cache
+    return new RegExp(
+      re.source.replace(/{/g, bp[2]).replace(/}/g, bp[3]), re.global ? REGLOB : ''
+    )
+  }
+
+  function _create (pair) {
+    if (pair === DEFAULT) return _pairs
+
+    var arr = pair.split(' ')
+
+    if (arr.length !== 2 || UNSUPPORTED.test(pair)) {
+      throw new Error('Unsupported brackets "' + pair + '"')
+    }
+    arr = arr.concat(pair.replace(NEED_ESCAPE, '\\').split(' '))
+
+    arr[4] = _rewrite(arr[1].length > 1 ? /{[\S\s]*?}/ : _pairs[4], arr)
+    arr[5] = _rewrite(pair.length > 3 ? /\\({|})/g : _pairs[5], arr)
+    arr[6] = _rewrite(_pairs[6], arr)
+    arr[7] = RegExp('\\\\(' + arr[3] + ')|([[({])|(' + arr[3] + ')|' + S_QBLOCKS, REGLOB)
+    arr[8] = pair
+    return arr
+  }
+
+  function _brackets (reOrIdx) {
+    return reOrIdx instanceof RegExp ? _regex(reOrIdx) : _cache[reOrIdx]
+  }
+
+  _brackets.split = function split (str, tmpl, _bp) {
+    // istanbul ignore next: _bp is for the compiler
+    if (!_bp) _bp = _cache
+
+    var
+      parts = [],
+      match,
+      isexpr,
+      start,
+      pos,
+      re = _bp[6]
+
+    isexpr = start = re.lastIndex = 0
+
+    while ((match = re.exec(str))) {
+
+      pos = match.index
+
+      if (isexpr) {
+
+        if (match[2]) {
+          re.lastIndex = skipBraces(str, match[2], re.lastIndex)
+          continue
+        }
+        if (!match[3]) {
+          continue
+        }
+      }
+
+      if (!match[1]) {
+        unescapeStr(str.slice(start, pos))
+        start = re.lastIndex
+        re = _bp[6 + (isexpr ^= 1)]
+        re.lastIndex = start
+      }
+    }
+
+    if (str && start < str.length) {
+      unescapeStr(str.slice(start))
+    }
+
+    return parts
+
+    function unescapeStr (s) {
+      if (tmpl || isexpr) {
+        parts.push(s && s.replace(_bp[5], '$1'))
+      } else {
+        parts.push(s)
+      }
+    }
+
+    function skipBraces (s, ch, ix) {
+      var
+        match,
+        recch = FINDBRACES[ch]
+
+      recch.lastIndex = ix
+      ix = 1
+      while ((match = recch.exec(s))) {
+        if (match[1] &&
+          !(match[1] === ch ? ++ix : --ix)) break
+      }
+      return ix ? s.length : recch.lastIndex
+    }
+  }
+
+  _brackets.hasExpr = function hasExpr (str) {
+    return _cache[4].test(str)
+  }
+
+  _brackets.loopKeys = function loopKeys (expr) {
+    var m = expr.match(_cache[9])
+
+    return m
+      ? { key: m[1], pos: m[2], val: _cache[0] + m[3].trim() + _cache[1] }
+      : { val: expr.trim() }
+  }
+
+  _brackets.array = function array (pair) {
+    return pair ? _create(pair) : _cache
+  }
+
+  function _reset (pair) {
+    if ((pair || (pair = DEFAULT)) !== _cache[8]) {
+      _cache = _create(pair)
+      _regex = pair === DEFAULT ? _loopback : _rewrite
+      _cache[9] = _regex(_pairs[9])
+    }
+    cachedBrackets = pair
+  }
+
+  function _setSettings (o) {
+    var b
+
+    o = o || {}
+    b = o.brackets
+    Object.defineProperty(o, 'brackets', {
+      set: _reset,
+      get: function () { return cachedBrackets },
+      enumerable: true
+    })
+    _settings = o
+    _reset(b)
+  }
+
+  Object.defineProperty(_brackets, 'settings', {
+    set: _setSettings,
+    get: function () { return _settings }
+  })
+
+  /* istanbul ignore next: in the browser riot is always in the scope */
+  _brackets.settings = typeof riot !== 'undefined' && riot.settings || {}
+  _brackets.set = _reset
+
+  _brackets.R_STRINGS = R_STRINGS
+  _brackets.R_MLCOMMS = R_MLCOMMS
+  _brackets.S_QBLOCKS = S_QBLOCKS
+
+  return _brackets
+
+})()
+
+/**
+ * @module tmpl
+ *
+ * tmpl          - Root function, returns the template value, render with data
+ * tmpl.hasExpr  - Test the existence of a expression inside a string
+ * tmpl.loopKeys - Get the keys for an 'each' loop (used by `_each`)
+ */
+
+var tmpl = (function () {
+
+  var _cache = {}
+
+  function _tmpl (str, data) {
+    if (!str) return str
+
+    return (_cache[str] || (_cache[str] = _create(str))).call(data, _logErr)
+  }
+
+  _tmpl.haveRaw = brackets.hasRaw
+
+  _tmpl.hasExpr = brackets.hasExpr
+
+  _tmpl.loopKeys = brackets.loopKeys
+
+  // istanbul ignore next
+  _tmpl.clearCache = function () { _cache = {} }
+
+  _tmpl.errorHandler = null
+
+  function _logErr (err, ctx) {
+
+    if (_tmpl.errorHandler) {
+
+      err.riotData = {
+        tagName: ctx && ctx.root && ctx.root.tagName,
+        _riot_id: ctx && ctx._riot_id  //eslint-disable-line camelcase
+      }
+      _tmpl.errorHandler(err)
+    }
+  }
+
+  function _create (str) {
+    var expr = _getTmpl(str)
+
+    if (expr.slice(0, 11) !== 'try{return ') expr = 'return ' + expr
+
+    return new Function('E', expr + ';')    // eslint-disable-line no-new-func
+  }
+
+  var
+    CH_IDEXPR = String.fromCharCode(0x2057),
+    RE_CSNAME = /^(?:(-?[_A-Za-z\xA0-\xFF][-\w\xA0-\xFF]*)|\u2057(\d+)~):/,
+    RE_QBLOCK = RegExp(brackets.S_QBLOCKS, 'g'),
+    RE_DQUOTE = /\u2057/g,
+    RE_QBMARK = /\u2057(\d+)~/g
+
+  function _getTmpl (str) {
+    var
+      qstr = [],
+      expr,
+      parts = brackets.split(str.replace(RE_DQUOTE, '"'), 1)
+
+    if (parts.length > 2 || parts[0]) {
+      var i, j, list = []
+
+      for (i = j = 0; i < parts.length; ++i) {
+
+        expr = parts[i]
+
+        if (expr && (expr = i & 1
+
+            ? _parseExpr(expr, 1, qstr)
+
+            : '"' + expr
+                .replace(/\\/g, '\\\\')
+                .replace(/\r\n?|\n/g, '\\n')
+                .replace(/"/g, '\\"') +
+              '"'
+
+          )) list[j++] = expr
+
+      }
+
+      expr = j < 2 ? list[0]
+           : '[' + list.join(',') + '].join("")'
+
+    } else {
+
+      expr = _parseExpr(parts[1], 0, qstr)
+    }
+
+    if (qstr[0]) {
+      expr = expr.replace(RE_QBMARK, function (_, pos) {
+        return qstr[pos]
+          .replace(/\r/g, '\\r')
+          .replace(/\n/g, '\\n')
+      })
+    }
+    return expr
+  }
+
+  var
+    RE_BREND = {
+      '(': /[()]/g,
+      '[': /[[\]]/g,
+      '{': /[{}]/g
+    }
+
+  function _parseExpr (expr, asText, qstr) {
+
+    expr = expr
+          .replace(RE_QBLOCK, function (s, div) {
+            return s.length > 2 && !div ? CH_IDEXPR + (qstr.push(s) - 1) + '~' : s
+          })
+          .replace(/\s+/g, ' ').trim()
+          .replace(/\ ?([[\({},?\.:])\ ?/g, '$1')
+
+    if (expr) {
+      var
+        list = [],
+        cnt = 0,
+        match
+
+      while (expr &&
+            (match = expr.match(RE_CSNAME)) &&
+            !match.index
+        ) {
+        var
+          key,
+          jsb,
+          re = /,|([[{(])|$/g
+
+        expr = RegExp.rightContext
+        key  = match[2] ? qstr[match[2]].slice(1, -1).trim().replace(/\s+/g, ' ') : match[1]
+
+        while (jsb = (match = re.exec(expr))[1]) skipBraces(jsb, re)
+
+        jsb  = expr.slice(0, match.index)
+        expr = RegExp.rightContext
+
+        list[cnt++] = _wrapExpr(jsb, 1, key)
+      }
+
+      expr = !cnt ? _wrapExpr(expr, asText)
+           : cnt > 1 ? '[' + list.join(',') + '].join(" ").trim()' : list[0]
+    }
+    return expr
+
+    function skipBraces (ch, re) {
+      var
+        mm,
+        lv = 1,
+        ir = RE_BREND[ch]
+
+      ir.lastIndex = re.lastIndex
+      while (mm = ir.exec(expr)) {
+        if (mm[0] === ch) ++lv
+        else if (!--lv) break
+      }
+      re.lastIndex = lv ? expr.length : ir.lastIndex
+    }
+  }
+
+  // istanbul ignore next: not both
+  var // eslint-disable-next-line max-len
+    JS_CONTEXT = '"in this?this:' + (typeof window !== 'object' ? 'global' : 'window') + ').',
+    JS_VARNAME = /[,{][\$\w]+(?=:)|(^ *|[^$\w\.{])(?!(?:typeof|true|false|null|undefined|in|instanceof|is(?:Finite|NaN)|void|NaN|new|Date|RegExp|Math)(?![$\w]))([$_A-Za-z][$\w]*)/g,
+    JS_NOPROPS = /^(?=(\.[$\w]+))\1(?:[^.[(]|$)/
+
+  function _wrapExpr (expr, asText, key) {
+    var tb
+
+    expr = expr.replace(JS_VARNAME, function (match, p, mvar, pos, s) {
+      if (mvar) {
+        pos = tb ? 0 : pos + match.length
+
+        if (mvar !== 'this' && mvar !== 'global' && mvar !== 'window') {
+          match = p + '("' + mvar + JS_CONTEXT + mvar
+          if (pos) tb = (s = s[pos]) === '.' || s === '(' || s === '['
+        } else if (pos) {
+          tb = !JS_NOPROPS.test(s.slice(pos))
+        }
+      }
+      return match
+    })
+
+    if (tb) {
+      expr = 'try{return ' + expr + '}catch(e){E(e,this)}'
+    }
+
+    if (key) {
+
+      expr = (tb
+          ? 'function(){' + expr + '}.call(this)' : '(' + expr + ')'
+        ) + '?"' + key + '":""'
+
+    } else if (asText) {
+
+      expr = 'function(v){' + (tb
+          ? expr.replace('return ', 'v=') : 'v=(' + expr + ')'
+        ) + ';return v||v===0?v:""}.call(this)'
+    }
+
+    return expr
+  }
+
+  _tmpl.version = brackets.version = 'v2.4.2'
+
+  return _tmpl
+
+})()
+
+/*
+  lib/browser/tag/mkdom.js
+
+  Includes hacks needed for the Internet Explorer version 9 and below
+  See: http://kangax.github.io/compat-table/es5/#ie8
+       http://codeplanet.io/dropping-ie8/
+*/
+var mkdom = (function _mkdom() {
+  var
+    reHasYield  = /<yield\b/i,
+    reYieldAll  = /<yield\s*(?:\/>|>([\S\s]*?)<\/yield\s*>|>)/ig,
+    reYieldSrc  = /<yield\s+to=['"]([^'">]*)['"]\s*>([\S\s]*?)<\/yield\s*>/ig,
+    reYieldDest = /<yield\s+from=['"]?([-\w]+)['"]?\s*(?:\/>|>([\S\s]*?)<\/yield\s*>)/ig
+  var
+    rootEls = { tr: 'tbody', th: 'tr', td: 'tr', col: 'colgroup' },
+    tblTags = IE_VERSION && IE_VERSION < 10
+      ? SPECIAL_TAGS_REGEX : /^(?:t(?:body|head|foot|[rhd])|caption|col(?:group)?)$/
+
+  /**
+   * Creates a DOM element to wrap the given content. Normally an `DIV`, but can be
+   * also a `TABLE`, `SELECT`, `TBODY`, `TR`, or `COLGROUP` element.
+   *
+   * @param   { String } templ  - The template coming from the custom tag definition
+   * @param   { String } [html] - HTML content that comes from the DOM element where you
+   *           will mount the tag, mostly the original tag in the page
+   * @param   { Boolean } checkSvg - flag needed to know if we need to force the svg rendering in case of loop nodes
+   * @returns {HTMLElement} DOM element with _templ_ merged through `YIELD` with the _html_.
+   */
+  function _mkdom(templ, html, checkSvg) {
+    var
+      match   = templ && templ.match(/^\s*<([-\w]+)/),
+      tagName = match && match[1].toLowerCase(),
+      el = mkEl('div', checkSvg && isSVGTag(tagName))
+
+    // replace all the yield tags with the tag inner html
+    templ = replaceYield(templ, html)
+
+    /* istanbul ignore next */
+    if (tblTags.test(tagName))
+      el = specialTags(el, templ, tagName)
+    else
+      setInnerHTML(el, templ)
+
+    el.stub = true
+
+    return el
+  }
+
+  /*
+    Creates the root element for table or select child elements:
+    tr/th/td/thead/tfoot/tbody/caption/col/colgroup/option/optgroup
+  */
+  function specialTags(el, templ, tagName) {
+    var
+      select = tagName[0] === 'o',
+      parent = select ? 'select>' : 'table>'
+
+    // trim() is important here, this ensures we don't have artifacts,
+    // so we can check if we have only one element inside the parent
+    el.innerHTML = '<' + parent + templ.trim() + '</' + parent
+    parent = el.firstChild
+
+    // returns the immediate parent if tr/th/td/col is the only element, if not
+    // returns the whole tree, as this can include additional elements
+    if (select) {
+      parent.selectedIndex = -1  // for IE9, compatible w/current riot behavior
+    } else {
+      // avoids insertion of cointainer inside container (ex: tbody inside tbody)
+      var tname = rootEls[tagName]
+      if (tname && parent.childElementCount === 1) parent = $(tname, parent)
+    }
+    return parent
+  }
+
+  /*
+    Replace the yield tag from any tag template with the innerHTML of the
+    original tag in the page
+  */
+  function replaceYield(templ, html) {
+    // do nothing if no yield
+    if (!reHasYield.test(templ)) return templ
+
+    // be careful with #1343 - string on the source having `$1`
+    var src = {}
+
+    html = html && html.replace(reYieldSrc, function (_, ref, text) {
+      src[ref] = src[ref] || text   // preserve first definition
+      return ''
+    }).trim()
+
+    return templ
+      .replace(reYieldDest, function (_, ref, def) {  // yield with from - to attrs
+        return src[ref] || def || ''
+      })
+      .replace(reYieldAll, function (_, def) {        // yield without any "from"
+        return html || def || ''
+      })
+  }
+
+  return _mkdom
+
+})()
+
+/**
+ * Convert the item looped into an object used to extend the child tag properties
+ * @param   { Object } expr - object containing the keys used to extend the children tags
+ * @param   { * } key - value to assign to the new object returned
+ * @param   { * } val - value containing the position of the item in the array
+ * @returns { Object } - new object containing the values of the original item
+ *
+ * The variables 'key' and 'val' are arbitrary.
+ * They depend on the collection type looped (Array, Object)
+ * and on the expression used on the each tag
+ *
+ */
+function mkitem(expr, key, val) {
+  var item = {}
+  item[expr.key] = key
+  if (expr.pos) item[expr.pos] = val
+  return item
+}
+
+/**
+ * Unmount the redundant tags
+ * @param   { Array } items - array containing the current items to loop
+ * @param   { Array } tags - array containing all the children tags
+ */
+function unmountRedundant(items, tags) {
+
+  var i = tags.length,
+    j = items.length,
+    t
+
+  while (i > j) {
+    t = tags[--i]
+    tags.splice(i, 1)
+    t.unmount()
+  }
+}
+
+/**
+ * Move the nested custom tags in non custom loop tags
+ * @param   { Object } child - non custom loop tag
+ * @param   { Number } i - current position of the loop tag
+ */
+function moveNestedTags(child, i) {
+  Object.keys(child.tags).forEach(function(tagName) {
+    var tag = child.tags[tagName]
+    if (isArray(tag))
+      each(tag, function (t) {
+        moveChildTag(t, tagName, i)
+      })
+    else
+      moveChildTag(tag, tagName, i)
+  })
+}
+
+/**
+ * Adds the elements for a virtual tag
+ * @param { Tag } tag - the tag whose root's children will be inserted or appended
+ * @param { Node } src - the node that will do the inserting or appending
+ * @param { Tag } target - only if inserting, insert before this tag's first child
+ */
+function addVirtual(tag, src, target) {
+  var el = tag._root, sib
+  tag._virts = []
+  while (el) {
+    sib = el.nextSibling
+    if (target)
+      src.insertBefore(el, target._root)
+    else
+      src.appendChild(el)
+
+    tag._virts.push(el) // hold for unmounting
+    el = sib
+  }
+}
+
+/**
+ * Move virtual tag and all child nodes
+ * @param { Tag } tag - first child reference used to start move
+ * @param { Node } src  - the node that will do the inserting
+ * @param { Tag } target - insert before this tag's first child
+ * @param { Number } len - how many child nodes to move
+ */
+function moveVirtual(tag, src, target, len) {
+  var el = tag._root, sib, i = 0
+  for (; i < len; i++) {
+    sib = el.nextSibling
+    src.insertBefore(el, target._root)
+    el = sib
+  }
+}
+
+/**
+ * Insert a new tag avoiding the insert for the conditional tags
+ * @param   {Boolean} isVirtual [description]
+ * @param   { Tag }  prevTag - tag instance used as reference to prepend our new tag
+ * @param   { Tag }  newTag - new tag to be inserted
+ * @param   { HTMLElement }  root - loop parent node
+ * @param   { Array }  tags - array containing the current tags list
+ * @param   { Function }  virtualFn - callback needed to move or insert virtual DOM
+ * @param   { Object } dom - DOM node we need to loop
+ */
+function insertTag(isVirtual, prevTag, newTag, root, tags, virtualFn, dom) {
+  if (isInStub(prevTag.root)) return
+  if (isVirtual) virtualFn(prevTag, root, newTag, dom.childNodes.length)
+  else root.insertBefore(prevTag.root, newTag.root) // #1374 some browsers reset selected here
+}
+
+
+/**
+ * Manage tags having the 'each'
+ * @param   { Object } dom - DOM node we need to loop
+ * @param   { Tag } parent - parent tag instance where the dom node is contained
+ * @param   { String } expr - string contained in the 'each' attribute
+ */
+function _each(dom, parent, expr) {
+
+  // remove the each property from the original tag
+  remAttr(dom, 'each')
+
+  var mustReorder = typeof getAttr(dom, 'no-reorder') !== T_STRING || remAttr(dom, 'no-reorder'),
+    tagName = getTagName(dom),
+    impl = __tagImpl[tagName] || { tmpl: getOuterHTML(dom) },
+    useRoot = SPECIAL_TAGS_REGEX.test(tagName),
+    root = dom.parentNode,
+    ref = document.createTextNode(''),
+    child = getTag(dom),
+    isOption = tagName.toLowerCase() === 'option', // the option tags must be treated differently
+    tags = [],
+    oldItems = [],
+    hasKeys,
+    isVirtual = dom.tagName == 'VIRTUAL'
+
+  // parse the each expression
+  expr = tmpl.loopKeys(expr)
+
+  // insert a marked where the loop tags will be injected
+  root.insertBefore(ref, dom)
+
+  // clean template code
+  parent.one('before-mount', function () {
+
+    // remove the original DOM node
+    dom.parentNode.removeChild(dom)
+    if (root.stub) root = parent.root
+
+  }).on('update', function () {
+    // get the new items collection
+    var items = tmpl(expr.val, parent),
+      // create a fragment to hold the new DOM nodes to inject in the parent tag
+      frag = document.createDocumentFragment()
+
+    // object loop. any changes cause full redraw
+    if (!isArray(items)) {
+      hasKeys = items || false
+      items = hasKeys ?
+        Object.keys(items).map(function (key) {
+          return mkitem(expr, key, items[key])
+        }) : []
+    }
+
+    // loop all the new items
+    var i = 0,
+      itemsLength = items.length
+
+    for (; i < itemsLength; i++) {
+      // reorder only if the items are objects
+      var
+        item = items[i],
+        _mustReorder = mustReorder && typeof item == T_OBJECT && !hasKeys,
+        oldPos = oldItems.indexOf(item),
+        pos = ~oldPos && _mustReorder ? oldPos : i,
+        // does a tag exist in this position?
+        tag = tags[pos]
+
+      item = !hasKeys && expr.key ? mkitem(expr, item, i) : item
+
+      // new tag
+      if (
+        !_mustReorder && !tag // with no-reorder we just update the old tags
+        ||
+        _mustReorder && !~oldPos || !tag // by default we always try to reorder the DOM elements
+      ) {
+
+        tag = new Tag(impl, {
+          parent: parent,
+          isLoop: true,
+          hasImpl: !!__tagImpl[tagName],
+          root: useRoot ? root : dom.cloneNode(),
+          item: item
+        }, dom.innerHTML)
+
+        tag.mount()
+
+        if (isVirtual) tag._root = tag.root.firstChild // save reference for further moves or inserts
+        // this tag must be appended
+        if (i == tags.length || !tags[i]) { // fix 1581
+          if (isVirtual)
+            addVirtual(tag, frag)
+          else frag.appendChild(tag.root)
+        }
+        // this tag must be insert
+        else {
+          insertTag(isVirtual, tag, tags[i], root, tags, addVirtual, dom)
+          oldItems.splice(i, 0, item)
+        }
+
+        tags.splice(i, 0, tag)
+        pos = i // handled here so no move
+      } else tag.update(item, true)
+
+      // reorder the tag if it's not located in its previous position
+      if (
+        pos !== i && _mustReorder &&
+        tags[i] // fix 1581 unable to reproduce it in a test!
+      ) {
+        // #closes 2040 PLEASE DON'T REMOVE IT!
+        // there are no tests for this feature
+        if (contains(items, oldItems[i]))
+          insertTag(isVirtual, tag, tags[i], root, tags, moveVirtual, dom)
+
+        // update the position attribute if it exists
+        if (expr.pos)
+          tag[expr.pos] = i
+        // move the old tag instance
+        tags.splice(i, 0, tags.splice(pos, 1)[0])
+        // move the old item
+        oldItems.splice(i, 0, oldItems.splice(pos, 1)[0])
+        // if the loop tags are not custom
+        // we need to move all their custom tags into the right position
+        if (!child && tag.tags) moveNestedTags(tag, i)
+      }
+
+      // cache the original item to use it in the events bound to this node
+      // and its children
+      tag._item = item
+      // cache the real parent tag internally
+      defineProperty(tag, '_parent', parent)
+    }
+
+    // remove the redundant tags
+    unmountRedundant(items, tags)
+
+    // insert the new nodes
+    root.insertBefore(frag, ref)
+    if (isOption) {
+
+      // #1374 FireFox bug in <option selected={expression}>
+      if (FIREFOX && !root.multiple) {
+        for (var n = 0; n < root.length; n++) {
+          if (root[n].__riot1374) {
+            root.selectedIndex = n  // clear other options
+            delete root[n].__riot1374
+            break
+          }
+        }
+      }
+    }
+
+    // set the 'tags' property of the parent tag
+    // if child is 'undefined' it means that we don't need to set this property
+    // for example:
+    // we don't need store the `myTag.tags['div']` property if we are looping a div tag
+    // but we need to track the `myTag.tags['child']` property looping a custom child node named `child`
+    if (child) parent.tags[tagName] = tags
+
+    // clone the items array
+    oldItems = items.slice()
+
+  })
+
+}
+/**
+ * Object that will be used to inject and manage the css of every tag instance
+ */
+var styleManager = (function(_riot) {
+
+  if (!window) return { // skip injection on the server
+    add: function () {},
+    inject: function () {}
+  }
+
+  var styleNode = (function () {
+    // create a new style element with the correct type
+    var newNode = mkEl('style')
+    setAttr(newNode, 'type', 'text/css')
+
+    // replace any user node or insert the new one into the head
+    var userNode = $('style[type=riot]')
+    if (userNode) {
+      if (userNode.id) newNode.id = userNode.id
+      userNode.parentNode.replaceChild(newNode, userNode)
+    }
+    else document.getElementsByTagName('head')[0].appendChild(newNode)
+
+    return newNode
+  })()
+
+  // Create cache and shortcut to the correct property
+  var cssTextProp = styleNode.styleSheet,
+    stylesToInject = ''
+
+  // Expose the style node in a non-modificable property
+  Object.defineProperty(_riot, 'styleNode', {
+    value: styleNode,
+    writable: true
+  })
+
+  /**
+   * Public api
+   */
+  return {
+    /**
+     * Save a tag style to be later injected into DOM
+     * @param   { String } css [description]
+     */
+    add: function(css) {
+      stylesToInject += css
+    },
+    /**
+     * Inject all previously saved tag styles into DOM
+     * innerHTML seems slow: http://jsperf.com/riot-insert-style
+     */
+    inject: function() {
+      if (stylesToInject) {
+        if (cssTextProp) cssTextProp.cssText += stylesToInject
+        else styleNode.innerHTML += stylesToInject
+        stylesToInject = ''
+      }
+    }
+  }
+
+})(riot)
+
+
+function parseNamedElements(root, tag, childTags, forceParsingNamed) {
+
+  walk(root, function(dom) {
+    if (dom.nodeType == 1) {
+      dom.isLoop = dom.isLoop ||
+                  (dom.parentNode && dom.parentNode.isLoop || getAttr(dom, 'each'))
+                    ? 1 : 0
+
+      // custom child tag
+      if (childTags) {
+        var child = getTag(dom)
+
+        if (child && !dom.isLoop)
+          childTags.push(initChildTag(child, {root: dom, parent: tag}, dom.innerHTML, tag))
+      }
+
+      if (!dom.isLoop || forceParsingNamed)
+        setNamed(dom, tag, [])
+    }
+
+  })
+
+}
+
+function parseExpressions(root, tag, expressions) {
+
+  function addExpr(dom, val, extra) {
+    if (tmpl.hasExpr(val)) {
+      expressions.push(extend({ dom: dom, expr: val }, extra))
+    }
+  }
+
+  walk(root, function(dom) {
+    var type = dom.nodeType,
+      attr
+
+    // text node
+    if (type == 3 && dom.parentNode.tagName != 'STYLE') addExpr(dom, dom.nodeValue)
+    if (type != 1) return
+
+    /* element */
+
+    // loop
+    attr = getAttr(dom, 'each')
+
+    if (attr) { _each(dom, tag, attr); return false }
+
+    // attribute expressions
+    each(dom.attributes, function(attr) {
+      var name = attr.name,
+        bool = name.split('__')[1]
+
+      addExpr(dom, attr.value, { attr: bool || name, bool: bool })
+      if (bool) { remAttr(dom, name); return false }
+
+    })
+
+    // skip custom tags
+    if (getTag(dom)) return false
+
+  })
+
+}
+function Tag(impl, conf, innerHTML) {
+
+  var self = riot.observable(this),
+    opts = inherit(conf.opts) || {},
+    parent = conf.parent,
+    isLoop = conf.isLoop,
+    hasImpl = conf.hasImpl,
+    item = cleanUpData(conf.item),
+    expressions = [],
+    childTags = [],
+    root = conf.root,
+    tagName = root.tagName.toLowerCase(),
+    attr = {},
+    propsInSyncWithParent = [],
+    dom
+
+  // only call unmount if we have a valid __tagImpl (has name property)
+  if (impl.name && root._tag) root._tag.unmount(true)
+
+  // not yet mounted
+  this.isMounted = false
+  root.isLoop = isLoop
+
+  // keep a reference to the tag just created
+  // so we will be able to mount this tag multiple times
+  root._tag = this
+
+  // create a unique id to this tag
+  // it could be handy to use it also to improve the virtual dom rendering speed
+  defineProperty(this, '_riot_id', ++__uid) // base 1 allows test !t._riot_id
+
+  extend(this, { parent: parent, root: root, opts: opts}, item)
+  // protect the "tags" property from being overridden
+  defineProperty(this, 'tags', {})
+
+  // grab attributes
+  each(root.attributes, function(el) {
+    var val = el.value
+    // remember attributes with expressions only
+    if (tmpl.hasExpr(val)) attr[el.name] = val
+  })
+
+  dom = mkdom(impl.tmpl, innerHTML, isLoop)
+
+  // options
+  function updateOpts() {
+    var ctx = hasImpl && isLoop ? self : parent || self
+
+    // update opts from current DOM attributes
+    each(root.attributes, function(el) {
+      if (el.name in attr) return
+      var val = el.value
+      opts[toCamel(el.name)] = tmpl.hasExpr(val) ? tmpl(val, ctx) : val
+    })
+    // recover those with expressions
+    each(Object.keys(attr), function(name) {
+      opts[toCamel(name)] = tmpl(attr[name], ctx)
+    })
+  }
+
+  function normalizeData(data) {
+    for (var key in item) {
+      if (typeof self[key] !== T_UNDEF && isWritable(self, key))
+        self[key] = data[key]
+    }
+  }
+
+  function inheritFrom(target) {
+    each(Object.keys(target), function(k) {
+      // some properties must be always in sync with the parent tag
+      var mustSync = !RESERVED_WORDS_BLACKLIST.test(k) && contains(propsInSyncWithParent, k)
+
+      if (typeof self[k] === T_UNDEF || mustSync) {
+        // track the property to keep in sync
+        // so we can keep it updated
+        if (!mustSync) propsInSyncWithParent.push(k)
+        self[k] = target[k]
+      }
+    })
+  }
+
+  /**
+   * Update the tag expressions and options
+   * @param   { * }  data - data we want to use to extend the tag properties
+   * @param   { Boolean } isInherited - is this update coming from a parent tag?
+   * @returns { self }
+   */
+  defineProperty(this, 'update', function(data, isInherited) {
+
+    // make sure the data passed will not override
+    // the component core methods
+    data = cleanUpData(data)
+    // inherit properties from the parent in loop
+    if (isLoop) {
+      inheritFrom(self.parent)
+    }
+    // normalize the tag properties in case an item object was initially passed
+    if (data && isObject(item)) {
+      normalizeData(data)
+      item = data
+    }
+    extend(self, data)
+    updateOpts()
+    self.trigger('update', data)
+    update(expressions, self)
+
+    // the updated event will be triggered
+    // once the DOM will be ready and all the re-flows are completed
+    // this is useful if you want to get the "real" root properties
+    // 4 ex: root.offsetWidth ...
+    if (isInherited && self.parent)
+      // closes #1599
+      self.parent.one('updated', function() { self.trigger('updated') })
+    else rAF(function() { self.trigger('updated') })
+
+    return this
+  })
+
+  defineProperty(this, 'mixin', function() {
+    each(arguments, function(mix) {
+      var instance,
+        props = [],
+        obj
+
+      mix = typeof mix === T_STRING ? riot.mixin(mix) : mix
+
+      // check if the mixin is a function
+      if (isFunction(mix)) {
+        // create the new mixin instance
+        instance = new mix()
+      } else instance = mix
+
+      var proto = Object.getPrototypeOf(instance)
+
+      // build multilevel prototype inheritance chain property list
+      do props = props.concat(Object.getOwnPropertyNames(obj || instance))
+      while (obj = Object.getPrototypeOf(obj || instance))
+
+      // loop the keys in the function prototype or the all object keys
+      each(props, function(key) {
+        // bind methods to self
+        // allow mixins to override other properties/parent mixins
+        if (key != 'init' && key != '__proto__') {
+          // check for getters/setters
+          var descriptor = Object.getOwnPropertyDescriptor(instance, key) || Object.getOwnPropertyDescriptor(proto, key)
+          var hasGetterSetter = descriptor && (descriptor.get || descriptor.set)
+
+          // apply method only if it does not already exist on the instance
+          if (!self.hasOwnProperty(key) && hasGetterSetter) {
+            Object.defineProperty(self, key, descriptor)
+          } else {
+            self[key] = isFunction(instance[key]) ?
+              instance[key].bind(self) :
+              instance[key]
+          }
+        }
+      })
+
+      // init method will be called automatically
+      if (instance.init) instance.init.bind(self)()
+    })
+    return this
+  })
+
+  defineProperty(this, 'mount', function() {
+
+    updateOpts()
+
+    // add global mixins
+    var globalMixin = riot.mixin(GLOBAL_MIXIN)
+
+    if (globalMixin)
+      for (var i in globalMixin)
+        if (globalMixin.hasOwnProperty(i))
+          self.mixin(globalMixin[i])
+
+    // children in loop should inherit from true parent
+    if (self._parent && self._parent.root.isLoop) {
+      inheritFrom(self._parent)
+    }
+
+    // initialiation
+    if (impl.fn) impl.fn.call(self, opts)
+
+    // parse layout after init. fn may calculate args for nested custom tags
+    parseExpressions(dom, self, expressions)
+
+    // mount the child tags
+    toggle(true)
+
+    // update the root adding custom attributes coming from the compiler
+    // it fixes also #1087
+    if (impl.attrs)
+      walkAttributes(impl.attrs, function (k, v) { setAttr(root, k, v) })
+    if (impl.attrs || hasImpl)
+      parseExpressions(self.root, self, expressions)
+
+    if (!self.parent || isLoop) self.update(item)
+
+    // internal use only, fixes #403
+    self.trigger('before-mount')
+
+    if (isLoop && !hasImpl) {
+      // update the root attribute for the looped elements
+      root = dom.firstChild
+    } else {
+      while (dom.firstChild) root.appendChild(dom.firstChild)
+      if (root.stub) root = parent.root
+    }
+
+    defineProperty(self, 'root', root)
+
+    // parse the named dom nodes in the looped child
+    // adding them to the parent as well
+    if (isLoop)
+      parseNamedElements(self.root, self.parent, null, true)
+
+    // if it's not a child tag we can trigger its mount event
+    if (!self.parent || self.parent.isMounted) {
+      self.isMounted = true
+      self.trigger('mount')
+    }
+    // otherwise we need to wait that the parent event gets triggered
+    else self.parent.one('mount', function() {
+      // avoid to trigger the `mount` event for the tags
+      // not visible included in an if statement
+      if (!isInStub(self.root)) {
+        self.parent.isMounted = self.isMounted = true
+        self.trigger('mount')
+      }
+    })
+  })
+
+
+  defineProperty(this, 'unmount', function(keepRootTag) {
+    var el = root,
+      p = el.parentNode,
+      ptag,
+      tagIndex = __virtualDom.indexOf(self)
+
+    self.trigger('before-unmount')
+
+    // remove this tag instance from the global virtualDom variable
+    if (~tagIndex)
+      __virtualDom.splice(tagIndex, 1)
+
+    if (p) {
+
+      if (parent) {
+        ptag = getImmediateCustomParentTag(parent)
+        // remove this tag from the parent tags object
+        // if there are multiple nested tags with same name..
+        // remove this element form the array
+        if (isArray(ptag.tags[tagName]))
+          each(ptag.tags[tagName], function(tag, i) {
+            if (tag._riot_id == self._riot_id)
+              ptag.tags[tagName].splice(i, 1)
+          })
+        else
+          // otherwise just delete the tag instance
+          ptag.tags[tagName] = undefined
+      }
+
+      else
+        while (el.firstChild) el.removeChild(el.firstChild)
+
+      if (!keepRootTag)
+        p.removeChild(el)
+      else {
+        // the riot-tag and the data-is attributes aren't needed anymore, remove them
+        remAttr(p, RIOT_TAG_IS)
+        remAttr(p, RIOT_TAG) // this will be removed in riot 3.0.0
+      }
+
+    }
+
+    if (this._virts) {
+      each(this._virts, function(v) {
+        if (v.parentNode) v.parentNode.removeChild(v)
+      })
+    }
+
+    self.trigger('unmount')
+    toggle()
+    self.off('*')
+    self.isMounted = false
+    delete root._tag
+
+  })
+
+  // proxy function to bind updates
+  // dispatched from a parent tag
+  function onChildUpdate(data) { self.update(data, true) }
+
+  function toggle(isMount) {
+
+    // mount/unmount children
+    each(childTags, function(child) { child[isMount ? 'mount' : 'unmount']() })
+
+    // listen/unlisten parent (events flow one way from parent to children)
+    if (!parent) return
+    var evt = isMount ? 'on' : 'off'
+
+    // the loop tags will be always in sync with the parent automatically
+    if (isLoop)
+      parent[evt]('unmount', self.unmount)
+    else {
+      parent[evt]('update', onChildUpdate)[evt]('unmount', self.unmount)
+    }
+  }
+
+
+  // named elements available for fn
+  parseNamedElements(dom, this, childTags)
+
+}
+/**
+ * Attach an event to a DOM node
+ * @param { String } name - event name
+ * @param { Function } handler - event callback
+ * @param { Object } dom - dom node
+ * @param { Tag } tag - tag instance
+ */
+function setEventHandler(name, handler, dom, tag) {
+
+  dom[name] = function(e) {
+
+    var ptag = tag._parent,
+      item = tag._item,
+      el
+
+    if (!item)
+      while (ptag && !item) {
+        item = ptag._item
+        ptag = ptag._parent
+      }
+
+    // cross browser event fix
+    e = e || window.event
+
+    // override the event properties
+    if (isWritable(e, 'currentTarget')) e.currentTarget = dom
+    if (isWritable(e, 'target')) e.target = e.srcElement
+    if (isWritable(e, 'which')) e.which = e.charCode || e.keyCode
+
+    e.item = item
+
+    // prevent default behaviour (by default)
+    if (handler.call(tag, e) !== true && !/radio|check/.test(dom.type)) {
+      if (e.preventDefault) e.preventDefault()
+      e.returnValue = false
+    }
+
+    if (!e.preventUpdate) {
+      el = item ? getImmediateCustomParentTag(ptag) : tag
+      el.update()
+    }
+
+  }
+
+}
+
+
+/**
+ * Insert a DOM node replacing another one (used by if- attribute)
+ * @param   { Object } root - parent node
+ * @param   { Object } node - node replaced
+ * @param   { Object } before - node added
+ */
+function insertTo(root, node, before) {
+  if (!root) return
+  root.insertBefore(before, node)
+  root.removeChild(node)
+}
+
+/**
+ * Update the expressions in a Tag instance
+ * @param   { Array } expressions - expression that must be re evaluated
+ * @param   { Tag } tag - tag instance
+ */
+function update(expressions, tag) {
+
+  each(expressions, function(expr, i) {
+
+    var dom = expr.dom,
+      attrName = expr.attr,
+      value = tmpl(expr.expr, tag),
+      parent = expr.parent || expr.dom.parentNode
+
+    if (expr.bool) {
+      value = !!value
+    } else if (value == null) {
+      value = ''
+    }
+
+    // #1638: regression of #1612, update the dom only if the value of the
+    // expression was changed
+    if (expr.value === value) {
+      return
+    }
+    expr.value = value
+
+    // textarea and text nodes has no attribute name
+    if (!attrName) {
+      // about #815 w/o replace: the browser converts the value to a string,
+      // the comparison by "==" does too, but not in the server
+      value += ''
+      // test for parent avoids error with invalid assignment to nodeValue
+      if (parent) {
+        // cache the parent node because somehow it will become null on IE
+        // on the next iteration
+        expr.parent = parent
+        if (parent.tagName === 'TEXTAREA') {
+          parent.value = value                    // #1113
+          if (!IE_VERSION) dom.nodeValue = value  // #1625 IE throws here, nodeValue
+        }                                         // will be available on 'updated'
+        else dom.nodeValue = value
+      }
+      return
+    }
+
+    // ~~#1612: look for changes in dom.value when updating the value~~
+    if (attrName === 'value') {
+      if (dom.value !== value) {
+        dom.value = value
+        setAttr(dom, attrName, value)
+      }
+      return
+    } else {
+      // remove original attribute
+      remAttr(dom, attrName)
+    }
+
+    // event handler
+    if (isFunction(value)) {
+      setEventHandler(attrName, value, dom, tag)
+
+    // if- conditional
+    } else if (attrName == 'if') {
+      var stub = expr.stub,
+        add = function() { insertTo(stub.parentNode, stub, dom) },
+        remove = function() { insertTo(dom.parentNode, dom, stub) }
+
+      // add to DOM
+      if (value) {
+        if (stub) {
+          add()
+          dom.inStub = false
+          // avoid to trigger the mount event if the tags is not visible yet
+          // maybe we can optimize this avoiding to mount the tag at all
+          if (!isInStub(dom)) {
+            walk(dom, function(el) {
+              if (el._tag && !el._tag.isMounted)
+                el._tag.isMounted = !!el._tag.trigger('mount')
+            })
+          }
+        }
+      // remove from DOM
+      } else {
+        stub = expr.stub = stub || document.createTextNode('')
+        // if the parentNode is defined we can easily replace the tag
+        if (dom.parentNode)
+          remove()
+        // otherwise we need to wait the updated event
+        else (tag.parent || tag).one('updated', remove)
+
+        dom.inStub = true
+      }
+    // show / hide
+    } else if (attrName === 'show') {
+      dom.style.display = value ? '' : 'none'
+
+    } else if (attrName === 'hide') {
+      dom.style.display = value ? 'none' : ''
+
+    } else if (expr.bool) {
+      dom[attrName] = value
+      if (value) setAttr(dom, attrName, attrName)
+      if (FIREFOX && attrName === 'selected' && dom.tagName === 'OPTION') {
+        dom.__riot1374 = value   // #1374
+      }
+
+    } else if (value === 0 || value && typeof value !== T_OBJECT) {
+      // <img src="{ expr }">
+      if (startsWith(attrName, RIOT_PREFIX) && attrName != RIOT_TAG) {
+        attrName = attrName.slice(RIOT_PREFIX.length)
+      }
+      setAttr(dom, attrName, value)
+    }
+
+  })
+
+}
+/**
+ * Specialized function for looping an array-like collection with `each={}`
+ * @param   { Array } els - collection of items
+ * @param   {Function} fn - callback function
+ * @returns { Array } the array looped
+ */
+function each(els, fn) {
+  var len = els ? els.length : 0
+
+  for (var i = 0, el; i < len; i++) {
+    el = els[i]
+    // return false -> current item was removed by fn during the loop
+    if (el != null && fn(el, i) === false) i--
+  }
+  return els
+}
+
+/**
+ * Detect if the argument passed is a function
+ * @param   { * } v - whatever you want to pass to this function
+ * @returns { Boolean } -
+ */
+function isFunction(v) {
+  return typeof v === T_FUNCTION || false   // avoid IE problems
+}
+
+/**
+ * Get the outer html of any DOM node SVGs included
+ * @param   { Object } el - DOM node to parse
+ * @returns { String } el.outerHTML
+ */
+function getOuterHTML(el) {
+  if (el.outerHTML) return el.outerHTML
+  // some browsers do not support outerHTML on the SVGs tags
+  else {
+    var container = mkEl('div')
+    container.appendChild(el.cloneNode(true))
+    return container.innerHTML
+  }
+}
+
+/**
+ * Set the inner html of any DOM node SVGs included
+ * @param { Object } container - DOM node where we will inject the new html
+ * @param { String } html - html to inject
+ */
+function setInnerHTML(container, html) {
+  if (typeof container.innerHTML != T_UNDEF) container.innerHTML = html
+  // some browsers do not support innerHTML on the SVGs tags
+  else {
+    var doc = new DOMParser().parseFromString(html, 'application/xml')
+    container.appendChild(
+      container.ownerDocument.importNode(doc.documentElement, true)
+    )
+  }
+}
+
+/**
+ * Checks wether a DOM node must be considered part of an svg document
+ * @param   { String }  name - tag name
+ * @returns { Boolean } -
+ */
+function isSVGTag(name) {
+  return ~SVG_TAGS_LIST.indexOf(name)
+}
+
+/**
+ * Detect if the argument passed is an object, exclude null.
+ * NOTE: Use isObject(x) && !isArray(x) to excludes arrays.
+ * @param   { * } v - whatever you want to pass to this function
+ * @returns { Boolean } -
+ */
+function isObject(v) {
+  return v && typeof v === T_OBJECT         // typeof null is 'object'
+}
+
+/**
+ * Remove any DOM attribute from a node
+ * @param   { Object } dom - DOM node we want to update
+ * @param   { String } name - name of the property we want to remove
+ */
+function remAttr(dom, name) {
+  dom.removeAttribute(name)
+}
+
+/**
+ * Convert a string containing dashes to camel case
+ * @param   { String } string - input string
+ * @returns { String } my-string -> myString
+ */
+function toCamel(string) {
+  return string.replace(/-(\w)/g, function(_, c) {
+    return c.toUpperCase()
+  })
+}
+
+/**
+ * Get the value of any DOM attribute on a node
+ * @param   { Object } dom - DOM node we want to parse
+ * @param   { String } name - name of the attribute we want to get
+ * @returns { String | undefined } name of the node attribute whether it exists
+ */
+function getAttr(dom, name) {
+  return dom.getAttribute(name)
+}
+
+/**
+ * Set any DOM/SVG attribute
+ * @param { Object } dom - DOM node we want to update
+ * @param { String } name - name of the property we want to set
+ * @param { String } val - value of the property we want to set
+ */
+function setAttr(dom, name, val) {
+  var xlink = XLINK_REGEX.exec(name)
+  if (xlink && xlink[1])
+    dom.setAttributeNS(XLINK_NS, xlink[1], val)
+  else
+    dom.setAttribute(name, val)
+}
+
+/**
+ * Detect the tag implementation by a DOM node
+ * @param   { Object } dom - DOM node we need to parse to get its tag implementation
+ * @returns { Object } it returns an object containing the implementation of a custom tag (template and boot function)
+ */
+function getTag(dom) {
+  return dom.tagName && __tagImpl[getAttr(dom, RIOT_TAG_IS) ||
+    getAttr(dom, RIOT_TAG) || dom.tagName.toLowerCase()]
+}
+/**
+ * Add a child tag to its parent into the `tags` object
+ * @param   { Object } tag - child tag instance
+ * @param   { String } tagName - key where the new tag will be stored
+ * @param   { Object } parent - tag instance where the new child tag will be included
+ */
+function addChildTag(tag, tagName, parent) {
+  var cachedTag = parent.tags[tagName]
+
+  // if there are multiple children tags having the same name
+  if (cachedTag) {
+    // if the parent tags property is not yet an array
+    // create it adding the first cached tag
+    if (!isArray(cachedTag))
+      // don't add the same tag twice
+      if (cachedTag !== tag)
+        parent.tags[tagName] = [cachedTag]
+    // add the new nested tag to the array
+    if (!contains(parent.tags[tagName], tag))
+      parent.tags[tagName].push(tag)
+  } else {
+    parent.tags[tagName] = tag
+  }
+}
+
+/**
+ * Move the position of a custom tag in its parent tag
+ * @param   { Object } tag - child tag instance
+ * @param   { String } tagName - key where the tag was stored
+ * @param   { Number } newPos - index where the new tag will be stored
+ */
+function moveChildTag(tag, tagName, newPos) {
+  var parent = tag.parent,
+    tags
+  // no parent no move
+  if (!parent) return
+
+  tags = parent.tags[tagName]
+
+  if (isArray(tags))
+    tags.splice(newPos, 0, tags.splice(tags.indexOf(tag), 1)[0])
+  else addChildTag(tag, tagName, parent)
+}
+
+/**
+ * Create a new child tag including it correctly into its parent
+ * @param   { Object } child - child tag implementation
+ * @param   { Object } opts - tag options containing the DOM node where the tag will be mounted
+ * @param   { String } innerHTML - inner html of the child node
+ * @param   { Object } parent - instance of the parent tag including the child custom tag
+ * @returns { Object } instance of the new child tag just created
+ */
+function initChildTag(child, opts, innerHTML, parent) {
+  var tag = new Tag(child, opts, innerHTML),
+    tagName = getTagName(opts.root),
+    ptag = getImmediateCustomParentTag(parent)
+  // fix for the parent attribute in the looped elements
+  tag.parent = ptag
+  // store the real parent tag
+  // in some cases this could be different from the custom parent tag
+  // for example in nested loops
+  tag._parent = parent
+
+  // add this tag to the custom parent tag
+  addChildTag(tag, tagName, ptag)
+  // and also to the real parent tag
+  if (ptag !== parent)
+    addChildTag(tag, tagName, parent)
+  // empty the child node once we got its template
+  // to avoid that its children get compiled multiple times
+  opts.root.innerHTML = ''
+
+  return tag
+}
+
+/**
+ * Loop backward all the parents tree to detect the first custom parent tag
+ * @param   { Object } tag - a Tag instance
+ * @returns { Object } the instance of the first custom parent tag found
+ */
+function getImmediateCustomParentTag(tag) {
+  var ptag = tag
+  while (!getTag(ptag.root)) {
+    if (!ptag.parent) break
+    ptag = ptag.parent
+  }
+  return ptag
+}
+
+/**
+ * Helper function to set an immutable property
+ * @param   { Object } el - object where the new property will be set
+ * @param   { String } key - object key where the new property will be stored
+ * @param   { * } value - value of the new property
+* @param   { Object } options - set the propery overriding the default options
+ * @returns { Object } - the initial object
+ */
+function defineProperty(el, key, value, options) {
+  Object.defineProperty(el, key, extend({
+    value: value,
+    enumerable: false,
+    writable: false,
+    configurable: true
+  }, options))
+  return el
+}
+
+/**
+ * Get the tag name of any DOM node
+ * @param   { Object } dom - DOM node we want to parse
+ * @returns { String } name to identify this dom node in riot
+ */
+function getTagName(dom) {
+  var child = getTag(dom),
+    namedTag = getAttr(dom, 'name'),
+    tagName = namedTag && !tmpl.hasExpr(namedTag) ?
+                namedTag :
+              child ? child.name : dom.tagName.toLowerCase()
+
+  return tagName
+}
+
+/**
+ * Extend any object with other properties
+ * @param   { Object } src - source object
+ * @returns { Object } the resulting extended object
+ *
+ * var obj = { foo: 'baz' }
+ * extend(obj, {bar: 'bar', foo: 'bar'})
+ * console.log(obj) => {bar: 'bar', foo: 'bar'}
+ *
+ */
+function extend(src) {
+  var obj, args = arguments
+  for (var i = 1; i < args.length; ++i) {
+    if (obj = args[i]) {
+      for (var key in obj) {
+        // check if this property of the source object could be overridden
+        if (isWritable(src, key))
+          src[key] = obj[key]
+      }
+    }
+  }
+  return src
+}
+
+/**
+ * Check whether an array contains an item
+ * @param   { Array } arr - target array
+ * @param   { * } item - item to test
+ * @returns { Boolean } Does 'arr' contain 'item'?
+ */
+function contains(arr, item) {
+  return ~arr.indexOf(item)
+}
+
+/**
+ * Check whether an object is a kind of array
+ * @param   { * } a - anything
+ * @returns {Boolean} is 'a' an array?
+ */
+function isArray(a) { return Array.isArray(a) || a instanceof Array }
+
+/**
+ * Detect whether a property of an object could be overridden
+ * @param   { Object }  obj - source object
+ * @param   { String }  key - object property
+ * @returns { Boolean } is this property writable?
+ */
+function isWritable(obj, key) {
+  var props = Object.getOwnPropertyDescriptor(obj, key)
+  return typeof obj[key] === T_UNDEF || props && props.writable
+}
+
+
+/**
+ * With this function we avoid that the internal Tag methods get overridden
+ * @param   { Object } data - options we want to use to extend the tag instance
+ * @returns { Object } clean object without containing the riot internal reserved words
+ */
+function cleanUpData(data) {
+  if (!(data instanceof Tag) && !(data && typeof data.trigger == T_FUNCTION))
+    return data
+
+  var o = {}
+  for (var key in data) {
+    if (!RESERVED_WORDS_BLACKLIST.test(key)) o[key] = data[key]
+  }
+  return o
+}
+
+/**
+ * Walk down recursively all the children tags starting dom node
+ * @param   { Object }   dom - starting node where we will start the recursion
+ * @param   { Function } fn - callback to transform the child node just found
+ */
+function walk(dom, fn) {
+  if (dom) {
+    // stop the recursion
+    if (fn(dom) === false) return
+    else {
+      dom = dom.firstChild
+
+      while (dom) {
+        walk(dom, fn)
+        dom = dom.nextSibling
+      }
+    }
+  }
+}
+
+/**
+ * Minimize risk: only zero or one _space_ between attr & value
+ * @param   { String }   html - html string we want to parse
+ * @param   { Function } fn - callback function to apply on any attribute found
+ */
+function walkAttributes(html, fn) {
+  var m,
+    re = /([-\w]+) ?= ?(?:"([^"]*)|'([^']*)|({[^}]*}))/g
+
+  while (m = re.exec(html)) {
+    fn(m[1].toLowerCase(), m[2] || m[3] || m[4])
+  }
+}
+
+/**
+ * Check whether a DOM node is in stub mode, useful for the riot 'if' directive
+ * @param   { Object }  dom - DOM node we want to parse
+ * @returns { Boolean } -
+ */
+function isInStub(dom) {
+  while (dom) {
+    if (dom.inStub) return true
+    dom = dom.parentNode
+  }
+  return false
+}
+
+/**
+ * Create a generic DOM node
+ * @param   { String } name - name of the DOM node we want to create
+ * @param   { Boolean } isSvg - should we use a SVG as parent node?
+ * @returns { Object } DOM node just created
+ */
+function mkEl(name, isSvg) {
+  return isSvg ?
+    document.createElementNS('http://www.w3.org/2000/svg', 'svg') :
+    document.createElement(name)
+}
+
+/**
+ * Shorter and fast way to select multiple nodes in the DOM
+ * @param   { String } selector - DOM selector
+ * @param   { Object } ctx - DOM node where the targets of our search will is located
+ * @returns { Object } dom nodes found
+ */
+function $$(selector, ctx) {
+  return (ctx || document).querySelectorAll(selector)
+}
+
+/**
+ * Shorter and fast way to select a single node in the DOM
+ * @param   { String } selector - unique dom selector
+ * @param   { Object } ctx - DOM node where the target of our search will is located
+ * @returns { Object } dom node found
+ */
+function $(selector, ctx) {
+  return (ctx || document).querySelector(selector)
+}
+
+/**
+ * Simple object prototypal inheritance
+ * @param   { Object } parent - parent object
+ * @returns { Object } child instance
+ */
+function inherit(parent) {
+  return Object.create(parent || null)
+}
+
+/**
+ * Get the name property needed to identify a DOM node in riot
+ * @param   { Object } dom - DOM node we need to parse
+ * @returns { String | undefined } give us back a string to identify this dom node
+ */
+function getNamedKey(dom) {
+  return getAttr(dom, 'id') || getAttr(dom, 'name')
+}
+
+/**
+ * Set the named properties of a tag element
+ * @param { Object } dom - DOM node we need to parse
+ * @param { Object } parent - tag instance where the named dom element will be eventually added
+ * @param { Array } keys - list of all the tag instance properties
+ */
+function setNamed(dom, parent, keys) {
+  // get the key value we want to add to the tag instance
+  var key = getNamedKey(dom),
+    isArr,
+    // add the node detected to a tag instance using the named property
+    add = function(value) {
+      // avoid to override the tag properties already set
+      if (contains(keys, key)) return
+      // check whether this value is an array
+      isArr = isArray(value)
+      // if the key was never set
+      if (!value)
+        // set it once on the tag instance
+        parent[key] = dom
+      // if it was an array and not yet set
+      else if (!isArr || isArr && !contains(value, dom)) {
+        // add the dom node into the array
+        if (isArr)
+          value.push(dom)
+        else
+          parent[key] = [value, dom]
+      }
+    }
+
+  // skip the elements with no named properties
+  if (!key) return
+
+  // check whether this key has been already evaluated
+  if (tmpl.hasExpr(key))
+    // wait the first updated event only once
+    parent.one('mount', function() {
+      key = getNamedKey(dom)
+      add(parent[key])
+    })
+  else
+    add(parent[key])
+
+}
+
+/**
+ * Faster String startsWith alternative
+ * @param   { String } src - source string
+ * @param   { String } str - test string
+ * @returns { Boolean } -
+ */
+function startsWith(src, str) {
+  return src.slice(0, str.length) === str
+}
+
+/**
+ * requestAnimationFrame function
+ * Adapted from https://gist.github.com/paulirish/1579671, license MIT
+ */
+var rAF = (function (w) {
+  var raf = w.requestAnimationFrame    ||
+            w.mozRequestAnimationFrame || w.webkitRequestAnimationFrame
+
+  if (!raf || /iP(ad|hone|od).*OS 6/.test(w.navigator.userAgent)) {  // buggy iOS6
+    var lastTime = 0
+
+    raf = function (cb) {
+      var nowtime = Date.now(), timeout = Math.max(16 - (nowtime - lastTime), 0)
+      setTimeout(function () { cb(lastTime = nowtime + timeout) }, timeout)
+    }
+  }
+  return raf
+
+})(window || {})
+
+/**
+ * Mount a tag creating new Tag instance
+ * @param   { Object } root - dom node where the tag will be mounted
+ * @param   { String } tagName - name of the riot tag we want to mount
+ * @param   { Object } opts - options to pass to the Tag instance
+ * @returns { Tag } a new Tag instance
+ */
+function mountTo(root, tagName, opts) {
+  var tag = __tagImpl[tagName],
+    // cache the inner HTML to fix #855
+    innerHTML = root._innerHTML = root._innerHTML || root.innerHTML
+
+  // clear the inner html
+  root.innerHTML = ''
+
+  if (tag && root) tag = new Tag(tag, { root: root, opts: opts }, innerHTML)
+
+  if (tag && tag.mount) {
+    tag.mount()
+    // add this tag to the virtualDom variable
+    if (!contains(__virtualDom, tag)) __virtualDom.push(tag)
+  }
+
+  return tag
+}
+/**
+ * Riot public api
+ */
+
+// share methods for other riot parts, e.g. compiler
+riot.util = { brackets: brackets, tmpl: tmpl }
+
+/**
+ * Create a mixin that could be globally shared across all the tags
+ */
+riot.mixin = (function() {
+  var mixins = {},
+    globals = mixins[GLOBAL_MIXIN] = {},
+    _id = 0
+
+  /**
+   * Create/Return a mixin by its name
+   * @param   { String }  name - mixin name (global mixin if object)
+   * @param   { Object }  mixin - mixin logic
+   * @param   { Boolean } g - is global?
+   * @returns { Object }  the mixin logic
+   */
+  return function(name, mixin, g) {
+    // Unnamed global
+    if (isObject(name)) {
+      riot.mixin('__unnamed_'+_id++, name, true)
+      return
+    }
+
+    var store = g ? globals : mixins
+
+    // Getter
+    if (!mixin) {
+      if (typeof store[name] === T_UNDEF) {
+        throw new Error('Unregistered mixin: ' + name)
+      }
+      return store[name]
+    }
+    // Setter
+    if (isFunction(mixin)) {
+      extend(mixin.prototype, store[name] || {})
+      store[name] = mixin
+    }
+    else {
+      store[name] = extend(store[name] || {}, mixin)
+    }
+  }
+
+})()
+
+/**
+ * Create a new riot tag implementation
+ * @param   { String }   name - name/id of the new riot tag
+ * @param   { String }   html - tag template
+ * @param   { String }   css - custom tag css
+ * @param   { String }   attrs - root tag attributes
+ * @param   { Function } fn - user function
+ * @returns { String } name/id of the tag just created
+ */
+riot.tag = function(name, html, css, attrs, fn) {
+  if (isFunction(attrs)) {
+    fn = attrs
+    if (/^[\w\-]+\s?=/.test(css)) {
+      attrs = css
+      css = ''
+    } else attrs = ''
+  }
+  if (css) {
+    if (isFunction(css)) fn = css
+    else styleManager.add(css)
+  }
+  name = name.toLowerCase()
+  __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
+  return name
+}
+
+/**
+ * Create a new riot tag implementation (for use by the compiler)
+ * @param   { String }   name - name/id of the new riot tag
+ * @param   { String }   html - tag template
+ * @param   { String }   css - custom tag css
+ * @param   { String }   attrs - root tag attributes
+ * @param   { Function } fn - user function
+ * @returns { String } name/id of the tag just created
+ */
+riot.tag2 = function(name, html, css, attrs, fn) {
+  if (css) styleManager.add(css)
+  //if (bpair) riot.settings.brackets = bpair
+  __tagImpl[name] = { name: name, tmpl: html, attrs: attrs, fn: fn }
+  return name
+}
+
+/**
+ * Mount a tag using a specific tag implementation
+ * @param   { String } selector - tag DOM selector
+ * @param   { String } tagName - tag implementation name
+ * @param   { Object } opts - tag logic
+ * @returns { Array } new tags instances
+ */
+riot.mount = function(selector, tagName, opts) {
+
+  var els,
+    allTags,
+    tags = []
+
+  // helper functions
+
+  function addRiotTags(arr) {
+    var list = ''
+    each(arr, function (e) {
+      if (!/[^-\w]/.test(e)) {
+        e = e.trim().toLowerCase()
+        list += ',[' + RIOT_TAG_IS + '="' + e + '"],[' + RIOT_TAG + '="' + e + '"]'
+      }
+    })
+    return list
+  }
+
+  function selectAllTags() {
+    var keys = Object.keys(__tagImpl)
+    return keys + addRiotTags(keys)
+  }
+
+  function pushTags(root) {
+    if (root.tagName) {
+      var riotTag = getAttr(root, RIOT_TAG_IS) || getAttr(root, RIOT_TAG)
+
+      // have tagName? force riot-tag to be the same
+      if (tagName && riotTag !== tagName) {
+        riotTag = tagName
+        setAttr(root, RIOT_TAG_IS, tagName)
+        setAttr(root, RIOT_TAG, tagName) // this will be removed in riot 3.0.0
+      }
+      var tag = mountTo(root, riotTag || root.tagName.toLowerCase(), opts)
+
+      if (tag) tags.push(tag)
+    } else if (root.length) {
+      each(root, pushTags)   // assume nodeList
+    }
+  }
+
+  // ----- mount code -----
+
+  // inject styles into DOM
+  styleManager.inject()
+
+  if (isObject(tagName)) {
+    opts = tagName
+    tagName = 0
+  }
+
+  // crawl the DOM to find the tag
+  if (typeof selector === T_STRING) {
+    if (selector === '*')
+      // select all the tags registered
+      // and also the tags found with the riot-tag attribute set
+      selector = allTags = selectAllTags()
+    else
+      // or just the ones named like the selector
+      selector += addRiotTags(selector.split(/, */))
+
+    // make sure to pass always a selector
+    // to the querySelectorAll function
+    els = selector ? $$(selector) : []
+  }
+  else
+    // probably you have passed already a tag or a NodeList
+    els = selector
+
+  // select all the registered and mount them inside their root elements
+  if (tagName === '*') {
+    // get all custom tags
+    tagName = allTags || selectAllTags()
+    // if the root els it's just a single tag
+    if (els.tagName)
+      els = $$(tagName, els)
+    else {
+      // select all the children for all the different root elements
+      var nodeList = []
+      each(els, function (_el) {
+        nodeList.push($$(tagName, _el))
+      })
+      els = nodeList
+    }
+    // get rid of the tagName
+    tagName = 0
+  }
+
+  pushTags(els)
+
+  return tags
+}
+
+/**
+ * Update all the tags instances created
+ * @returns { Array } all the tags instances
+ */
+riot.update = function() {
+  return each(__virtualDom, function(tag) {
+    tag.update()
+  })
+}
+
+/**
+ * Export the Virtual DOM
+ */
+riot.vdom = __virtualDom
+
+/**
+ * Export the Tag constructor
+ */
+riot.Tag = Tag
+  // support CommonJS, AMD & browser
+  /* istanbul ignore next */
+  if (typeof exports === T_OBJECT)
+    module.exports = riot
+  else if (typeof define === T_FUNCTION && typeof define.amd !== T_UNDEF)
+    define(function() { return riot })
+  else
+    window.riot = riot
+
+})(typeof window != 'undefined' ? window : void 0);
+
+},{}],34:[function(require,module,exports){
+arguments[4][33][0].apply(exports,arguments)
+},{"dup":33}],35:[function(require,module,exports){
+'use strict';
+module.exports = function (str) {
+	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+	});
+};
+
+},{}],36:[function(require,module,exports){
+module.exports = function denodeify(fn) {
+	return function() {
+		var self = this
+		var args = Array.prototype.slice.call(arguments)
+		return new Promise(function(resolve, reject) {
+			args.push(function(err, res) {
+				if (err) {
+					reject(err)
+				} else {
+					resolve(res)
+				}
+			})
+
+			var res = fn.apply(self, args)
+
+			var isPromise = res
+				&& (typeof res === 'object' || typeof res === 'function')
+				&& typeof res.then === 'function'
+
+			if (isPromise) {
+				resolve(res)
+			}
+		})
+	}
+}
+
+},{}],37:[function(require,module,exports){
+(function (setImmediate,clearImmediate){
+var nextTick = require('process/browser.js').nextTick;
+var apply = Function.prototype.apply;
+var slice = Array.prototype.slice;
+var immediateIds = {};
+var nextImmediateId = 0;
+
+// DOM APIs, for completeness
+
+exports.setTimeout = function() {
+  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+};
+exports.setInterval = function() {
+  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+};
+exports.clearTimeout =
+exports.clearInterval = function(timeout) { timeout.close(); };
+
+function Timeout(id, clearFn) {
+  this._id = id;
+  this._clearFn = clearFn;
+}
+Timeout.prototype.unref = Timeout.prototype.ref = function() {};
+Timeout.prototype.close = function() {
+  this._clearFn.call(window, this._id);
+};
+
+// Does not start the time, just sets up the members needed.
+exports.enroll = function(item, msecs) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = msecs;
+};
+
+exports.unenroll = function(item) {
+  clearTimeout(item._idleTimeoutId);
+  item._idleTimeout = -1;
+};
+
+exports._unrefActive = exports.active = function(item) {
+  clearTimeout(item._idleTimeoutId);
+
+  var msecs = item._idleTimeout;
+  if (msecs >= 0) {
+    item._idleTimeoutId = setTimeout(function onTimeout() {
+      if (item._onTimeout)
+        item._onTimeout();
+    }, msecs);
+  }
+};
+
+// That's not how node.js implements it but the exposed api is the same.
+exports.setImmediate = typeof setImmediate === "function" ? setImmediate : function(fn) {
+  var id = nextImmediateId++;
+  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+
+  immediateIds[id] = true;
+
+  nextTick(function onNextTick() {
+    if (immediateIds[id]) {
+      // fn.call() is faster so we optimize for the common use-case
+      // @see http://jsperf.com/call-apply-segu
+      if (args) {
+        fn.apply(null, args);
+      } else {
+        fn.call(null);
+      }
+      // Prevent ids from leaking
+      exports.clearImmediate(id);
+    }
+  });
+
+  return id;
+};
+
+exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
+  delete immediateIds[id];
+};
+}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
+},{"process/browser.js":38,"timers":37}],38:[function(require,module,exports){
+arguments[4][17][0].apply(exports,arguments)
+},{"dup":17}],39:[function(require,module,exports){
+module.exports = extend
+
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
+function extend() {
+    var target = {}
+
+    for (var i = 0; i < arguments.length; i++) {
+        var source = arguments[i]
+
+        for (var key in source) {
+            if (hasOwnProperty.call(source, key)) {
+                target[key] = source[key]
+            }
+        }
+    }
+
+    return target
+}
+
+},{}]},{},[11]);
