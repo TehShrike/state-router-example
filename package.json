@@ -7,17 +7,17 @@
     "test": "echo \"Error: no test specified\" && exit 0",
     "build": "npm run build:riot && npm run build:ractive && npm run build:ractive-redux && npm run build:virtualdom && npm run build:ko && npm run build:svelte",
     "watch:riot": "watchify -t riotify -d implementations/riot/index.js -o implementations/riot/bundle.js",
-    "build:riot": "browserify -t riotify implementations/riot/index.js | uglifyjs - -mc -o implementations/riot/bundle.js",
+    "build:riot": "browserify -t riotify implementations/riot/index.js -o implementations/riot/bundle.js",
     "watch:ractive": "watchify -t brfs -d implementations/ractive/index.js -o implementations/ractive/bundle.js",
-    "build:ractive": "browserify -t brfs implementations/ractive/index.js | uglifyjs - -mc -o implementations/ractive/bundle.js",
+    "build:ractive": "browserify -t brfs implementations/ractive/index.js -o implementations/ractive/bundle.js",
     "watch:ractive-redux": "watchify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs -d implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
-    "build:ractive-redux": "browserify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs implementations/ractive-redux/index.js | uglifyjs - -mc -o implementations/ractive-redux/bundle.js",
+    "build:ractive-redux": "browserify -t [ babelify --presets [ es2015 ] --plugins [ transform-object-rest-spread ] ] -t brfs implementations/ractive-redux/index.js -o implementations/ractive-redux/bundle.js",
     "watch:virtualdom": "watchify -d implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
-    "build:virtualdom": "browserify implementations/virtualdom/index.js | uglifyjs - -mc -o implementations/virtualdom/bundle.js",
+    "build:virtualdom": "browserify implementations/virtualdom/index.js -o implementations/virtualdom/bundle.js",
     "watch:ko": "watchify -t brfs -d implementations/knockout/index.js -o implementations/knockout/bundle.js",
-    "build:ko": "browserify -t brfs implementations/knockout/index.js | uglifyjs - -mc -o implementations/knockout/bundle.js",
-    "watch:svelte": "watchify -t sveltify -t [ babelify --presets [ es2015 ] --extensions .js,.html ] -d implementations/svelte/index.js -o implementations/svelte/bundle.js",
-    "build:svelte": "browserify -t sveltify -t [ babelify --presets [ es2015 ] --extensions .js,.html ] implementations/svelte/index.js | uglifyjs - -mc -o implementations/svelte/bundle.js"
+    "build:ko": "browserify -t brfs implementations/knockout/index.js -o implementations/knockout/bundle.js",
+    "watch:svelte": "watchify -t sveltify -d implementations/svelte/index.js -o implementations/svelte/bundle.js",
+    "build:svelte": "browserify -t sveltify implementations/svelte/index.js -o implementations/svelte/bundle.js"
   },
   "repository": {
     "type": "git",
@@ -30,14 +30,15 @@
   },
   "homepage": "https://github.com/TehShrike/state-router-example",
   "dependencies": {
-    "abstract-state-router": "6.0.4",
+    "abstract-state-router": "^6.1.0",
     "array.prototype.findindex": "^1.0.0",
     "async-all": "1.0.1",
     "async-each": "0.1.6",
     "dom-value": "0.0.0",
     "domready": "^1.0.8",
-    "knockout": "^3.3.0",
+    "knockout": "^3.5.0",
     "knockout-state-renderer": "^1.0.0",
+    "map-obj": "^3.1.0",
     "ractive": "0.8.7",
     "ractive-state-router": "~7.0.0",
     "random-uuid-v4": "0.0.5",
@@ -51,18 +52,18 @@
     "rollup-plugin-svelte": "5.0.3",
     "state-router-redux-ractive": "~2.0.0",
     "svelte": "3.0.0",
-    "svelte-state-renderer": "2.0.0",
-    "virtualdom-state-renderer": "1.0.0"
+    "svelte-state-renderer": "file:../svelte-state-renderer",
+    "virtualdom-state-renderer": "1.0.0",
+    "warg": "^1.2.2"
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "6.3.13",
     "babel-preset-es2015": "6.24.1",
     "babelify": "7.2.0",
-    "brfs": "^1.4.0",
-    "browserify": "16.2.3",
+    "brfs": "^1.6.1",
+    "browserify": "^16.2.3",
     "riotify": "^0.1.0",
     "sveltify": "3.0.0",
-    "uglify-js": "2.7.5",
-    "watchify": "3.11.1"
+    "watchify": "^3.11.1"
   }
 }
